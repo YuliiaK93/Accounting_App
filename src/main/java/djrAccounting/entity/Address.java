@@ -11,10 +11,15 @@ import javax.persistence.Table;
 @Getter
 @Setter
 @Entity
-@Table(name = "roles")
+@Table(name = "addresses")
 @Where(clause = "is_deleted = false")
 @NoArgsConstructor
-public class Role extends BaseEntity {
+public class Address extends BaseEntity {
 
-    private String description;
+    private String addressLine1;
+    private String addressLine2;
+    private String city;
+    private String state;
+    private String country;
+    private String zipCode;
 }
