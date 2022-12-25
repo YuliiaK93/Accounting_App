@@ -20,8 +20,10 @@ public class Company extends BaseEntity {
     private String title;
     private String phone;
     private String website;
+
     @Enumerated(EnumType.STRING)
     private CompanyStatus companyStatus;
+
     @OneToOne
     @JoinColumn(name = "address_id")
     private Address address;
