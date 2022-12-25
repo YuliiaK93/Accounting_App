@@ -18,20 +18,20 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class Invoice extends BaseEntity {
 
-    String invoiceNo;
+    private String invoiceNo;
 
     @Enumerated(EnumType.STRING)
-    InvoiceStatus invoiceStatus;
+    private InvoiceStatus invoiceStatus;
 
     @Enumerated(EnumType.STRING)
-    InvoiceType invoiceType;
-    LocalDate date;
+    private InvoiceType invoiceType;
+    private LocalDate date;
 
     @ManyToOne
     @JoinColumn(name = "client_vendor_id")
-    ClientVendor clientVendor;
+    private ClientVendor clientVendor;
 
     @ManyToOne
     @JoinColumn(name = "company_id")
-    Company company;
+    private Company company;
 }
