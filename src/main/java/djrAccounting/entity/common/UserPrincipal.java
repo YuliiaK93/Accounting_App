@@ -1,6 +1,7 @@
 package djrAccounting.entity.common;
 
 import djrAccounting.entity.User;
+import djrAccounting.enums.CompanyStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -45,7 +46,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !user.getCompany().getCompanyStatus().equals(CompanyStatus.PASSIVE);
     }
 
     @Override
