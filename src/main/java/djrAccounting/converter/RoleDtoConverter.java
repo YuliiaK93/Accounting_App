@@ -20,7 +20,7 @@ public class RoleDtoConverter implements Converter<String, RoleDto> {
     @Override
     public RoleDto convert(String source) {
 
-        if (source.isBlank()) {
+        if (source == null || source.isBlank()) {
             return null;
         }
 
