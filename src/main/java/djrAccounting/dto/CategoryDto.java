@@ -12,6 +12,8 @@ import javax.validation.constraints.Size;
 @Data
 public class CategoryDto {
 
+    private Long id;
+
     @NotBlank(message = "Required field")
     @Size(min = 2, max = 50, message = "Size should be between 2 and 50")
     private String description;
