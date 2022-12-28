@@ -7,15 +7,18 @@ import djrAccounting.repository.InvoiceRepository;
 import djrAccounting.service.InvoiceService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import djrAccounting.dto.InvoiceDto;
+import djrAccounting.mapper.MapperUtil;
+import djrAccounting.repository.InvoiceRepository;
+import djrAccounting.service.InvoiceService;
+import org.springframework.stereotype.Service;
 
 @Service
 public class InvoiceServiceImpl implements InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
-
     private final MapperUtil mapper;
 
     public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapper) {
@@ -32,5 +35,8 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .stream()
                 .map(invoice -> mapper.convert(invoice, InvoiceDto.class))
                 .collect(Collectors.toList());
+
+    public InvoiceDto findById(Long id) {
+        return mapper.convert(invoiceRepository.findById(id).orElseThrow(), InvoiceDto.class);
     }
 }
