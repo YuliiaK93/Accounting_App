@@ -30,8 +30,8 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
         return invoiceProductRepository.findByInvoice_InvoiceNo(invoiceNo)
                 .stream()
-                .map(invoiceProduct -> invoiceProduct.getPrice()
-                        .multiply(BigDecimal.valueOf(invoiceProduct.getTax() / 100)))
+                .map(invoiceProduct -> invoiceProduct.getPrice().add(invoiceProduct.getPrice()
+                        .multiply(BigDecimal.valueOf(invoiceProduct.getTax() / 100))))
                 .reduce(BigDecimal::add).orElseThrow();
     }
 }
