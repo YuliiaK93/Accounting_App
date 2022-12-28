@@ -10,12 +10,8 @@ import javax.transaction.Transactional;
 public interface UserRepository extends JpaRepository<User, Long> {
 
 
-   User findByUserId(String username);
-
     User findByUsername(String username);
 
-    @Transactional
-    void deleteUserName(String username);
 
 
 }
