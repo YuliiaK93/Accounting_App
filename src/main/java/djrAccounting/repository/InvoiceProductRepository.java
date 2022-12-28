@@ -1,4 +1,4 @@
-package djrAccounting.service.implementation;
+package djrAccounting.repository;
 
 import djrAccounting.entity.InvoiceProduct;
 import org.springframework.data.jpa.repository.JpaRepository;

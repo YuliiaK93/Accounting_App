@@ -1,6 +1,7 @@
 package djrAccounting.service.implementation;
 
 import djrAccounting.entity.InvoiceProduct;
+import djrAccounting.repository.InvoiceProductRepository;
 import djrAccounting.service.InvoiceProductService;
 import org.springframework.stereotype.Service;
 
