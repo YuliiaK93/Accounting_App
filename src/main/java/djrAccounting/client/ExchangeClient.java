@@ -1,6 +1,7 @@
 package djrAccounting.client;
 
-import djrAccounting.dto.ExchangeRatesDto;
+import djrAccounting.dto.currency.ExchangeDto;
+import djrAccounting.dto.currency.UsdDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -8,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public interface ExchangeClient {
 
     @GetMapping
-    ExchangeRatesDto getExchangeRates();
+    ExchangeDto getExchangeRates();
 
 
 

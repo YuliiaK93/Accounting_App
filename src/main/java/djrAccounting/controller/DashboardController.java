@@ -20,7 +20,7 @@ public class DashboardController {
     @GetMapping
     public String showEuroRate(Model model) {
         model.addAttribute("exchangeRates", exchange.getExchangeRates());
-        System.out.println(exchange.getExchangeRates().toString());
+
         return "dashboard";
     }
 

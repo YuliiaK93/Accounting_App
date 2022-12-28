@@ -1,7 +1,7 @@
 package djrAccounting.service.implementation;
 
 import djrAccounting.client.ExchangeClient;
-import djrAccounting.dto.ExchangeRatesDto;
+import djrAccounting.dto.currency.UsdDto;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,7 +13,8 @@ public class ExchangeImpl {
         this.exchangeClient = exchangeClient;
     }
 
-    public ExchangeRatesDto getExchangeRates() {
-        return exchangeClient.getExchangeRates();
+    public UsdDto getExchangeRates() {
+
+        return exchangeClient.getExchangeRates().getUsdDto();
     }
 }
