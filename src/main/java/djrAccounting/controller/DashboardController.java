@@ -21,15 +21,9 @@ public class DashboardController {
 
 
     @GetMapping
-    public String showEuroRate(Model model) {
+    public String dashboard(Model model) {
+
         model.addAttribute("exchangeRates", exchange.getExchangeRates());
-
-        return "dashboard";
-    }
-
-    @GetMapping
-    public String lastTransactions(Model model) {
-
         model.addAttribute("invoices", invoiceService.getLast3ApprovedInvoicesForCurrentUserCompany());
 
         return "dashboard";
