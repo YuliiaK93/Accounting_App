@@ -32,6 +32,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public InvoiceDto findById(Long id) {
         return mapper.convert(invoiceRepository.findById(id).orElseThrow(), InvoiceDto.class);
     }
