@@ -28,7 +28,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         return invoiceRepository.getLast3ApprovedInvoicesByCompany(((UserPrincipal) SecurityContextHolder.getContext()
                         .getAuthentication()
-                        .getDetails()).getCompanyTitleForProfile())
+                        .getPrincipal()).getCompanyTitleForProfile())
                 .stream()
                 .map(invoice -> mapper.convert(invoice, InvoiceDto.class))
                 .collect(Collectors.toList());
