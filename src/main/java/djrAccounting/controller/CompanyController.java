@@ -1,6 +1,5 @@
 package djrAccounting.controller;
 
-import djrAccounting.bootstrap.StaticConstants;
 import djrAccounting.dto.CompanyDto;
 import djrAccounting.service.CompanyService;
 import org.springframework.stereotype.Controller;
@@ -29,7 +28,6 @@ public class CompanyController {
     public String createCompany(Model model) {
 
         model.addAttribute("newCompany", new CompanyDto());
-        model.addAttribute("countries", StaticConstants.COUNTRY_LIST);
 
         return "company/company-create";
     }
