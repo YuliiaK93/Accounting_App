@@ -10,4 +10,7 @@ public interface CompanyService {
 
     List<CompanyDto> listAllCompanies();
 
+    void activateCompanyStatus(Long id);
+
+    void save(CompanyDto companyDto);
 }
