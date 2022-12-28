@@ -28,9 +28,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public List<InvoiceDto> getLast3ApprovedInvoicesForCurrentUserCompany() {
 
-        List<InvoiceDto> invoiceDtoList = invoiceRepository.getLast3ApprovedInvoicesByCompany(((UserPrincipal) SecurityContextHolder.getContext()
-                        .getAuthentication()
-                        .getPrincipal()).getCompanyTitleForProfile())
+        List<InvoiceDto> invoiceDtoList = invoiceRepository.getLast3ApprovedInvoicesByCompany(getCurrentCompanyTitle())
                 .stream()
                 .map(invoice -> mapper.convert(invoice, InvoiceDto.class))
                 .collect(Collectors.toList());
@@ -47,5 +45,12 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public InvoiceDto findById(Long id) {
         return mapper.convert(invoiceRepository.findById(id).orElseThrow(), InvoiceDto.class);
+    }
+
+    private String getCurrentCompanyTitle() {
+
+        return ((UserPrincipal) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal()).getCompanyTitleForProfile();
     }
 }

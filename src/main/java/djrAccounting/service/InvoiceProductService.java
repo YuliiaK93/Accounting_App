@@ -6,4 +6,8 @@ public interface InvoiceProductService {
     BigDecimal getTotalPriceByInvoice(String invoiceNo);
 
     BigDecimal getTotalPriceWithTaxByInvoice(String invoiceNo);
+
+    BigDecimal getTotalCostForCurrentCompany();
+
+    BigDecimal getTotalSalesForCurrentCompany();
 }
