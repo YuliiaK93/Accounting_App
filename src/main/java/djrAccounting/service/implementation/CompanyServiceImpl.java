@@ -31,18 +31,26 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public List<CompanyDto> listAllCompanies() {
-        List<CompanyDto> companyDtoList = companyRepository.findAll(Sort.by("title")).stream()
+
+        return companyRepository.findAll(Sort.by("title")).stream()
                 .filter(company -> company.getId() != 1)
                 .map(company -> mapper.convert(company, new CompanyDto()))
+                .sorted(Comparator.comparing(CompanyDto::getCompanyStatus))
                 .collect(Collectors.toList());
 
-        return companyDtoList;
     }
 
     @Override
     public void activateCompanyStatus(Long id) {
         Company company = mapper.convert(findById(id), Company.class);
         company.setCompanyStatus(CompanyStatus.ACTIVE);
+        companyRepository.save(company);
+    }
+
+    @Override
+    public void deactivateCompanyStatus(Long id) {
+        Company company = mapper.convert(findById(id), Company.class);
+        company.setCompanyStatus(CompanyStatus.PASSIVE);
         companyRepository.save(company);
     }
 
