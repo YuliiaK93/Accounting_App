@@ -42,7 +42,7 @@ public class CompanyController {
                                 BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
-            return "/company/company-create";
+            return "company/company-create";
         }
 
         if (companyService.isTitleExist(company.getTitle())) {
