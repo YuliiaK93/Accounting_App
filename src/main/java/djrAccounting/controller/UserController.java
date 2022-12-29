@@ -25,7 +25,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/create")
+    @GetMapping("/user-create")
     public String createUser(Model model){
 
         model.addAttribute("user", new UserDto());
@@ -33,21 +33,21 @@ public class UserController {
         model.addAttribute("roles", roleService.findById(1L));
         model.addAttribute("users", userService.listAllUsers());
 
-        return "/user/create";
+        return "/user-create";
     }
 
-    @PostMapping("/create")
+    @PostMapping("/user-create")
     public String insertUser(@Valid @ModelAttribute("user") UserDto user, BindingResult bindingResult, Model model){
 
         if(bindingResult.hasErrors()) {
             model.addAttribute("roles", roleService.findById(1L));
             model.addAttribute("users", userService.listAllUsers());
 
-            return "/user/create";
+            return "/user-create";
         }
 
         userService.save(user);
-        return "redirect:/user/create";
+        return "redirect:/user-create";
 
 
 

@@ -4,6 +4,7 @@ import djrAccounting.dto.UserDto;
 import djrAccounting.entity.User;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.UserRepository;
+import djrAccounting.service.SecurityService;
 import djrAccounting.service.UserService;
 import org.springframework.stereotype.Service;
 
@@ -16,15 +17,18 @@ public class UserServiceImpl  implements UserService {
 
     private final UserRepository userRepository;
     private final MapperUtil mapper;
+    private final SecurityService securityService;
 
 
-    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil) {
+    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, SecurityService securityService) {
         this.userRepository = userRepository;
         this.mapper = mapperUtil;
+        this.securityService = securityService;
     }
 
     @Override
     public UserDto findById(Long id) {
+
         Optional<User> user = userRepository.findById(id);
         return mapper.convert(user, new UserDto());
     }
