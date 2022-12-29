@@ -60,7 +60,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
                 .map(invoiceProduct -> invoiceProduct.getPrice()
                         .add(invoiceProduct.getPrice()
                                 .multiply(BigDecimal.valueOf(invoiceProduct.getTax()))
-                                .divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP))
+                                .divide(BigDecimal.valueOf(100), RoundingMode.HALF_EVEN))
                         .multiply(BigDecimal.valueOf(invoiceProduct.getQuantity())))
                 .reduce(BigDecimal::add)
                 .orElseThrow();
