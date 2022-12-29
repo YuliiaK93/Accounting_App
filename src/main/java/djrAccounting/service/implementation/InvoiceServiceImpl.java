@@ -1,12 +1,11 @@
 package djrAccounting.service.implementation;
 
 import djrAccounting.dto.InvoiceDto;
-import djrAccounting.entity.common.UserPrincipal;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.InvoiceRepository;
 import djrAccounting.service.InvoiceProductService;
 import djrAccounting.service.InvoiceService;
-import org.springframework.security.core.context.SecurityContextHolder;
+import djrAccounting.service.SecurityService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,18 +16,22 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
     private final InvoiceProductService invoiceProductService;
+    private final SecurityService securityService;
     private final MapperUtil mapper;
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, InvoiceProductService invoiceProductService, MapperUtil mapper) {
+    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, InvoiceProductService invoiceProductService, SecurityService securityService, MapperUtil mapper) {
         this.invoiceRepository = invoiceRepository;
         this.invoiceProductService = invoiceProductService;
+        this.securityService = securityService;
         this.mapper = mapper;
     }
 
     @Override
     public List<InvoiceDto> getLast3ApprovedInvoicesForCurrentUserCompany() {
 
-        List<InvoiceDto> invoiceDtoList = invoiceRepository.getLast3ApprovedInvoicesByCompany(getCurrentCompanyTitle())
+        List<InvoiceDto> invoiceDtoList = invoiceRepository.getLast3ApprovedInvoicesByCompanyId(securityService.getLoggedInUser()
+                        .getCompany()
+                        .getId())
                 .stream()
                 .map(invoice -> mapper.convert(invoice, InvoiceDto.class))
                 .collect(Collectors.toList());
@@ -45,12 +48,5 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public InvoiceDto findById(Long id) {
         return mapper.convert(invoiceRepository.findById(id).orElseThrow(), InvoiceDto.class);
-    }
-
-    private String getCurrentCompanyTitle() {
-
-        return ((UserPrincipal) SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getPrincipal()).getCompanyTitleForProfile();
     }
 }

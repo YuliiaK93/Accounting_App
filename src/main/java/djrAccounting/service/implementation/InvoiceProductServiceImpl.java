@@ -1,11 +1,10 @@
 package djrAccounting.service.implementation;
 
 import djrAccounting.entity.InvoiceProduct;
-import djrAccounting.entity.common.UserPrincipal;
 import djrAccounting.enums.InvoiceType;
 import djrAccounting.repository.InvoiceProductRepository;
 import djrAccounting.service.InvoiceProductService;
-import org.springframework.security.core.context.SecurityContextHolder;
+import djrAccounting.service.SecurityService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -16,15 +15,17 @@ import java.util.List;
 public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     private final InvoiceProductRepository invoiceProductRepository;
+    private final SecurityService securityService;
 
-    public InvoiceProductServiceImpl(InvoiceProductRepository invoiceProductRepository) {
+    public InvoiceProductServiceImpl(InvoiceProductRepository invoiceProductRepository, SecurityService securityService) {
         this.invoiceProductRepository = invoiceProductRepository;
+        this.securityService = securityService;
     }
 
     @Override
     public BigDecimal getTotalPriceByInvoice(String invoiceNo) {
 
-        return invoiceProductRepository.findByInvoice_InvoiceNoAndInvoice_Company_Title(invoiceNo, getCurrentCompanyTitle())
+        return invoiceProductRepository.findByInvoice_InvoiceNoAndInvoice_Company_Id(invoiceNo, getCurrentCompanyTitle())
                 .stream()
                 .map(invoiceProduct -> invoiceProduct.getPrice()
                         .multiply(BigDecimal.valueOf(invoiceProduct.getQuantity())))
@@ -34,20 +35,19 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
     public BigDecimal getTotalPriceWithTaxByInvoice(String invoiceNo) {
-
         return calculatePriceWithTax(invoiceProductRepository.findByInvoice_InvoiceNoAndInvoice_Company_Title(invoiceNo, getCurrentCompanyTitle()));
     }
 
     @Override
     public BigDecimal getTotalCostForCurrentCompany() {
 
-        return calculatePriceWithTax(invoiceProductRepository.findAllInvoicesByInvoice_Company_TitleAndInvoice_InvoiceStatusIsApproved(getCurrentCompanyTitle(), InvoiceType.PURCHASE));
+        return calculatePriceWithTax(invoiceProductRepository.findAllInvoicesByInvoice_Company_IdAndInvoice_InvoiceStatusIsApproved(getCurrentCompanyTitle(), InvoiceType.PURCHASE));
     }
 
     @Override
     public BigDecimal getTotalSalesForCurrentCompany() {
 
-        return calculatePriceWithTax(invoiceProductRepository.findAllInvoicesByInvoice_Company_TitleAndInvoice_InvoiceStatusIsApproved(getCurrentCompanyTitle(), InvoiceType.SALES));
+        return calculatePriceWithTax(invoiceProductRepository.findAllInvoicesByInvoice_Company_IdAndInvoice_InvoiceStatusIsApproved(getCurrentCompanyTitle(), InvoiceType.SALES));
     }
 
     private BigDecimal calculatePriceWithTax(List<InvoiceProduct> list) {
@@ -56,16 +56,13 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
                 .map(invoiceProduct -> invoiceProduct.getPrice()
                         .add(invoiceProduct.getPrice()
                                 .multiply(BigDecimal.valueOf(invoiceProduct.getTax()))
-                                .divide(BigDecimal.valueOf(100), RoundingMode.FLOOR))
+                                .divide(BigDecimal.valueOf(100), RoundingMode.HALF_EVEN))
                         .multiply(BigDecimal.valueOf(invoiceProduct.getQuantity())))
                 .reduce(BigDecimal::add)
                 .orElseThrow();
     }
 
-    private String getCurrentCompanyTitle() {
-
-        return ((UserPrincipal) SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getPrincipal()).getCompanyTitleForProfile();
+    private Long getCurrentCompanyTitle() {
+        return securityService.getLoggedInUser().getCompany().getId();
     }
 }
