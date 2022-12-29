@@ -55,6 +55,16 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
+    public CompanyDto update(CompanyDto companyDto) {
+        Company dbCompany = companyRepository.findById(companyDto.getId()).orElseThrow();
+        Company convertedCompany = mapper.convert(companyDto, Company.class);
+        convertedCompany.setCompanyStatus(dbCompany.getCompanyStatus());
+        companyRepository.save(convertedCompany);
+
+        return companyDto;
+    }
+
+    @Override
     public void save(CompanyDto companyDto) {
 
         Company company = mapper.convert(companyDto, Company.class);

@@ -1,6 +1,7 @@
 package djrAccounting.controller;
 
 import djrAccounting.service.InvoiceService;
+import djrAccounting.service.dashboard.FinancialSummaryService;
 import djrAccounting.service.implementation.ExchangeImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,10 +14,12 @@ public class DashboardController {
 
     private final ExchangeImpl exchange;
     private final InvoiceService invoiceService;
+    private final FinancialSummaryService financialSummaryService;
 
-    public DashboardController(ExchangeImpl exchange, InvoiceService invoiceService) {
+    public DashboardController(ExchangeImpl exchange, InvoiceService invoiceService, FinancialSummaryService financialSummaryService) {
         this.exchange = exchange;
         this.invoiceService = invoiceService;
+        this.financialSummaryService = financialSummaryService;
     }
 
 
@@ -25,6 +28,7 @@ public class DashboardController {
 
         model.addAttribute("exchangeRates", exchange.getExchangeRates());
         model.addAttribute("invoices", invoiceService.getLast3ApprovedInvoicesForCurrentUserCompany());
+        model.addAttribute("summaryNumbers", financialSummaryService.financialSummaryForCurrentCompany());
 
         return "dashboard";
     }
