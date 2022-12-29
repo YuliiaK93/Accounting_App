@@ -1,5 +1,6 @@
 package djrAccounting.controller;
 
+import djrAccounting.bootstrap.StaticConstants;
 import djrAccounting.dto.CompanyDto;
 import djrAccounting.service.CompanyService;
 import org.springframework.stereotype.Controller;
@@ -39,6 +40,24 @@ public class CompanyController {
 
         return "redirect:/companies/list";
     }
+
+    @GetMapping("/update/{id}")
+    public String editCompany(@PathVariable("id") Long id, Model model) {
+
+        model.addAttribute("company", companyService.findById(id));
+        model.addAttribute("countries", StaticConstants.COUNTRY_LIST);
+
+        return "company/company-update";
+    }
+
+    @PostMapping("/update/{id}")
+    public String updateCompany(@ModelAttribute("company") CompanyDto companyDto) {
+
+        companyService.update(companyDto);
+
+        return "redirect:/companies/list";
+    }
+
 
     @GetMapping("/activate/{id}")
     public String activateCompany(@PathVariable("id") Long id) {
