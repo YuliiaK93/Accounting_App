@@ -2,6 +2,7 @@ package djrAccounting.service.implementation;
 
 import djrAccounting.dto.InvoiceDto;
 import djrAccounting.entity.common.UserPrincipal;
+import djrAccounting.enums.InvoiceType;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.InvoiceRepository;
 import djrAccounting.service.InvoiceService;
@@ -21,6 +22,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         this.mapper = mapper;
     }
 
+
     @Override
     public List<InvoiceDto> getLast3ApprovedInvoicesForCurrentUserCompany() {
 
@@ -36,4 +38,16 @@ public class InvoiceServiceImpl implements InvoiceService {
     public InvoiceDto findById(Long id) {
         return mapper.convert(invoiceRepository.findById(id).orElseThrow(), InvoiceDto.class);
     }
+
+    @Override
+    public List<InvoiceDto> getAllPurchaseInvoiceForCurrentCompany(){
+        return invoiceRepository.findAllPurchaseInvoiceForCurrentCompany(((UserPrincipal) SecurityContextHolder.getContext()
+                        .getAuthentication()
+                        .getPrincipal()).getCompanyTitleForProfile(), InvoiceType.PURCHASE)
+                .stream()
+                .map(invoice -> mapper.convert(invoice, InvoiceDto.class))
+                .collect(Collectors.toList());
+
+    }
+
 }
