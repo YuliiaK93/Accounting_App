@@ -40,4 +40,9 @@ public class UserServiceImpl implements UserService {
         userList.forEach(user -> user.setEnabled(false));
         userRepository.saveAll(userList);
     }
+
+    @Override
+    public UserDto findByUsername(String username) {
+        return mapperUtil.convert(userRepository.findByUsername(username), new UserDto());
+    }
 }

@@ -38,7 +38,7 @@ public class CompanyController {
     }
 
     @PostMapping("/create")
-    public String insertCompany(@Valid @ModelAttribute CompanyDto company,
+    public String insertCompany(@Valid @ModelAttribute("newCompany") CompanyDto company,
                                 BindingResult bindingResult) {
 
         if (companyService.isTitleExist(company.getTitle())) {
@@ -46,7 +46,7 @@ public class CompanyController {
         }
 
         if (bindingResult.hasErrors()) {
-            return "/company/company-create";
+            return "company/company-create";
         }
 
         companyService.save(company);
