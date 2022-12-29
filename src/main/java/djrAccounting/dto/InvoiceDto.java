@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @AllArgsConstructor
@@ -31,4 +32,8 @@ public class InvoiceDto {
     private ClientVendorDto clientVendor;
 
     private CompanyDto company;
+
+    private BigDecimal price;
+    private BigDecimal tax;
+    private BigDecimal total;
 }
