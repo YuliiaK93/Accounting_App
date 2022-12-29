@@ -41,6 +41,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> listAllUsers() {
+
         List<User> userList =userRepository.findAll();
         return userList.stream().map(user -> mapperUtil.convert(user, new UserDto()))
                 .collect(Collectors.toList());
@@ -52,6 +53,16 @@ public class UserServiceImpl implements UserService {
         User user1 = mapperUtil.convert(userDto, new User());
         user1.setPassword(passwordEncoder.encode(user1.getPassword()));
         userRepository.save(user1);
+
+    }
+
+    @Override
+    public void deleteUserById(Long id) {
+        User user = userRepository.findById(id).get();
+
+        user.setIsDeleted(true);
+
+        userRepository.save(user);
 
     }
 }

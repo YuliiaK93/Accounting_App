@@ -2,14 +2,12 @@ package djrAccounting.controller;
 
 import djrAccounting.dto.UserDto;
 import djrAccounting.service.RoleService;
+import djrAccounting.service.SecurityService;
 import djrAccounting.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -20,9 +18,20 @@ public class UserController {
     private final RoleService roleService;
     private final UserService userService;
 
-    public UserController(RoleService roleService, UserService userService) {
+    private final SecurityService securityService;
+
+    public UserController(RoleService roleService, UserService userService, SecurityService securityService) {
         this.roleService = roleService;
         this.userService = userService;
+        this.securityService = securityService;
+    }
+
+    @GetMapping("/list")
+    public String listAllUsers(Model model){
+
+        model.addAttribute("users", userService.listAllUsers());
+
+        return "user/user-list";
     }
 
     @GetMapping("/user-create")
@@ -53,12 +62,11 @@ public class UserController {
 
     }
 
-    @GetMapping("/list")
-    public String listAllUsers(Model model){
+    @GetMapping("/delete/{id}")
+    public String deleteUser(@PathVariable("id") Long id){
 
-        model.addAttribute("users", userService.listAllUsers());
-
-        return "user/user-list";
+        userService.deleteUserById(id);
+        return "redirect:/users/list";
     }
 
 
