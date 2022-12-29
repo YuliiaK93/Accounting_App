@@ -82,12 +82,7 @@ public class CompanyServiceImpl implements CompanyService {
     public boolean isTitleExist(String title) {
 
         companyRepository.findAll().stream()
-                .map(company -> {
-                    if (company.getTitle().equals(title)) {
-                        return true;
-                    }
-                    return false;
-                });
+                .map(company -> company.getTitle().equals(title));
 
         return false;
     }

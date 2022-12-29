@@ -38,15 +38,15 @@ public class CompanyController {
     }
 
     @PostMapping("/create")
-    public String insertCompany(@Valid @ModelAttribute CompanyDto company,
+    public String insertCompany(@Valid @ModelAttribute("newCompany") CompanyDto company,
                                 BindingResult bindingResult) {
-
-        if (companyService.isTitleExist(company.getTitle())) {
-            bindingResult.rejectValue("title", " ", "This title already exists");
-        }
 
         if (bindingResult.hasErrors()) {
             return "/company/company-create";
+        }
+
+        if (companyService.isTitleExist(company.getTitle())) {
+            bindingResult.rejectValue("title", " ", "This title already exists");
         }
 
         companyService.save(company);
