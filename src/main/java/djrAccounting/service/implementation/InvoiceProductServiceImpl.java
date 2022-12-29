@@ -25,7 +25,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     @Override
     public BigDecimal getTotalPriceByInvoice(String invoiceNo) {
 
-        return invoiceProductRepository.findByInvoice_InvoiceNoAndInvoice_Company_Title(invoiceNo, getCurrentCompanyTitle())
+        return invoiceProductRepository.findByInvoice_InvoiceNoAndInvoice_Company_Id(invoiceNo, getCurrentCompanyTitle())
                 .stream()
                 .map(invoiceProduct -> invoiceProduct.getPrice()
                         .multiply(BigDecimal.valueOf(invoiceProduct.getQuantity())))
@@ -36,7 +36,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     @Override
     public BigDecimal getTotalPriceWithTaxByInvoice(String invoiceNo) {
 
-        BigDecimal price = calculatePriceWithTax(invoiceProductRepository.findByInvoice_InvoiceNoAndInvoice_Company_Title(invoiceNo, getCurrentCompanyTitle()));
+        BigDecimal price = calculatePriceWithTax(invoiceProductRepository.findByInvoice_InvoiceNoAndInvoice_Company_Id(invoiceNo, getCurrentCompanyTitle()));
 
         System.out.println(price);
         return price;
@@ -45,13 +45,13 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     @Override
     public BigDecimal getTotalCostForCurrentCompany() {
 
-        return calculatePriceWithTax(invoiceProductRepository.findAllInvoicesByInvoice_Company_TitleAndInvoice_InvoiceStatusIsApproved(getCurrentCompanyTitle(), InvoiceType.PURCHASE));
+        return calculatePriceWithTax(invoiceProductRepository.findAllInvoicesByInvoice_Company_IdAndInvoice_InvoiceStatusIsApproved(getCurrentCompanyTitle(), InvoiceType.PURCHASE));
     }
 
     @Override
     public BigDecimal getTotalSalesForCurrentCompany() {
 
-        return calculatePriceWithTax(invoiceProductRepository.findAllInvoicesByInvoice_Company_TitleAndInvoice_InvoiceStatusIsApproved(getCurrentCompanyTitle(), InvoiceType.SALES));
+        return calculatePriceWithTax(invoiceProductRepository.findAllInvoicesByInvoice_Company_IdAndInvoice_InvoiceStatusIsApproved(getCurrentCompanyTitle(), InvoiceType.SALES));
     }
 
     private BigDecimal calculatePriceWithTax(List<InvoiceProduct> list) {
@@ -66,7 +66,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
                 .orElseThrow();
     }
 
-    private String getCurrentCompanyTitle() {
-        return securityService.getLoggedInUser().getCompany().getTitle();
+    private Long getCurrentCompanyTitle() {
+        return securityService.getLoggedInUser().getCompany().getId();
     }
 }

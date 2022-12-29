@@ -29,9 +29,9 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public List<InvoiceDto> getLast3ApprovedInvoicesForCurrentUserCompany() {
 
-        List<InvoiceDto> invoiceDtoList = invoiceRepository.getLast3ApprovedInvoicesByCompany(securityService.getLoggedInUser()
+        List<InvoiceDto> invoiceDtoList = invoiceRepository.getLast3ApprovedInvoicesByCompanyId(securityService.getLoggedInUser()
                         .getCompany()
-                        .getTitle())
+                        .getId())
                 .stream()
                 .map(invoice -> mapper.convert(invoice, InvoiceDto.class))
                 .collect(Collectors.toList());
