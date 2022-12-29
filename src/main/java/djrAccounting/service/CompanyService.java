@@ -15,4 +15,6 @@ public interface CompanyService {
     void activateCompanyStatus(Long id);
 
     void deactivateCompanyStatus(Long id);
+
+    CompanyDto update(CompanyDto companyDto);
 }
