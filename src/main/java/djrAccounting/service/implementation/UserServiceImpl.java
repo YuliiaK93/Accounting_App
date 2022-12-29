@@ -12,8 +12,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final MapperUtil mapperUtil;
 
-
-
     public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil) {
         this.userRepository = userRepository;
         this.mapperUtil = mapperUtil;
@@ -22,5 +20,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto findById(Long id) {
         return mapperUtil.convert(userRepository.findById(id).orElseThrow(), UserDto.class);
+    }
+
+    @Override
+    public UserDto findByUsername(String username) {
+        return mapperUtil.convert(userRepository.findByUsername(username), new UserDto());
     }
 }

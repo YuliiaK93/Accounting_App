@@ -5,6 +5,7 @@ import djrAccounting.entity.User;
 import djrAccounting.entity.common.UserPrincipal;
 import djrAccounting.repository.UserRepository;
 import djrAccounting.service.SecurityService;
+import djrAccounting.service.UserService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -35,7 +36,7 @@ public class SecurityServiceImpl implements SecurityService {
     @Override
     public UserDto getLoggedInUser() {
         var currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userService.findByUserName(currentUsername);
+        return userService.findByUsername(currentUsername);
 
     }
 }
