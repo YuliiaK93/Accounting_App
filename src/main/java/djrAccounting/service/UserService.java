@@ -8,5 +8,6 @@ import org.springframework.stereotype.Service;
 public interface UserService {
 
     UserDto findById(Long id);
+    UserDto findByUsername(String username);
 }
 

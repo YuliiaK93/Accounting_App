@@ -4,7 +4,9 @@ import djrAccounting.dto.UserDto;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.UserRepository;
 import djrAccounting.service.UserService;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -18,5 +20,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto findById(Long id) {
         return mapperUtil.convert(userRepository.findById(id).orElseThrow(), UserDto.class);
+    }
+
+    @Override
+    public UserDto findByUsername(String username) {
+        return mapperUtil.convert(userRepository.findByUsername(username),UserDto.class);
     }
 }
