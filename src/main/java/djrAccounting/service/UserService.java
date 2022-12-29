@@ -13,7 +13,7 @@ public interface UserService {
 
     UserDto findByUserName(String username);
 
-   // List<UserDto> listAllUsers();
+   List<UserDto> listAllUsers();
 
    // void update(UserDto userDto);
 

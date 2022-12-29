@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
 
     private final RoleService roleService;
@@ -29,6 +29,7 @@ public class UserController {
     public String createUser(Model model){
 
         model.addAttribute("user", new UserDto());
+        //TODO will be implemented after security context @Yuliia
         model.addAttribute("roles", roleService.findById(1L));
         model.addAttribute("users", userService.listAllUsers());
 
@@ -51,6 +52,15 @@ public class UserController {
 
 
     }
+
+    @GetMapping("/list")
+    public String listAllUsers(Model model){
+
+        model.addAttribute("users", userService.listAllUsers());
+
+        return "user/user-list";
+    }
+
 
 
 
