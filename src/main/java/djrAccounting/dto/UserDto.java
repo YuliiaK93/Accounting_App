@@ -38,8 +38,24 @@ public class UserDto {
     private String phone;
     private boolean enabled;
 
+    public RoleDto getRole() {
+        return role;
+    }
+
+    public void setRole(RoleDto role) {
+        this.role = role;
+    }
+
     @NotNull(message = "Please select a Role")
     private RoleDto role;
+
+    public CompanyDto getCompany() {
+        return company;
+    }
+
+    public void setCompany(CompanyDto company) {
+        this.company = company;
+    }
 
     @NotNull(message = "Please select a Customer.")
     private CompanyDto company;

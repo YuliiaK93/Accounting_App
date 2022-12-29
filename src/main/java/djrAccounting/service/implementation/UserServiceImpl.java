@@ -6,19 +6,25 @@ import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.UserRepository;
 import djrAccounting.service.SecurityService;
 import djrAccounting.service.UserService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final MapperUtil mapperUtil;
+    private final PasswordEncoder passwordEncoder;
 
     private final SecurityService securityService;
 
-    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, SecurityService securityService) {
+    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder, SecurityService securityService) {
         this.userRepository = userRepository;
         this.mapperUtil = mapperUtil;
+        this.passwordEncoder = passwordEncoder;
         this.securityService = securityService;
     }
 
@@ -29,17 +35,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto findByUsername(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(() ->;
+        User user = userRepository.findByUsername(username);
         return mapperUtil.convert(user, new UserDto());
     }
 
     @Override
     public List<UserDto> listAllUsers() {
-        return null;
+        List<User> userList =userRepository.findAll();
+        return userList.stream().map(user -> mapperUtil.convert(user, new UserDto()))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public void save(UserDto user) {
+    public void save(UserDto userDto) {
+
+        User user1 = mapperUtil.convert(userDto, new User());
+        user1.setPassword(passwordEncoder.encode(user1.getPassword()));
+        userRepository.save(user1);
 
     }
 }
