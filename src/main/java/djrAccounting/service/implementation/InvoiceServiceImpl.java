@@ -5,9 +5,11 @@ import djrAccounting.entity.common.UserPrincipal;
 import djrAccounting.enums.InvoiceType;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.InvoiceRepository;
+import djrAccounting.service.InvoiceProductService;
 import djrAccounting.service.InvoiceService;
-import org.springframework.security.core.context.SecurityContextHolder;
+import djrAccounting.service.SecurityService;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,23 +17,34 @@ import java.util.stream.Collectors;
 public class InvoiceServiceImpl implements InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
+    private final InvoiceProductService invoiceProductService;
+    private final SecurityService securityService;
     private final MapperUtil mapper;
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapper) {
+    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, InvoiceProductService invoiceProductService, SecurityService securityService, MapperUtil mapper) {
         this.invoiceRepository = invoiceRepository;
+        this.invoiceProductService = invoiceProductService;
+        this.securityService = securityService;
         this.mapper = mapper;
     }
-
 
     @Override
     public List<InvoiceDto> getLast3ApprovedInvoicesForCurrentUserCompany() {
 
-        return invoiceRepository.getLast3ApprovedInvoicesByCompany(((UserPrincipal) SecurityContextHolder.getContext()
-                        .getAuthentication()
-                        .getPrincipal()).getCompanyTitleForProfile())
+        List<InvoiceDto> invoiceDtoList = invoiceRepository.getLast3ApprovedInvoicesByCompanyId(securityService.getLoggedInUser()
+                        .getCompany()
+                        .getId())
                 .stream()
                 .map(invoice -> mapper.convert(invoice, InvoiceDto.class))
                 .collect(Collectors.toList());
+
+        invoiceDtoList.forEach(invoiceDto -> {
+            invoiceDto.setPrice(invoiceProductService.getTotalPriceByInvoice(invoiceDto.getInvoiceNo()));
+            invoiceDto.setTotal(invoiceProductService.getTotalPriceWithTaxByInvoice(invoiceDto.getInvoiceNo()));
+            invoiceDto.setTax(invoiceDto.getTotal().subtract(invoiceDto.getPrice()));
+        });
+
+        return invoiceDtoList;
     }
 
     @Override
