@@ -35,11 +35,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     @Override
     public BigDecimal getTotalPriceWithTaxByInvoice(String invoiceNo) {
 
-
-        BigDecimal price = calculatePriceWithTax(invoiceProductRepository.findByInvoice_InvoiceNoAndInvoice_Company_Title(invoiceNo, getCurrentCompanyTitle()));
-
-        System.out.println(price);
-        return price;
+        return calculatePriceWithTax(invoiceProductRepository.findByInvoice_InvoiceNoAndInvoice_Company_Title(invoiceNo, getCurrentCompanyTitle()));
     }
 
     @Override
