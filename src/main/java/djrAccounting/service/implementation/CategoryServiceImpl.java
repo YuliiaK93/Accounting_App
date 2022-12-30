@@ -5,6 +5,7 @@ import djrAccounting.entity.Category;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.CategoryRepository;
 import djrAccounting.service.CategoryService;
+import djrAccounting.service.SecurityService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,10 +16,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
 
+    private final SecurityService securityService;
+
     private final MapperUtil mapper;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository, MapperUtil mapper) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, SecurityService securityService, MapperUtil mapper) {
         this.categoryRepository = categoryRepository;
+        this.securityService = securityService;
         this.mapper = mapper;
     }
 
@@ -28,8 +32,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Category> listAllCategories() {
+    public List<CategoryDto> listAllCategories() {
         return null;
-
     }
+
+
 }
