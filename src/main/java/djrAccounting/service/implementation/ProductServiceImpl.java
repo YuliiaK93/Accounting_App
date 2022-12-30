@@ -47,4 +47,13 @@ public class ProductServiceImpl implements ProductService {
         product.setIsDeleted(true);
         productRepository.save(product);
     }
+
+    @Override
+    public boolean productExistByCategory(Long categoryId){
+        return productRepository.existsByCategory_Id(categoryId);
+
+    }
+
+
+
 }
