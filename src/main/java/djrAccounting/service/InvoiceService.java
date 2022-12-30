@@ -7,5 +7,5 @@ public interface InvoiceService {
     List<InvoiceDto> getLast3ApprovedInvoicesForCurrentUserCompany();
     InvoiceDto findById(Long id);
     boolean existsByClientVendorId(Long id);
-    List<InvoiceDto> findAllByCurrentUserCompany();
+    List<InvoiceDto> findSalesInvoicesByCurrentUserCompany();
 }

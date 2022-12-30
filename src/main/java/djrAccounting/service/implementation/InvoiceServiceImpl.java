@@ -1,6 +1,7 @@
 package djrAccounting.service.implementation;
 
 import djrAccounting.dto.InvoiceDto;
+import djrAccounting.enums.InvoiceType;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.InvoiceRepository;
 import djrAccounting.service.InvoiceProductService;
@@ -61,9 +62,9 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public List<InvoiceDto> findAllByCurrentUserCompany() {
-        List<InvoiceDto> invoiceDtoList = invoiceRepository.findAllByCompanyId(securityService.getLoggedInUser()
-                .getCompany().getId())
+    public List<InvoiceDto> findSalesInvoicesByCurrentUserCompany() {
+        List<InvoiceDto> invoiceDtoList = invoiceRepository.findAllByCompanyIdAndInvoiceType(securityService.getLoggedInUser()
+                .getCompany().getId(), InvoiceType.SALES)
                 .stream()
                 .map(invoice -> mapper.convert(invoice, InvoiceDto.class))
                 .collect(Collectors.toList());

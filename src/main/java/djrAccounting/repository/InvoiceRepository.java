@@ -1,6 +1,7 @@
 package djrAccounting.repository;
 
 import djrAccounting.entity.Invoice;
+import djrAccounting.enums.InvoiceType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -12,5 +13,6 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     List<Invoice> getLast3ApprovedInvoicesByCompanyId(Long companyId);
     boolean existsByClientVendorId(Long id);
     List<Invoice> findAllByCompanyId(Long id);
+    List<Invoice> findAllByCompanyIdAndInvoiceType(Long id, InvoiceType invoiceType);
 }
 
