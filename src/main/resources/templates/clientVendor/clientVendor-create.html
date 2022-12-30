@@ -197,9 +197,13 @@
                                                             <div class="form-group">
                                                                 <div class="controls">
                                                                     <label>Country</label>
-                                                                    <input type="text" th:field="*{address.country}"
-                                                                           placeholder="State"
-                                                                           class="form-control">
+                                                                    <select id="country" class="form-control" th:field="*{address.country}">
+                                                                        <option th:value="${countries.get(232)}"
+                                                                                th:text="${countries.get(232)}"></option>
+                                                                        <option th:each="country, stat : ${countries}"
+                                                                                th:value="${country}"
+                                                                                th:text="${country}" th:unless="${country.equals('United States')}"></option>
+                                                                    </select>
                                                                     <div th:if="${#fields.hasErrors('address.country')}">
                                                                         <ul>
                                                                             <li class="validation"
