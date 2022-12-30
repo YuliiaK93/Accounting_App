@@ -52,10 +52,11 @@ public class SalesInvoiceController {
     @GetMapping("/create")
     public String createSalesInvoicePage(Model model) {
 
+        model.addAttribute("newSalesInvoice", new InvoiceDto());
         model.addAttribute("invoiceNo",invoiceService.nextSalesInvoiceNo());
         model.addAttribute("clients",clientVendorService.listClientsBySelectedUserCompany());
         model.addAttribute("date", LocalDate.now());
-        model.addAttribute("newSalesInvoice", new InvoiceDto());
+
 
         return "invoice/sales-invoice-create";
     }
