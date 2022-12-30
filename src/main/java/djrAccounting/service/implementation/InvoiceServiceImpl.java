@@ -7,7 +7,6 @@ import djrAccounting.service.InvoiceProductService;
 import djrAccounting.service.InvoiceService;
 import djrAccounting.service.SecurityService;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,6 +46,12 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public InvoiceDto findById(Long id) {
-        return mapper.convert(invoiceRepository.findById(id).orElseThrow(), InvoiceDto.class);
+        InvoiceDto invoiceDto = mapper.convert(invoiceRepository.findById(id).orElseThrow(), InvoiceDto.class);
+
+        invoiceDto.setPrice(invoiceProductService.getTotalPriceByInvoice(invoiceDto.getInvoiceNo()));
+        invoiceDto.setTotal(invoiceProductService.getTotalPriceWithTaxByInvoice(invoiceDto.getInvoiceNo()));
+        invoiceDto.setTax(invoiceDto.getTotal().subtract(invoiceDto.getPrice()));
+
+        return invoiceDto;
     }
 }
