@@ -59,4 +59,21 @@ public class InvoiceServiceImpl implements InvoiceService {
     public boolean existsByClientVendorId(Long id) {
         return invoiceRepository.existsByClientVendorId(id);
     }
+
+    @Override
+    public List<InvoiceDto> findAllByCurrentUserCompany() {
+        List<InvoiceDto> invoiceDtoList = invoiceRepository.findAllByCompanyId(securityService.getLoggedInUser()
+                .getCompany().getId())
+                .stream()
+                .map(invoice -> mapper.convert(invoice, InvoiceDto.class))
+                .collect(Collectors.toList());
+
+        invoiceDtoList.forEach(invoiceDto -> {
+            invoiceDto.setPrice(invoiceProductService.getTotalPriceByInvoice(invoiceDto.getInvoiceNo()));
+            invoiceDto.setTotal(invoiceProductService.getTotalPriceWithTaxByInvoice(invoiceDto.getInvoiceNo()));
+            invoiceDto.setTax(invoiceDto.getTotal().subtract(invoiceDto.getPrice()));
+        });
+
+        return invoiceDtoList;
+    }
 }
