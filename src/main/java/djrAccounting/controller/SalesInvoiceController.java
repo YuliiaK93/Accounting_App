@@ -1,14 +1,19 @@
 package djrAccounting.controller;
 
 import djrAccounting.dto.InvoiceDto;
+import djrAccounting.enums.InvoiceStatus;
+import djrAccounting.enums.InvoiceType;
+import djrAccounting.service.ClientVendorService;
 import djrAccounting.service.CompanyService;
 import djrAccounting.service.InvoiceProductService;
 import djrAccounting.service.InvoiceService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.time.LocalDate;
 
 @Controller
 @RequestMapping("/salesInvoices")
@@ -17,11 +22,13 @@ public class SalesInvoiceController {
     private final CompanyService companyService;
     private final InvoiceService invoiceService;
     private final InvoiceProductService invoiceProductService;
+    private final ClientVendorService clientVendorService;
 
-    public SalesInvoiceController(CompanyService companyService, InvoiceService invoiceService, InvoiceProductService invoiceProductService) {
+    public SalesInvoiceController(CompanyService companyService, InvoiceService invoiceService, InvoiceProductService invoiceProductService, ClientVendorService clientVendorService) {
         this.companyService = companyService;
         this.invoiceService = invoiceService;
         this.invoiceProductService = invoiceProductService;
+        this.clientVendorService = clientVendorService;
     }
     @GetMapping("/list")
     public String listInvoices(Model model){
@@ -42,4 +49,29 @@ public class SalesInvoiceController {
 
         return "invoice/invoice_print";
     }
+
+    @GetMapping("/create")
+    public String createSalesInvoicePage(Model model) {
+
+        model.addAttribute("invoiceNo",invoiceService.nextSalesInvoiceNo());
+        model.addAttribute("clients",clientVendorService.listClientsBySelectedUserCompany());
+        model.addAttribute("date", LocalDate.now());
+        model.addAttribute("newSalesInvoice", new InvoiceDto());
+
+        return "invoice/sales-invoice-create";
+    }
+
+
+    @PostMapping("/create")
+    public String createSalesInvoice(@Valid @ModelAttribute ("newSalesInvoice") InvoiceDto invoiceDto, BindingResult bindingResult, Model model){
+
+        invoiceDto.setInvoiceType(InvoiceType.SALES);
+        invoiceDto.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
+
+
+        invoiceService.save(invoiceDto);
+
+        return "invoice/sales-invoice-create";
+    }
+
 }
