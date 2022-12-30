@@ -1,6 +1,9 @@
 package djrAccounting.service.implementation;
 
 import djrAccounting.dto.InvoiceDto;
+import djrAccounting.entity.Company;
+import djrAccounting.entity.Invoice;
+import djrAccounting.enums.CompanyStatus;
 import djrAccounting.enums.InvoiceType;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.InvoiceRepository;
@@ -76,5 +79,21 @@ public class InvoiceServiceImpl implements InvoiceService {
         });
 
         return invoiceDtoList;
+    }
+
+    @Override
+    public void save(InvoiceDto invoiceDto) {
+        Invoice invoice = mapper.convert(invoiceDto, Invoice.class);
+        invoiceRepository.save(invoice);
+    }
+
+    @Override
+    public String nextSalesInvoiceNo() {
+        Invoice invoice = invoiceRepository.findTopByCompanyIdOrderByInvoiceNo(securityService.getLoggedInUser().getCompany().getId());
+        String invoiceNo = invoice.getInvoiceNo();
+        String substring = invoiceNo.substring(2);
+        int number = Integer.parseInt(substring) +1;
+
+        return  "S-"+number;
     }
 }

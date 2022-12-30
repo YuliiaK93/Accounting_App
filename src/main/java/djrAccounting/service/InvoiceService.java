@@ -8,4 +8,6 @@ public interface InvoiceService {
     InvoiceDto findById(Long id);
     boolean existsByClientVendorId(Long id);
     List<InvoiceDto> findSalesInvoicesByCurrentUserCompany();
+    void save(InvoiceDto invoiceDto);
+    String nextSalesInvoiceNo();
 }
