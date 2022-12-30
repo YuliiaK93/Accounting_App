@@ -1,8 +1,7 @@
 package djrAccounting.controller;
 
+import djrAccounting.service.DashboardService;
 import djrAccounting.service.InvoiceService;
-import djrAccounting.service.dashboard.FinancialSummaryService;
-import djrAccounting.service.implementation.ExchangeImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,23 +11,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/dashboard")
 public class DashboardController {
 
-    private final ExchangeImpl exchange;
     private final InvoiceService invoiceService;
-    private final FinancialSummaryService financialSummaryService;
+    private final DashboardService dashboardService;
 
-    public DashboardController(ExchangeImpl exchange, InvoiceService invoiceService, FinancialSummaryService financialSummaryService) {
-        this.exchange = exchange;
+    public DashboardController(InvoiceService invoiceService, DashboardService dashboardService) {
         this.invoiceService = invoiceService;
-        this.financialSummaryService = financialSummaryService;
+        this.dashboardService = dashboardService;
     }
 
 
     @GetMapping
     public String dashboard(Model model) {
 
-        model.addAttribute("exchangeRates", exchange.getExchangeRates());
+        model.addAttribute("exchangeRates", dashboardService.getExchangeRates());
         model.addAttribute("invoices", invoiceService.getLast3ApprovedInvoicesForCurrentUserCompany());
-        model.addAttribute("summaryNumbers", financialSummaryService.financialSummaryForCurrentCompany());
+        model.addAttribute("summaryNumbers", dashboardService.financialSummaryForCurrentCompany());
 
         return "dashboard";
     }

@@ -1,6 +1,7 @@
 package djrAccounting.entity.common;
 
 import djrAccounting.entity.User;
+import djrAccounting.enums.CompanyStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,7 +12,7 @@ import java.util.List;
 
 public class UserPrincipal implements UserDetails {
 
-    private final User user;
+    private User user;
 
 
     public UserPrincipal(User user) {
@@ -45,9 +46,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        // TODO: 28/12/2022
-        //        return !user.getCompany().getCompanyStatus().equals(CompanyStatus.PASSIVE);
-        return true;
+        return !user.getCompany().getCompanyStatus().equals(CompanyStatus.PASSIVE);
     }
 
     @Override
@@ -60,15 +59,15 @@ public class UserPrincipal implements UserDetails {
         return this.user.isEnabled();
     }
 
-    public Long getId() {
+    public Long getId(){
         return this.user.getId();
     }
 
-    public String getFullNameForProfile() {
+    public String getFullNameForProfile(){
         return this.user.getFirstname() + " " + this.user.getLastname();
     }
 
-    public String getCompanyTitleForProfile() {
+    public String getCompanyTitleForProfile(){
         return this.user.getCompany().getTitle();
     }
 

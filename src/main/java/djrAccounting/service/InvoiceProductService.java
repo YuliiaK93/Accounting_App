@@ -1,6 +1,9 @@
 package djrAccounting.service;
 
+import djrAccounting.dto.InvoiceProductDto;
+
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface InvoiceProductService {
     BigDecimal getTotalPriceByInvoice(String invoiceNo);
@@ -10,4 +13,6 @@ public interface InvoiceProductService {
     BigDecimal getTotalCostForCurrentCompany();
 
     BigDecimal getTotalSalesForCurrentCompany();
+
+    List<InvoiceProductDto> getAllByInvoiceStatusApprovedForCurrentCompany();
 }

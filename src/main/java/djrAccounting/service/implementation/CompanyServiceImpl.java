@@ -6,6 +6,7 @@ import djrAccounting.enums.CompanyStatus;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.CompanyRepository;
 import djrAccounting.service.CompanyService;
+import djrAccounting.service.UserService;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +19,12 @@ public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
     private final MapperUtil mapper;
+    private final UserService userService;
 
-    public CompanyServiceImpl(CompanyRepository companyRepository, MapperUtil mapperUtil) {
+    public CompanyServiceImpl(CompanyRepository companyRepository, MapperUtil mapperUtil, UserService userService) {
         this.companyRepository = companyRepository;
         this.mapper = mapperUtil;
+        this.userService = userService;
     }
 
     @Override
@@ -44,6 +47,7 @@ public class CompanyServiceImpl implements CompanyService {
     public void activateCompanyStatus(Long id) {
         Company company = mapper.convert(findById(id), Company.class);
         company.setCompanyStatus(CompanyStatus.ACTIVE);
+        userService.makeUserEnableByCompany(company);
         companyRepository.save(company);
     }
 
@@ -51,6 +55,7 @@ public class CompanyServiceImpl implements CompanyService {
     public void deactivateCompanyStatus(Long id) {
         Company company = mapper.convert(findById(id), Company.class);
         company.setCompanyStatus(CompanyStatus.PASSIVE);
+        userService.makeUserDisableByCompany(company);
         companyRepository.save(company);
     }
 
@@ -71,6 +76,15 @@ public class CompanyServiceImpl implements CompanyService {
         company.setCompanyStatus(CompanyStatus.ACTIVE);
 
         companyRepository.save(company);
+    }
+
+    @Override
+    public boolean isTitleExist(String title) {
+
+        companyRepository.findAll().stream()
+                .map(company -> company.getTitle().equals(title));
+
+        return false;
     }
 
 }
