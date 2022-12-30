@@ -12,7 +12,7 @@ public interface ClientVendorService {
 
     void save(ClientVendorDto clientVendorDto);
     void update(ClientVendorDto clientVendorDto);
-    void deleteById(Long id);
+    void deleteById(Long id) throws IllegalAccessException;
 
 
 }

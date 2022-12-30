@@ -10,6 +10,8 @@ import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.ClientVendorRepository;
 import djrAccounting.repository.UserRepository;
 import djrAccounting.service.ClientVendorService;
+import djrAccounting.service.InvoiceService;
+import djrAccounting.service.SecurityService;
 import djrAccounting.service.UserService;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,12 +27,15 @@ public class ClientVendorServiceImpl implements ClientVendorService {
 
     private final ClientVendorRepository clientVendorRepository;
     private final MapperUtil mapperUtil;
-    private final UserService userService;
+    private final SecurityService securityService;
+    private final InvoiceService invoiceService;
 
-    public ClientVendorServiceImpl(ClientVendorRepository clientVendorRepository, MapperUtil mapperUtil, UserService userService) {
+
+    public ClientVendorServiceImpl(ClientVendorRepository clientVendorRepository, MapperUtil mapperUtil, SecurityService securityService, InvoiceService invoiceService) {
         this.clientVendorRepository = clientVendorRepository;
         this.mapperUtil = mapperUtil;
-        this.userService = userService;
+        this.securityService = securityService;
+        this.invoiceService = invoiceService;
     }
 
     @Override
@@ -40,11 +45,10 @@ public class ClientVendorServiceImpl implements ClientVendorService {
 
     @Override
     public List<ClientVendorDto> listAllClientVendors() {
-        //find out who is the user
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserDto userDto = userService.findByUsername(username);
+
+        Long companyId=securityService.getLoggedInUser().getCompany().getId();
         return clientVendorRepository.findAll(Sort.by("clientVendorType")).stream()
-                .filter(clientVendor -> clientVendor.getCompany().getId().equals(userDto.getCompany().getId()))
+                .filter(clientVendor -> clientVendor.getCompany().getId().equals(companyId))
                 .map(clientVendor -> mapperUtil.convert(clientVendor, new ClientVendorDto()))
                 .collect(Collectors.toList());
     }
@@ -55,29 +59,29 @@ public class ClientVendorServiceImpl implements ClientVendorService {
         clientVendorRepository.save(clientVendor);
     }
 
-    @Override// Double check if you should return object back?
+    @Override
     public void update(ClientVendorDto clientVendorDto) {
-        //find the task in db
         Optional<ClientVendor> clientVendor = clientVendorRepository.findById(clientVendorDto.getId());
         ClientVendor updatedClientVendor = mapperUtil.convert(clientVendorDto, new ClientVendor());
         if (clientVendor.isPresent()) {
-            updatedClientVendor.setId(clientVendorDto.getId());
+            updatedClientVendor.setId(clientVendor.get().getId());
             clientVendorRepository.save(updatedClientVendor);
         }
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(Long id) throws IllegalAccessException {
         Optional<ClientVendor> clientVendor = clientVendorRepository.findById(id);
         if (clientVendor.isPresent()) {
-            //create boolean if invoice exists in invoice repository with this vendor id
-            clientVendor.get().setIsDeleted(true);
-            clientVendorRepository.save(clientVendor.get());
+            if(!(invoiceService.existsByClientVendorId(id))){
+                clientVendor.get().setIsDeleted(true);
+                clientVendorRepository.save(clientVendor.get());
+            }else{
+                throw new IllegalAccessException("Cannot be deleted. Has invoice linked to Client/Vendor");
+            }
         }
-        //in invoice repo, boolean findByClientVendorIdExists();
-        //inject invoice service, use
+        }
 
-    }
 }
 
 

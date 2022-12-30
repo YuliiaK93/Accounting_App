@@ -14,7 +14,7 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @Data
 public class ClientVendorDto {
-//Add @Valid to PostMapping Methods, place Binding result after clientVendor parametor to make sure validation works
+
     private Long id;
 
     @NotBlank(message = "Company Name is a required field.")
