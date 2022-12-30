@@ -31,13 +31,16 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto findById(Long id) {
-        return mapper.convert(categoryRepository.findById(id).orElseThrow(),CategoryDto.class);
+        return mapper.convert(categoryRepository.findById(id).orElseThrow(), CategoryDto.class);
     }
 
     @Override
     public List<CategoryDto> listAllCategories() {
-        Long companyId = securityService.getLoggedInUser().getCompany().getId();
-        return categoryRepository.findAll().stream().filter(category -> category.getCompany().getId()== companyId).map(category -> mapper.convert(category, new CategoryDto())).collect(Collectors.toList());
+    return categoryRepository.findByCompany_IdOrderByDescriptionAsc(securityService.getLoggedInUser()
+            .getCompany().getId()).stream().map(category -> mapper.convert(category, CategoryDto.class))
+            .collect(Collectors.toList());
     }
-    }
+
+
+}
 
