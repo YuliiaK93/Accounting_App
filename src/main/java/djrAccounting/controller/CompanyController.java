@@ -39,9 +39,10 @@ public class CompanyController {
 
     @PostMapping("/create")
     public String insertCompany(@Valid @ModelAttribute("newCompany") CompanyDto company,
-                                BindingResult bindingResult) {
+                                BindingResult bindingResult, Model model) {
 
         if (bindingResult.hasErrors()) {
+            model.addAttribute("countries", StaticConstants.COUNTRY_LIST);
             return "company/company-create";
         }
 
@@ -64,7 +65,13 @@ public class CompanyController {
     }
 
     @PostMapping("/update/{id}")
-    public String updateCompany(@ModelAttribute("company") CompanyDto companyDto) {
+    public String updateCompany(@Valid @ModelAttribute("company") CompanyDto companyDto,
+                                BindingResult bindingResult, Model model) {
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("countries", StaticConstants.COUNTRY_LIST);
+            return "company/company-update";
+        }
 
         companyService.update(companyDto);
 
