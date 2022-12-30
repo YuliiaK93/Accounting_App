@@ -1,24 +1,15 @@
 package djrAccounting.service.implementation;
 
 import djrAccounting.dto.ClientVendorDto;
-import djrAccounting.dto.CompanyDto;
-import djrAccounting.dto.UserDto;
 import djrAccounting.entity.ClientVendor;
 import djrAccounting.entity.Company;
-import djrAccounting.entity.User;
-import djrAccounting.enums.ClientVendorType;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.ClientVendorRepository;
-import djrAccounting.repository.UserRepository;
 import djrAccounting.service.ClientVendorService;
 import djrAccounting.service.InvoiceService;
 import djrAccounting.service.SecurityService;
-import djrAccounting.service.UserService;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;

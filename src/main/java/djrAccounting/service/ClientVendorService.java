@@ -1,8 +1,6 @@
 package djrAccounting.service;
 
 import djrAccounting.dto.ClientVendorDto;
-import djrAccounting.enums.ClientVendorType;
-
 import java.util.List;
 
 public interface ClientVendorService {

@@ -16,7 +16,6 @@ import javax.validation.Valid;
 public class ClientVendorController {
 
     private final ClientVendorService clientVendorService;
-
     public ClientVendorController(ClientVendorService clientVendorService) {
         this.clientVendorService = clientVendorService;
     }
@@ -36,8 +35,9 @@ public class ClientVendorController {
     }
 
     @PostMapping("/create")
-    public String createClientVendor(@Valid @ModelAttribute("newClientVendor") ClientVendorDto clientVendorDto, BindingResult bindingResult) {
+    public String createClientVendor(@Valid @ModelAttribute("newClientVendor") ClientVendorDto clientVendorDto, BindingResult bindingResult, Model model) {
     if(bindingResult.hasErrors()){
+        model.addAttribute("clientVendorTypes", ClientVendorType.values());
         return "clientVendor/clientVendor-create";
     }
        clientVendorService.save(clientVendorDto);
@@ -53,10 +53,12 @@ public class ClientVendorController {
     }
 
     @PostMapping("/update/{id}")                             //TODO @Ekaterina will implement UI validation
-    public String editClientVendor(@Valid @ModelAttribute("clientVendor") ClientVendorDto clientVendorDto, BindingResult bindingResult){
+    public String editClientVendor(@Valid @ModelAttribute("clientVendor") ClientVendorDto clientVendorDto, BindingResult bindingResult,@PathVariable("id") Long id, Model model){
         if(bindingResult.hasErrors()){
+            model.addAttribute("countries", StaticConstants.COUNTRY_LIST);
+            model.addAttribute("clientVendorTypes", ClientVendorType.values());
             return "clientVendor/clientVendor-update";
-        }// problem with validation
+        }
      clientVendorService.update(clientVendorDto);
         return "redirect:/clientVendors/list";
     }
@@ -68,7 +70,7 @@ public class ClientVendorController {
                 clientVendorService.deleteById(id);
              }catch (IllegalAccessException e) {
               model.addAttribute("error", e.getMessage());
-              return "";
+              return "clientVendor/clientVendor-list";
             }
         return "redirect:/clientVendors/list";
     }
