@@ -5,10 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.persistence.Column;
+import javax.validation.constraints.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -29,8 +27,8 @@ public class ClientVendorDto {
     @NotNull(message = "Please select type.")
     private ClientVendorType clientVendorType;
 
-    @NotBlank(message = "Address is required field.")
-    @Size(min = 2, max = 100, message = "Address should have 2-100 characters long")
+//    @NotNull(message = "Address is required field.")
+//    @Size(min = 2, max = 100, message = "Address should have 2-100 characters long")
     private AddressDto address;
 
     private CompanyDto company;

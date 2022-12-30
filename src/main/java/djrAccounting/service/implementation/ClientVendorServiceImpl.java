@@ -4,6 +4,7 @@ import djrAccounting.dto.ClientVendorDto;
 import djrAccounting.dto.CompanyDto;
 import djrAccounting.dto.UserDto;
 import djrAccounting.entity.ClientVendor;
+import djrAccounting.entity.Company;
 import djrAccounting.entity.User;
 import djrAccounting.enums.ClientVendorType;
 import djrAccounting.mapper.MapperUtil;
@@ -42,10 +43,8 @@ public class ClientVendorServiceImpl implements ClientVendorService {
     public ClientVendorDto findById(Long id) {
         return mapperUtil.convert(clientVendorRepository.findById(id).orElseThrow(), ClientVendorDto.class);
     }
-
     @Override
     public List<ClientVendorDto> listAllClientVendors() {
-
         Long companyId=securityService.getLoggedInUser().getCompany().getId();
         return clientVendorRepository.findAll(Sort.by("clientVendorType")).stream()
                 .filter(clientVendor -> clientVendor.getCompany().getId().equals(companyId))
@@ -56,9 +55,9 @@ public class ClientVendorServiceImpl implements ClientVendorService {
     @Override
     public void save(ClientVendorDto clientVendorDto) {
         ClientVendor clientVendor = mapperUtil.convert(clientVendorDto, new ClientVendor());
+        clientVendor.setCompany(mapperUtil.convert(securityService.getLoggedInUser().getCompany(), Company.class));
         clientVendorRepository.save(clientVendor);
     }
-
     @Override
     public void update(ClientVendorDto clientVendorDto) {
         Optional<ClientVendor> clientVendor = clientVendorRepository.findById(clientVendorDto.getId());
