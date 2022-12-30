@@ -14,5 +14,7 @@ public interface InvoiceProductService {
 
     BigDecimal getTotalSalesForCurrentCompany();
 
+    BigDecimal getTotalProfitLossForCurrentCompany();
+
     List<InvoiceProductDto> getAllByInvoiceStatusApprovedForCurrentCompany();
 }
