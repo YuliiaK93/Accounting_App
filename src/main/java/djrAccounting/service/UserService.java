@@ -1,6 +1,5 @@
 package djrAccounting.service;
 
-
 import djrAccounting.dto.UserDto;
 import djrAccounting.entity.Company;
 import org.springframework.stereotype.Service;
@@ -12,5 +11,8 @@ public interface UserService {
 
     void makeUserEnableByCompany(Company company);
     void makeUserDisableByCompany(Company company);
+    UserDto findByUsername(String username);
+
+
 }
 
