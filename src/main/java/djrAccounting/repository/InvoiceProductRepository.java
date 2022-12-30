@@ -18,4 +18,6 @@ public interface InvoiceProductRepository extends JpaRepository<InvoiceProduct, 
             "where i.invoice.company.id = :id and i.invoice.invoiceStatus = 'APPROVED' " +
             "order by i.invoice.date DESC")
     List<InvoiceProduct> findByInvoice_Company_IdAndInvoice_InvoiceStatusIsApprovedOrderByInvoice_DateDesc(@Param("id") Long companyId);
+
+    List<InvoiceProduct> findByInvoiceId(Long id);
 }
