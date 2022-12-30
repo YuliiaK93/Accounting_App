@@ -5,7 +5,10 @@ import djrAccounting.dto.CompanyDto;
 import djrAccounting.service.CompanyService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/companies")
@@ -29,12 +32,22 @@ public class CompanyController {
     public String createCompany(Model model) {
 
         model.addAttribute("newCompany", new CompanyDto());
+        model.addAttribute("countries", StaticConstants.COUNTRY_LIST);
 
         return "company/company-create";
     }
 
     @PostMapping("/create")
-    public String insertCompany(@ModelAttribute("newCompany") CompanyDto company) {
+    public String insertCompany(@Valid @ModelAttribute("newCompany") CompanyDto company,
+                                BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            return "company/company-create";
+        }
+
+        if (companyService.isTitleExist(company.getTitle())) {
+            bindingResult.rejectValue("title", " ", "This title already exists");
+        }
 
         companyService.save(company);
 

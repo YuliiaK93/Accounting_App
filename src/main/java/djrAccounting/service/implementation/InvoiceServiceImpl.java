@@ -49,4 +49,9 @@ public class InvoiceServiceImpl implements InvoiceService {
     public InvoiceDto findById(Long id) {
         return mapper.convert(invoiceRepository.findById(id).orElseThrow(), InvoiceDto.class);
     }
+
+    @Override
+    public boolean existsByClientVendorId(Long id) {
+        return invoiceRepository.existsByClientVendorId(id);
+    }
 }
