@@ -14,5 +14,6 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     boolean existsByClientVendorId(Long id);
     List<Invoice> findAllByCompanyId(Long id);
     List<Invoice> findAllByCompanyIdAndInvoiceType(Long id, InvoiceType invoiceType);
+    Invoice findTopByCompanyIdOrderByInvoiceNoDesc(Long id);
 }
 

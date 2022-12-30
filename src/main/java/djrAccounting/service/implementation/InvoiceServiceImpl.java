@@ -89,7 +89,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public String nextSalesInvoiceNo() {
-        Invoice invoice = invoiceRepository.findTopByCompanyIdOrderByInvoiceNo(securityService.getLoggedInUser().getCompany().getId());
+        Invoice invoice = invoiceRepository.findTopByCompanyIdOrderByInvoiceNoDesc(securityService.getLoggedInUser().getCompany().getId());
         String invoiceNo = invoice.getInvoiceNo();
         String substring = invoiceNo.substring(2);
         int number = Integer.parseInt(substring) +1;
