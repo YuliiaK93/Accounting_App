@@ -8,7 +8,6 @@ import djrAccounting.repository.InvoiceProductRepository;
 import djrAccounting.service.InvoiceProductService;
 import djrAccounting.service.SecurityService;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
@@ -59,6 +58,19 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     public List<InvoiceProductDto> getAllByInvoiceStatusApprovedForCurrentCompany() {
 
         return invoiceProductRepository.findByInvoice_Company_IdAndInvoice_InvoiceStatusIsApprovedOrderByInvoice_DateDesc(getCurrentCompanyId())
+                .stream()
+                .map(invoiceProduct -> mapper.convert(invoiceProduct, InvoiceProductDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public InvoiceProductDto findById(Long id) {
+        return mapper.convert(invoiceProductRepository.findById(id).orElseThrow(), InvoiceProductDto.class);
+    }
+
+    @Override
+    public List<InvoiceProductDto> findByInvoiceId(Long id) {
+        return invoiceProductRepository.findByInvoiceId(id)
                 .stream()
                 .map(invoiceProduct -> mapper.convert(invoiceProduct, InvoiceProductDto.class))
                 .collect(Collectors.toList());
