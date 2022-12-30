@@ -1,17 +1,21 @@
-package djrAccounting.service.dashboard.implementation;
+package djrAccounting.service.implementation;
 
+import djrAccounting.client.ExchangeClient;
+import djrAccounting.dto.currency.UsdDto;
 import djrAccounting.dto.dashboard.FinancialSummaryDto;
+import djrAccounting.service.DashboardService;
 import djrAccounting.service.InvoiceProductService;
-import djrAccounting.service.dashboard.FinancialSummaryService;
 import org.springframework.stereotype.Service;
 
 @Service
-public class FinancialSummaryServiceImpl implements FinancialSummaryService {
+public class DashboardServiceImpl implements DashboardService {
 
+    private final ExchangeClient exchangeClient;
     private final InvoiceProductService invoiceProductService;
 
-    public FinancialSummaryServiceImpl(InvoiceProductService invoiceProductService) {
+    public DashboardServiceImpl(InvoiceProductService invoiceProductService, ExchangeClient exchangeClient) {
         this.invoiceProductService = invoiceProductService;
+        this.exchangeClient = exchangeClient;
     }
 
     @Override
@@ -22,5 +26,10 @@ public class FinancialSummaryServiceImpl implements FinancialSummaryService {
                 .totalCost(invoiceProductService.getTotalCostForCurrentCompany())
                 .profitLoss(invoiceProductService.getTotalSalesForCurrentCompany()
                         .subtract(invoiceProductService.getTotalCostForCurrentCompany())).build();
+    }
+
+    @Override
+    public UsdDto getExchangeRates() {
+        return exchangeClient.getExchangeRates().getUsdDto();
     }
 }
