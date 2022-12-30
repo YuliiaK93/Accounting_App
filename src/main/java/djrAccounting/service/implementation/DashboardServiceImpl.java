@@ -24,8 +24,7 @@ public class DashboardServiceImpl implements DashboardService {
         return FinancialSummaryDto.builder()
                 .totalSales(invoiceProductService.getTotalSalesForCurrentCompany())
                 .totalCost(invoiceProductService.getTotalCostForCurrentCompany())
-                .profitLoss(invoiceProductService.getTotalSalesForCurrentCompany()
-                        .subtract(invoiceProductService.getTotalCostForCurrentCompany())).build();
+                .profitLoss(invoiceProductService.getTotalProfitLossForCurrentCompany()).build();
     }
 
     @Override

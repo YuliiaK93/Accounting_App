@@ -56,6 +56,16 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     @Override
+    public BigDecimal getTotalProfitLossForCurrentCompany() {
+
+        return invoiceProductRepository.findByInvoice_Company_Id(getCurrentCompanyId())
+                .stream()
+                .map(InvoiceProduct::getProfitLoss)
+                .reduce(BigDecimal::add)
+                .orElseThrow();
+    }
+
+    @Override
     public List<InvoiceProductDto> getAllByInvoiceStatusApprovedForCurrentCompany() {
 
         return invoiceProductRepository.findByInvoice_Company_IdAndInvoice_InvoiceStatusIsApprovedOrderByInvoice_DateDesc(getCurrentCompanyId())
