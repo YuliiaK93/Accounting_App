@@ -9,5 +9,5 @@ public interface CategoryService {
 
     CategoryDto findById(Long id);
 
-    List<Category> listAllCategories();
+    List<CategoryDto> listAllCategories();
 }
