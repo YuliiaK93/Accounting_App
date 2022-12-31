@@ -34,20 +34,18 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public List<CompanyDto> listAllCompanies() {
-
         return companyRepository.findAll(Sort.by("title")).stream()
                 .filter(company -> company.getId() != 1)
                 .map(company -> mapper.convert(company, new CompanyDto()))
                 .sorted(Comparator.comparing(CompanyDto::getCompanyStatus))
                 .collect(Collectors.toList());
-
     }
 
     @Override
     public void activateCompanyStatus(Long id) {
         Company company = mapper.convert(findById(id), Company.class);
         company.setCompanyStatus(CompanyStatus.ACTIVE);
-       // userService.makeUserEnableByCompany(company);
+        // userService.makeUserEnableByCompany(company);
         companyRepository.save(company);
     }
 
@@ -65,23 +63,18 @@ public class CompanyServiceImpl implements CompanyService {
         Company convertedCompany = mapper.convert(companyDto, Company.class);
         convertedCompany.setCompanyStatus(dbCompany.getCompanyStatus());
         companyRepository.save(convertedCompany);
-
         return companyDto;
     }
 
     @Override
     public void save(CompanyDto companyDto) {
-
         Company company = mapper.convert(companyDto, Company.class);
         company.setCompanyStatus(CompanyStatus.ACTIVE);
-
         companyRepository.save(company);
     }
 
     @Override
     public boolean isTitleExist(String title) {
-
         return companyRepository.existsByTitle(title);
     }
-
 }

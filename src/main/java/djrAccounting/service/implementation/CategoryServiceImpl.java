@@ -16,11 +16,8 @@ import java.util.stream.Collectors;
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
-
     private final CategoryRepository categoryRepository;
-
     private final SecurityService securityService;
-
     private final MapperUtil mapper;
 
     public CategoryServiceImpl(CategoryRepository categoryRepository, SecurityService securityService, MapperUtil mapper) {
@@ -40,7 +37,5 @@ public class CategoryServiceImpl implements CategoryService {
             .getCompany().getId()).stream().map(category -> mapper.convert(category, CategoryDto.class))
             .collect(Collectors.toList());
     }
-
-
 }
 

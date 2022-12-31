@@ -22,16 +22,14 @@ public class PurchaseInvoiceController {
         this.invoiceService = invoiceService;
         this.invoiceProductService = invoiceProductService;
     }
+
     @GetMapping("/print/{id}")
     public String printPurchaseInvoice(@PathVariable("id") Long id, Model model) {
-
         InvoiceDto invoiceDto = invoiceService.findById(id);
-
         model.addAttribute("company", companyService.findById(invoiceDto.getCompany().getId()));
         model.addAttribute("invoice", invoiceDto);
         model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(invoiceDto.getId()));
 
         return "invoice/invoice_print";
     }
-
 }

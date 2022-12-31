@@ -17,7 +17,6 @@ public class SecurityServiceImpl implements SecurityService {
     private final UserRepository userRepository;
     private final UserService userService;
 
-
     public SecurityServiceImpl(UserRepository userRepository, UserService userService) {
         this.userRepository = userRepository;
         this.userService = userService;
@@ -31,7 +30,6 @@ public class SecurityServiceImpl implements SecurityService {
         }
         return new UserPrincipal(user);
     }
-
 
     @Override
     public UserDto getLoggedInUser() {

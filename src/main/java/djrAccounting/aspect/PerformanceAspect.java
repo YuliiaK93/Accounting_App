@@ -35,7 +35,5 @@ public class PerformanceAspect {
                 , (afterTime - beforeTime), proceedingJoinPoint.getSignature().toShortString());
 
         return result;
-
     }
-
 }

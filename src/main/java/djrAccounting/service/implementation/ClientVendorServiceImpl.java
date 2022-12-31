@@ -26,7 +26,6 @@ public class ClientVendorServiceImpl implements ClientVendorService {
     private final SecurityService securityService;
     private final InvoiceService invoiceService;
 
-
     public ClientVendorServiceImpl(ClientVendorRepository clientVendorRepository, MapperUtil mapperUtil, SecurityService securityService, InvoiceService invoiceService) {
         this.clientVendorRepository = clientVendorRepository;
         this.mapperUtil = mapperUtil;
@@ -80,14 +79,12 @@ public class ClientVendorServiceImpl implements ClientVendorService {
 
     @Override
     public List<ClientVendorDto> listClientsBySelectedUserCompany() {
-
         return clientVendorRepository.findAllByCompanyIdAndClientVendorTypeOrderByClientVendorName(securityService.getLoggedInUser()
                         .getCompany().getId(), ClientVendorType.CLIENT)
                 .stream()
                 .map(client -> mapperUtil.convert(client, ClientVendorDto.class))
                 .collect(Collectors.toList());
     }
-
 }
 
 

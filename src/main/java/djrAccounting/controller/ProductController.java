@@ -19,17 +19,14 @@ public class ProductController {
     }
 
     @GetMapping("/list")
-    public String listProducts(Model model){
-        model.addAttribute("products", productService.getAllProducts() );
+    public String listProducts(Model model) {
+        model.addAttribute("products", productService.getAllProducts());
         return "/product/product-list";
     }
 
     @GetMapping("/create")
-    public String getProductCreate(){
+    public String getProductCreate() {
         //todo it is created to redirect after Client added
         return "";
     }
-
-
-
 }

@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class TestController {
 
-
     TestRepository testRepository;
 
     public TestController(TestRepository testRepository) {
@@ -16,8 +15,7 @@ public class TestController {
     }
 
     @RequestMapping(value = {"/test"})
-    public String test(Model model){
-
+    public String test(Model model) {
         model.addAttribute("dbmessage", testRepository.getById(1).getTestval());
         return "/test";
     }

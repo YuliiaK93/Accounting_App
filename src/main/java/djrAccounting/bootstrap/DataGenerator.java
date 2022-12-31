@@ -18,7 +18,7 @@ public class DataGenerator implements CommandLineRunner {
         String[] countries = Locale.getISOCountries();
 
         // Loop each country
-        for(int i = 0; i < countries.length; i++) {
+        for (int i = 0; i < countries.length; i++) {
 
             String country = countries[i];
             Locale locale = new Locale("en", country);

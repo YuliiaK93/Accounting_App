@@ -14,18 +14,15 @@ public class UserPrincipal implements UserDetails {
 
     private User user;
 
-
     public UserPrincipal(User user) {
         this.user = user;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-
         List<GrantedAuthority> authorityList = new ArrayList<>();
         GrantedAuthority authority = new SimpleGrantedAuthority(this.user.getRole().getDescription());
         authorityList.add(authority);
-
         return authorityList;
     }
 
@@ -59,16 +56,15 @@ public class UserPrincipal implements UserDetails {
         return this.user.isEnabled();
     }
 
-    public Long getId(){
+    public Long getId() {
         return this.user.getId();
     }
 
-    public String getFullNameForProfile(){
+    public String getFullNameForProfile() {
         return this.user.getFirstname() + " " + this.user.getLastname();
     }
 
-    public String getCompanyTitleForProfile(){
+    public String getCompanyTitleForProfile() {
         return this.user.getCompany().getTitle();
     }
-
 }

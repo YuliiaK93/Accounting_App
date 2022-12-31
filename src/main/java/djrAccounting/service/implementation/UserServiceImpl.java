@@ -21,7 +21,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final MapperUtil mapperUtil;
     private final PasswordEncoder passwordEncoder;
-
     private final SecurityService securityService;
 
     public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder, @Lazy SecurityService securityService) {
@@ -44,7 +43,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> listAllUsers() {
-
         List<User> userList = userRepository.findAll();
         return userList.stream().map(user -> mapperUtil.convert(user, new UserDto()))
                 .sorted(Comparator.comparing((UserDto user) ->
@@ -55,7 +53,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void save(UserDto userDto) {
-
         User user1 = mapperUtil.convert(userDto, new User());
         user1.setPassword(passwordEncoder.encode(user1.getPassword()));
         userRepository.save(user1);
@@ -71,7 +68,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto update(UserDto userDto) {
-
         Optional<User> user = userRepository.findById(userDto.getId());
         User convertedUser = mapperUtil.convert(userDto, new User());
         convertedUser.setId(user.get().getId());
@@ -90,6 +86,7 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
         return list;
     }
+
     public List<UserDto> findAllFilterForLoggedInUser() {
         UserDto loggedInUser = securityService.getLoggedInUser();
         switch (loggedInUser.getRole().getDescription()) {

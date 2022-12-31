@@ -7,7 +7,6 @@ public enum CompanyStatus {
     private final String value;
 
     CompanyStatus(String value) {
-
         this.value = value;
     }
 

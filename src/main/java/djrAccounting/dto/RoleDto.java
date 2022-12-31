@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class RoleDto {
-
     private Long id;
     private String description;
 }

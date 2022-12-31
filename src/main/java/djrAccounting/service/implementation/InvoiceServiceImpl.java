@@ -32,7 +32,6 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public List<InvoiceDto> getLast3ApprovedInvoicesForCurrentUserCompany() {
-
         List<InvoiceDto> invoiceDtoList = invoiceRepository.getLast3ApprovedInvoicesByCompanyId(securityService.getLoggedInUser()
                         .getCompany()
                         .getId())
@@ -52,7 +51,6 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public InvoiceDto findById(Long id) {
         InvoiceDto invoiceDto = mapper.convert(invoiceRepository.findById(id).orElseThrow(), InvoiceDto.class);
-
         invoiceDto.setPrice(invoiceProductService.getTotalPriceByInvoice(invoiceDto.getInvoiceNo()));
         invoiceDto.setTotal(invoiceProductService.getTotalPriceWithTaxByInvoice(invoiceDto.getInvoiceNo()));
         invoiceDto.setTax(invoiceDto.getTotal().subtract(invoiceDto.getPrice()));

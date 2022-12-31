@@ -20,7 +20,6 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public FinancialSummaryDto financialSummaryForCurrentCompany() {
-
         return FinancialSummaryDto.builder()
                 .totalSales(invoiceProductService.getTotalSalesForCurrentCompany())
                 .totalCost(invoiceProductService.getTotalCostForCurrentCompany())

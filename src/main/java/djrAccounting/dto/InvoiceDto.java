@@ -17,13 +17,9 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Data
 public class InvoiceDto {
-
     private Long id;
-
     private String invoiceNo;
-
     private InvoiceStatus invoiceStatus;
-
     private InvoiceType invoiceType;
 
     @NotNull
@@ -35,7 +31,6 @@ public class InvoiceDto {
     private ClientVendorDto clientVendor;
 
     private CompanyDto company;
-
     private BigDecimal price;
     private BigDecimal tax;
     private BigDecimal total;

@@ -21,13 +21,11 @@ public class ReportingServiceImpl implements ReportingService {
 
     @Override
     public List<InvoiceProductDto> getAllInvoiceProductsThatApprovedFroCurrentCompany() {
-
         return invoiceProductService.getAllByInvoiceStatusApprovedForCurrentCompany();
     }
 
     @Override
     public Map<String, BigDecimal> getAllProfitLossPerMonth() {
-
         return invoiceProductService.getAllByInvoiceStatusApprovedForCurrentCompany()
                 .stream()
                 .collect(Collectors.toMap(invoiceProductDto -> invoiceProductDto.getInvoice()

@@ -7,8 +7,6 @@ import java.time.LocalDate;
 
 @Data
 public class ExchangeDto {
-
-
     private LocalDate date;
 
     @JsonProperty("usd")
