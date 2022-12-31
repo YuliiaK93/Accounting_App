@@ -41,13 +41,14 @@ public class CompanyController {
     public String insertCompany(@Valid @ModelAttribute("newCompany") CompanyDto company,
                                 BindingResult bindingResult, Model model) {
 
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("countries", StaticConstants.COUNTRY_LIST);
+        if (companyService.isTitleExist(company.getTitle())) {
+            bindingResult.rejectValue("title", " ", "This title already exists");
             return "company/company-create";
         }
 
-        if (companyService.isTitleExist(company.getTitle())) {
-            bindingResult.rejectValue("title", " ", "This title already exists");
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("countries", StaticConstants.COUNTRY_LIST);
+            return "company/company-create";
         }
 
         companyService.save(company);
