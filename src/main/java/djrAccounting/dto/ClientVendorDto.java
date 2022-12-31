@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
+import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 @AllArgsConstructor
@@ -29,8 +30,9 @@ public class ClientVendorDto {
 
     //TODO @Ekaterina cannot create clientVendor if this annotations present
 
-    //@NotNull(message = "Address is required field.")
-    //@Size(min = 2, max = 100, message = "Address should have 2-100 characters long")
+    @NotNull(message = "Address is required field.")
+   // @Size(min = 2, max = 100, message = "Address should have 2-100 characters long")
+    @Valid
     private AddressDto address;
 
     private CompanyDto company;

@@ -88,6 +88,12 @@ public class ClientVendorServiceImpl implements ClientVendorService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public boolean nameExists(String name) {
+        return clientVendorRepository.existsByClientVendorName(name);
+    }
+
+
 }
 
 
