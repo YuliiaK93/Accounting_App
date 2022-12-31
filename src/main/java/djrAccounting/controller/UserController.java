@@ -32,12 +32,12 @@ public class UserController {
     @GetMapping("/list")
     public String listAllUsers(Model model){
 
-        model.addAttribute("users", userService.listAllUsers());
+        model.addAttribute("users", userService.findAllFilterForLoggedInUser());
 
         return "user/user-list";
     }
 
-    @GetMapping("/user-create")
+    @GetMapping("/create")
     public String createUser(Model model){
 
         model.addAttribute("user", new UserDto());
@@ -45,15 +45,16 @@ public class UserController {
         model.addAttribute("roles", roleService.findById(1L));
         model.addAttribute("companies",companyService.listAllCompanies());
 
-        return "/user-create";
+        return "/user/user-create";
     }
 
-    @PostMapping("/user-create")
-    public String insertUser(@Valid @ModelAttribute("user") UserDto user, BindingResult bindingResult, Model model){
+    @PostMapping("/create")
+    public String insertUser(@Valid @ModelAttribute("user") UserDto user, UserDto userDto, BindingResult bindingResult, Model model){
 
+        //TODO will be implemented after security context of companies, roles
         if(bindingResult.hasErrors()) {
+            model.addAttribute("user", userDto);
             model.addAttribute("roles", roleService.findById(1L));
-            model.addAttribute("users", userService.listAllUsers());
 
             return "/user-create";
         }
@@ -68,6 +69,15 @@ public class UserController {
 
         userService.deleteUserById(id);
         return "redirect:/user-list";
+    }
+
+    @GetMapping("update/{id}")
+    public String editUser(@PathVariable("id") Long userId, Model model){
+        model.addAttribute("user", userService.findById(userId));
+        model.addAttribute("roles", roleService.findById(1L));
+        model.addAttribute("users", userService.listAllUsers());
+
+        return "/user/update";
     }
     @PostMapping("/update/{id}")
     public String updateUser(@PathVariable("id") Long id, Model model){
