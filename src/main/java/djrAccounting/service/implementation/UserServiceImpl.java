@@ -6,6 +6,7 @@ import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.UserRepository;
 import djrAccounting.service.SecurityService;
 import djrAccounting.service.UserService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public class UserServiceImpl implements UserService {
 
     private final SecurityService securityService;
 
-    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder, SecurityService securityService) {
+    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder, @Lazy SecurityService securityService) {
         this.userRepository = userRepository;
         this.mapperUtil = mapperUtil;
         this.passwordEncoder = passwordEncoder;
@@ -44,11 +45,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDto> listAllUsers() {
 
-        List<User> userList =userRepository.findAll();
+        List<User> userList = userRepository.findAll();
         return userList.stream().map(user -> mapperUtil.convert(user, new UserDto()))
                 .sorted(Comparator.comparing((UserDto user) ->
-                 user.getCompany().getTitle())
-                 .thenComparing(userDto -> userDto.getRole().getDescription()))
+                                user.getCompany().getTitle())
+                        .thenComparing(userDto -> userDto.getRole().getDescription()))
                 .collect(Collectors.toList());
     }
 
@@ -63,9 +64,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUserById(Long id) {
         User user = userRepository.findById(id).get();
-
         user.setIsDeleted(true);
-
+        user.setUsername(user.getUsername() + "-" + user.getId());
         userRepository.save(user);
     }
 
@@ -80,4 +80,14 @@ public class UserServiceImpl implements UserService {
         return findById(userDto.getId());
     }
 
+    private List<UserDto> findAllOrderByCompanyAndRole() {
+        List<UserDto> list = userRepository.findAllOrderByCompanyAndRole(false).stream().map(currentUser -> {
+                    Boolean isOnlyAdmin = currentUser.getRole().getDescription().equals("Admin");
+                    UserDto userDto = mapperUtil.convert(currentUser, new UserDto());
+                    userDto.setOnlyAdmin(isOnlyAdmin);
+                    return userDto;
+                })
+                .collect(Collectors.toList());
+        return list;
+    }
 }
