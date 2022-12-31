@@ -5,6 +5,7 @@ import djrAccounting.service.CategoryService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 
@@ -33,5 +34,9 @@ public class CategoryController {
         return "category/category-create";
     }
 
+    @PostMapping("/create")
+    public String insertCategory(){
+
+    }
 
 }
