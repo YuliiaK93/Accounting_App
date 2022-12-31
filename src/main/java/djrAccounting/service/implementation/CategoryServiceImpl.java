@@ -1,6 +1,8 @@
 package djrAccounting.service.implementation;
 
 import djrAccounting.dto.CategoryDto;
+import djrAccounting.entity.Category;
+import djrAccounting.entity.Company;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.CategoryRepository;
 import djrAccounting.service.CategoryService;
@@ -40,15 +42,27 @@ public class CategoryServiceImpl implements CategoryService {
             .collect(Collectors.toList());
 
         newList.forEach(categoryDto -> {
-            if (productService.productExistByCategory(categoryDto.getId())){
-                categoryDto.setHasProduct(true);
-            } else {
-                categoryDto.setHasProduct(false);
-            }
-
+            categoryDto.setHasProduct(productService.productExistByCategory(categoryDto.getId()));
         });
 
         return newList;
+    }
+
+    @Override
+    public void save(CategoryDto categoryDto) {
+        Category category = mapper.convert(categoryDto, Category.class);
+        category.setCompany(mapper.convert(securityService.getLoggedInUser().getCompany(), Company.class));
+        categoryRepository.save(category);
+
+
+    }
+
+
+    @Override
+    public boolean isCategoryDescriptionExist(String description){
+
+        return categoryRepository.existsByDescription(description);
+
     }
 
 }
