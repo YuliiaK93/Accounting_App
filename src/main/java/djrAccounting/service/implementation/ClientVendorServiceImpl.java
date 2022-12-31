@@ -72,6 +72,12 @@ public class ClientVendorServiceImpl implements ClientVendorService {
         }
         }
 
+    @Override
+    public boolean nameExists(String name) {
+        return clientVendorRepository.existsByClientVendorName(name);
+    }
+
+
 }
 
 
