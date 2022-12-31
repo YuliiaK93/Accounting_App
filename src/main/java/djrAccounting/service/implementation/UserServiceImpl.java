@@ -90,4 +90,19 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
         return list;
     }
+    public List<UserDto> findAllFilterForLoggedInUser() {
+        UserDto loggedInUser = securityService.getLoggedInUser();
+        switch (loggedInUser.getRole().getDescription()) {
+            case "Root User":
+                return findAllOrderByCompanyAndRole().stream()
+                        .filter(user -> user.getRole().getDescription().equals("Admin"))
+                        .collect(Collectors.toList());
+            case "Admin":
+                return findAllOrderByCompanyAndRole().stream()
+                        .filter(user -> user.getCompany().equals(loggedInUser.getCompany()))
+                        .collect(Collectors.toList());
+            default:
+                return findAllOrderByCompanyAndRole();
+        }
+    }
 }
