@@ -1,23 +1,34 @@
 package djrAccounting.service.implementation;
 
 import djrAccounting.dto.UserDto;
-import djrAccounting.entity.Company;
 import djrAccounting.entity.User;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.UserRepository;
+import djrAccounting.service.SecurityService;
 import djrAccounting.service.UserService;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final MapperUtil mapperUtil;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil) {
+    private final SecurityService securityService;
+
+    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder, @Lazy SecurityService securityService) {
         this.userRepository = userRepository;
         this.mapperUtil = mapperUtil;
+        this.passwordEncoder = passwordEncoder;
+        this.securityService = securityService;
     }
 
     @Override
@@ -26,23 +37,72 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void makeUserEnableByCompany(Company company) {
-
-        List<User> userList = userRepository.findAllByCompany(company);
-        userList.forEach(user -> user.setEnabled(true));
-        userRepository.saveAll(userList);
-    }
-
-    @Override
-    public void makeUserDisableByCompany(Company company) {
-
-        List<User> userList = userRepository.findAllByCompany(company);
-        userList.forEach(user -> user.setEnabled(false));
-        userRepository.saveAll(userList);
-    }
-
-    @Override
     public UserDto findByUsername(String username) {
-        return mapperUtil.convert(userRepository.findByUsername(username), UserDto.class);
+        User user = userRepository.findByUsername(username);
+        return mapperUtil.convert(user, new UserDto());
+    }
+
+    @Override
+    public List<UserDto> listAllUsers() {
+
+        List<User> userList = userRepository.findAll();
+        return userList.stream().map(user -> mapperUtil.convert(user, new UserDto()))
+                .sorted(Comparator.comparing((UserDto user) ->
+                                user.getCompany().getTitle())
+                        .thenComparing(userDto -> userDto.getRole().getDescription()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void save(UserDto userDto) {
+
+        User user1 = mapperUtil.convert(userDto, new User());
+        user1.setPassword(passwordEncoder.encode(user1.getPassword()));
+        userRepository.save(user1);
+    }
+
+    @Override
+    public void deleteUserById(Long id) {
+        User user = userRepository.findById(id).get();
+        user.setIsDeleted(true);
+        user.setUsername(user.getUsername() + "-" + user.getId());
+        userRepository.save(user);
+    }
+
+    @Override
+    public UserDto update(UserDto userDto) {
+
+        Optional<User> user = userRepository.findById(userDto.getId());
+        User convertedUser = mapperUtil.convert(userDto, new User());
+        convertedUser.setId(user.get().getId());
+        convertedUser.setPassword(user.get().getPassword());
+        userRepository.save(convertedUser);
+        return findById(userDto.getId());
+    }
+
+    private List<UserDto> findAllOrderByCompanyAndRole() {
+        List<UserDto> list = userRepository.findAllOrderByCompanyAndRole(false).stream().map(currentUser -> {
+                    Boolean isOnlyAdmin = currentUser.getRole().getDescription().equals("Admin");
+                    UserDto userDto = mapperUtil.convert(currentUser, new UserDto());
+                    userDto.setOnlyAdmin(isOnlyAdmin);
+                    return userDto;
+                })
+                .collect(Collectors.toList());
+        return list;
+    }
+    public List<UserDto> findAllFilterForLoggedInUser() {
+        UserDto loggedInUser = securityService.getLoggedInUser();
+        switch (loggedInUser.getRole().getDescription()) {
+            case "Root User":
+                return findAllOrderByCompanyAndRole().stream()
+                        .filter(user -> user.getRole().getDescription().equals("Admin"))
+                        .collect(Collectors.toList());
+            case "Admin":
+                return findAllOrderByCompanyAndRole().stream()
+                        .filter(user -> user.getCompany().equals(loggedInUser.getCompany()))
+                        .collect(Collectors.toList());
+            default:
+                return findAllOrderByCompanyAndRole();
+        }
     }
 }
