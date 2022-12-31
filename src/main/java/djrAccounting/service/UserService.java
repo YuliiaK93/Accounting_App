@@ -13,9 +13,8 @@ public interface UserService {
     UserDto findByUsername(String username);
     List<UserDto> listAllUsers();
     void save(UserDto user);
-
     void deleteUserById(Long id);
-
     UserDto update(UserDto user);
+    List<UserDto> findAllFilterForLoggedInUser();
 }
 
