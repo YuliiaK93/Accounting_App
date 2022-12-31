@@ -81,7 +81,7 @@ public class ClientVendorServiceImpl implements ClientVendorService {
     @Override
     public List<ClientVendorDto> listClientsBySelectedUserCompany() {
 
-        return clientVendorRepository.findAllByCompanyIdAndClientVendorType(securityService.getLoggedInUser()
+        return clientVendorRepository.findAllByCompanyIdAndClientVendorTypeOrderByClientVendorName(securityService.getLoggedInUser()
                         .getCompany().getId(), ClientVendorType.CLIENT)
                 .stream()
                 .map(client -> mapperUtil.convert(client, ClientVendorDto.class))

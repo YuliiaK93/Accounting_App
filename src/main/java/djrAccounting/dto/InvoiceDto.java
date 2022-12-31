@@ -5,8 +5,10 @@ import djrAccounting.enums.InvoiceType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -29,6 +31,7 @@ public class InvoiceDto {
     private LocalDate date;
 
     @NotNull(message = "Required field")
+    @Valid
     private ClientVendorDto clientVendor;
 
     private CompanyDto company;

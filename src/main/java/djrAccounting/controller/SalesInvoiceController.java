@@ -1,8 +1,6 @@
 package djrAccounting.controller;
 
 import djrAccounting.dto.InvoiceDto;
-import djrAccounting.enums.InvoiceStatus;
-import djrAccounting.enums.InvoiceType;
 import djrAccounting.service.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,14 +18,14 @@ public class SalesInvoiceController {
     private final InvoiceService invoiceService;
     private final InvoiceProductService invoiceProductService;
     private final ClientVendorService clientVendorService;
-    private final SecurityService securityService;
 
-    public SalesInvoiceController(CompanyService companyService, InvoiceService invoiceService, InvoiceProductService invoiceProductService, ClientVendorService clientVendorService, SecurityService securityService) {
+
+    public SalesInvoiceController(CompanyService companyService, InvoiceService invoiceService, InvoiceProductService invoiceProductService, ClientVendorService clientVendorService) {
         this.companyService = companyService;
         this.invoiceService = invoiceService;
         this.invoiceProductService = invoiceProductService;
         this.clientVendorService = clientVendorService;
-        this.securityService = securityService;
+
     }
     @GetMapping("/list")
     public String listInvoices(Model model){
@@ -63,15 +61,15 @@ public class SalesInvoiceController {
 
 
     @PostMapping("/create")
-    public String createSalesInvoice(@Valid @ModelAttribute ("newSalesInvoice") InvoiceDto invoiceDto,Model model, BindingResult bindingResult){
+    public String createSalesInvoice(@Valid @ModelAttribute ("newSalesInvoice") InvoiceDto invoiceDto, BindingResult bindingResult, Model model){
+
+
+        model.addAttribute("clients",clientVendorService.listClientsBySelectedUserCompany());
 
         if (bindingResult.hasErrors()){
+            model.addAttribute("clients",clientVendorService.listClientsBySelectedUserCompany());
             return "invoice/sales-invoice-create";
         }
-        model.addAttribute("clients",clientVendorService.listClientsBySelectedUserCompany());
-        invoiceDto.setInvoiceType(InvoiceType.SALES);
-        invoiceDto.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
-        invoiceDto.setCompany(securityService.getLoggedInUser().getCompany());
 
         invoiceService.save(invoiceDto);
 

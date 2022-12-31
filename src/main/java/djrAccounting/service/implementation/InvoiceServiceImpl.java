@@ -4,6 +4,7 @@ import djrAccounting.dto.InvoiceDto;
 import djrAccounting.entity.Company;
 import djrAccounting.entity.Invoice;
 import djrAccounting.enums.CompanyStatus;
+import djrAccounting.enums.InvoiceStatus;
 import djrAccounting.enums.InvoiceType;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.InvoiceRepository;
@@ -83,6 +84,9 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public void save(InvoiceDto invoiceDto) {
+        invoiceDto.setInvoiceType(InvoiceType.SALES);
+        invoiceDto.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
+        invoiceDto.setCompany(securityService.getLoggedInUser().getCompany());
         Invoice invoice = mapper.convert(invoiceDto, Invoice.class);
         invoiceRepository.save(invoice);
     }
