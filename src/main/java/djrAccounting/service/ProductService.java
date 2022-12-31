@@ -14,4 +14,6 @@ public interface ProductService {
 
 
     void deleteProductById(Long id);
+
+    boolean productExistByCategory(Long categoryId);
 }
