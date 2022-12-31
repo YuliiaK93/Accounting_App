@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -63,4 +64,16 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
     }
+
+    @Override
+    public UserDto update(UserDto userDto) {
+
+        Optional<User> user = userRepository.findById(userDto.getId());
+        User convertedUser = mapperUtil.convert(userDto, new User());
+        convertedUser.setId(user.get().getId());
+        convertedUser.setPassword(user.get().getPassword());
+        userRepository.save(convertedUser);
+        return findById(userDto.getId());
+    }
+
 }
