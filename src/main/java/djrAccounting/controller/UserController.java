@@ -1,6 +1,7 @@
 package djrAccounting.controller;
 
 import djrAccounting.dto.UserDto;
+import djrAccounting.service.CompanyService;
 import djrAccounting.service.RoleService;
 import djrAccounting.service.SecurityService;
 import djrAccounting.service.UserService;
@@ -17,13 +18,15 @@ public class UserController {
 
     private final RoleService roleService;
     private final UserService userService;
-
     private final SecurityService securityService;
 
-    public UserController(RoleService roleService, UserService userService, SecurityService securityService) {
+    private final CompanyService companyService;
+
+    public UserController(RoleService roleService, UserService userService, SecurityService securityService, CompanyService companyService) {
         this.roleService = roleService;
         this.userService = userService;
         this.securityService = securityService;
+        this.companyService = companyService;
     }
 
     @GetMapping("/list")
@@ -40,7 +43,7 @@ public class UserController {
         model.addAttribute("user", new UserDto());
         //TODO will be implemented after security context @Yuliia
         model.addAttribute("roles", roleService.findById(1L));
-        model.addAttribute("users", userService.listAllUsers());
+        model.addAttribute("companies",companyService.listAllCompanies());
 
         return "/user-create";
     }
@@ -58,40 +61,20 @@ public class UserController {
         userService.save(user);
         return "redirect:/user-create";
 
-
-
     }
 
     @GetMapping("/delete/{id}")
     public String deleteUser(@PathVariable("id") Long id){
 
         userService.deleteUserById(id);
-        return "redirect:/users/list";
+        return "redirect:/user-list";
     }
+    @PostMapping("/update/{id}")
+    public String updateUser(@PathVariable("id") Long id, Model model){
+        model.addAttribute("user", userService.findById(id));
+        model.addAttribute("roles", roleService.findById(1L));
+        model.addAttribute("companies", companyService.listAllCompanies());
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        return "/user/user_update";
+    }
 }
