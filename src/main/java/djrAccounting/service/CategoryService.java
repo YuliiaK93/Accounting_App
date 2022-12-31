@@ -12,4 +12,6 @@ public interface CategoryService {
     List<CategoryDto> listAllCategories();
 
     void save(CategoryDto categoryDto);
+
+    boolean isCategoryDescriptionExist(String description);
 }
