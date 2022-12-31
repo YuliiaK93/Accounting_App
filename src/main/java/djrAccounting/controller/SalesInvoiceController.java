@@ -52,28 +52,37 @@ public class SalesInvoiceController {
     @GetMapping("/create")
     public String createSalesInvoicePage(Model model) {
 
-        model.addAttribute("newSalesInvoice", new InvoiceDto());
-        model.addAttribute("invoiceNo",invoiceService.nextSalesInvoiceNo());
+        InvoiceDto invoiceDto= new InvoiceDto();
+        model.addAttribute("newSalesInvoice", invoiceDto);
+        invoiceDto.setInvoiceNo(invoiceService.nextSalesInvoiceNo());
+        invoiceDto.setDate(LocalDate.now());
         model.addAttribute("clients",clientVendorService.listClientsBySelectedUserCompany());
-        model.addAttribute("date", LocalDate.now());
-
 
         return "invoice/sales-invoice-create";
     }
 
 
     @PostMapping("/create")
-    public String createSalesInvoice(@Valid @ModelAttribute ("newSalesInvoice") InvoiceDto invoiceDto, BindingResult bindingResult){
+    public String createSalesInvoice(@Valid @ModelAttribute ("newSalesInvoice") InvoiceDto invoiceDto,Model model, BindingResult bindingResult){
 
+        if (bindingResult.hasErrors()){
+            return "invoice/sales-invoice-create";
+        }
+        model.addAttribute("clients",clientVendorService.listClientsBySelectedUserCompany());
         invoiceDto.setInvoiceType(InvoiceType.SALES);
         invoiceDto.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
         invoiceDto.setCompany(securityService.getLoggedInUser().getCompany());
-        invoiceDto.setInvoiceNo(invoiceService.nextSalesInvoiceNo());
-        invoiceDto.setDate(LocalDate.now());
 
         invoiceService.save(invoiceDto);
 
-        return "invoice/sales-invoice-create";
+        return "redirect:/products/create";
+    }
+
+
+    @PostMapping("/update/{id}")
+    public String updateSalesInvoice (@PathVariable("id") Long id, InvoiceDto invoiceDto ){
+        //todo @mehmet will implement update
+        return "redirect:/salesInvoices/list";
     }
 
 }
