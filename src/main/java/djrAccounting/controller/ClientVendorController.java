@@ -38,6 +38,7 @@ public class ClientVendorController {
     public String createClientVendor(@Valid @ModelAttribute("newClientVendor") ClientVendorDto clientVendorDto, BindingResult bindingResult, Model model) {
     if(bindingResult.hasErrors()){
         model.addAttribute("clientVendorTypes", ClientVendorType.values());
+        model.addAttribute("countries", StaticConstants.COUNTRY_LIST);
         return "clientVendor/clientVendor-create";
     }
        clientVendorService.save(clientVendorDto);
