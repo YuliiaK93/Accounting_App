@@ -1,6 +1,11 @@
 package djrAccounting.service.implementation;
 
 import djrAccounting.dto.InvoiceDto;
+import djrAccounting.entity.Company;
+import djrAccounting.entity.Invoice;
+import djrAccounting.enums.CompanyStatus;
+import djrAccounting.enums.InvoiceStatus;
+import djrAccounting.enums.InvoiceType;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.InvoiceRepository;
 import djrAccounting.service.InvoiceProductService;
@@ -58,5 +63,43 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public boolean existsByClientVendorId(Long id) {
         return invoiceRepository.existsByClientVendorId(id);
+    }
+
+    @Override
+    public List<InvoiceDto> findSalesInvoicesByCurrentUserCompany() {
+        List<InvoiceDto> invoiceDtoList = invoiceRepository.findAllByCompanyIdAndInvoiceType(securityService.getLoggedInUser()
+                .getCompany().getId(), InvoiceType.SALES)
+                .stream()
+                .map(invoice -> mapper.convert(invoice, InvoiceDto.class))
+                .collect(Collectors.toList());
+
+        invoiceDtoList.forEach(invoiceDto -> {
+            invoiceDto.setPrice(invoiceProductService.getTotalPriceByInvoice(invoiceDto.getInvoiceNo()));
+            invoiceDto.setTotal(invoiceProductService.getTotalPriceWithTaxByInvoice(invoiceDto.getInvoiceNo()));
+            invoiceDto.setTax(invoiceDto.getTotal().subtract(invoiceDto.getPrice()));
+        });
+
+        return invoiceDtoList;
+    }
+
+    @Override
+    public void save(InvoiceDto invoiceDto) {
+        invoiceDto.setInvoiceType(InvoiceType.SALES);
+        invoiceDto.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
+        invoiceDto.setCompany(securityService.getLoggedInUser().getCompany());
+        Invoice invoice = mapper.convert(invoiceDto, Invoice.class);
+        invoiceRepository.save(invoice);
+    }
+
+    @Override
+    public String nextSalesInvoiceNo() {
+        Invoice invoice = invoiceRepository.findTopByCompanyIdOrderByIdDesc(securityService.getLoggedInUser().getCompany().getId());
+        String invoiceNo = invoice.getInvoiceNo();
+        String substring = invoiceNo.substring(2);
+        int number = Integer.parseInt(substring) +1;
+        if(number<10) {return "S-"+"00"+number;}
+        else if (number<100) {return "S-"+"0"+number;}
+
+        return  "S-"+number;
     }
 }
