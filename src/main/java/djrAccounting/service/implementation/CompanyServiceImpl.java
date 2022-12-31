@@ -47,7 +47,7 @@ public class CompanyServiceImpl implements CompanyService {
     public void activateCompanyStatus(Long id) {
         Company company = mapper.convert(findById(id), Company.class);
         company.setCompanyStatus(CompanyStatus.ACTIVE);
-        userService.makeUserEnableByCompany(company);
+       // userService.makeUserEnableByCompany(company);
         companyRepository.save(company);
     }
 
@@ -55,7 +55,7 @@ public class CompanyServiceImpl implements CompanyService {
     public void deactivateCompanyStatus(Long id) {
         Company company = mapper.convert(findById(id), Company.class);
         company.setCompanyStatus(CompanyStatus.PASSIVE);
-        userService.makeUserDisableByCompany(company);
+        //userService.makeUserDisableByCompany(company);
         companyRepository.save(company);
     }
 

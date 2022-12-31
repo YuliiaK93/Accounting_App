@@ -6,4 +6,5 @@ import java.util.List;
 public interface InvoiceService {
     List<InvoiceDto> getLast3ApprovedInvoicesForCurrentUserCompany();
     InvoiceDto findById(Long id);
+    boolean existsByClientVendorId(Long id);
 }
