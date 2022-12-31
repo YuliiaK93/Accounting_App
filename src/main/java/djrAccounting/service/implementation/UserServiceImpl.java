@@ -53,7 +53,6 @@ public class UserServiceImpl implements UserService {
         User user1 = mapperUtil.convert(userDto, new User());
         user1.setPassword(passwordEncoder.encode(user1.getPassword()));
         userRepository.save(user1);
-
     }
 
     @Override
@@ -63,6 +62,5 @@ public class UserServiceImpl implements UserService {
         user.setIsDeleted(true);
 
         userRepository.save(user);
-
     }
 }
