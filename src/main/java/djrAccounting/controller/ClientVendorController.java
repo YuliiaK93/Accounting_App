@@ -37,15 +37,19 @@ public class ClientVendorController {
 
     @PostMapping("/create")
     public String createClientVendor(@Valid @ModelAttribute("newClientVendor") ClientVendorDto clientVendorDto, BindingResult bindingResult, Model model) {
-        boolean duplicatedName=clientVendorService.nameExists(clientVendorDto.getClientVendorName());
-        if(bindingResult.hasErrors() || duplicatedName){
-            if(duplicatedName){
-                bindingResult.rejectValue("clientVendorName"," ", "A Client/Vendor with this name already exists. Please, try again.");
+        boolean duplicatedName = clientVendorService.nameExists(clientVendorDto.getClientVendorName());
+        if (bindingResult.hasErrors() || duplicatedName) {
+            if (duplicatedName) {
+                bindingResult.rejectValue("clientVendorName", " ", "A Client/Vendor with this name already exists. Please, try again.");
             }
             model.addAttribute("clientVendorTypes", ClientVendorType.values());
             model.addAttribute("countries", StaticConstants.COUNTRY_LIST);
             return "clientVendor/clientVendor-create";
         }
+
+        clientVendorService.save(clientVendorDto);
+        return "redirect:/clientVendors/list";
+    }
 
     @GetMapping("/update/{id}")
     public String editClientVendor(@PathVariable("id") Long id, Model model) {
