@@ -9,6 +9,7 @@ import djrAccounting.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,6 +46,9 @@ public class UserServiceImpl implements UserService {
 
         List<User> userList =userRepository.findAll();
         return userList.stream().map(user -> mapperUtil.convert(user, new UserDto()))
+                .sorted(Comparator.comparing((UserDto user) ->
+                 user.getCompany().getTitle())
+                 .thenComparing(userDto -> userDto.getRole().getDescription()))
                 .collect(Collectors.toList());
     }
 
