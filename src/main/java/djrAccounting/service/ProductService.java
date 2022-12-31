@@ -11,4 +11,6 @@ public interface ProductService {
     List<ProductDto> getAllProducts();
 
     void deleteProductById(Long id);
+
+    boolean productExistByCategory(Long categoryId);
 }

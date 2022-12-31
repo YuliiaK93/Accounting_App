@@ -1,7 +1,6 @@
 package djrAccounting.service;
 
 import djrAccounting.dto.ClientVendorDto;
-
 import java.util.List;
 
 public interface ClientVendorService {

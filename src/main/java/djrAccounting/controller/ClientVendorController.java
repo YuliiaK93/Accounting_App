@@ -37,14 +37,15 @@ public class ClientVendorController {
 
     @PostMapping("/create")
     public String createClientVendor(@Valid @ModelAttribute("newClientVendor") ClientVendorDto clientVendorDto, BindingResult bindingResult, Model model) {
-        if (bindingResult.hasErrors()) {
+        boolean duplicatedName=clientVendorService.nameExists(clientVendorDto.getClientVendorName());
+        if(bindingResult.hasErrors() || duplicatedName){
+            if(duplicatedName){
+                bindingResult.rejectValue("clientVendorName"," ", "A Client/Vendor with this name already exists. Please, try again.");
+            }
             model.addAttribute("clientVendorTypes", ClientVendorType.values());
             model.addAttribute("countries", StaticConstants.COUNTRY_LIST);
             return "clientVendor/clientVendor-create";
         }
-        clientVendorService.save(clientVendorDto);
-        return "redirect:/clientVendors/list";
-    }
 
     @GetMapping("/update/{id}")
     public String editClientVendor(@PathVariable("id") Long id, Model model) {
@@ -55,14 +56,18 @@ public class ClientVendorController {
     }
 
     @PostMapping("/update/{id}")                             //TODO @Ekaterina will implement UI validation
-    public String editClientVendor(@Valid @ModelAttribute("clientVendor") ClientVendorDto clientVendorDto, BindingResult bindingResult, @PathVariable("id") Long id, Model model) {
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("countries", StaticConstants.COUNTRY_LIST);
-            model.addAttribute("clientVendorTypes", ClientVendorType.values());
-            return "clientVendor/clientVendor-update";
-        }
-        clientVendorService.update(clientVendorDto);
-        return "redirect:/clientVendors/list";
+    public String editClientVendor(@Valid @ModelAttribute("clientVendor") ClientVendorDto clientVendorDto, BindingResult bindingResult,@PathVariable("id") Long id, Model model){
+            boolean duplicatedName = clientVendorService.nameExists(clientVendorDto.getClientVendorName());
+            if(bindingResult.hasErrors() || duplicatedName){
+                if(duplicatedName){
+                    bindingResult.rejectValue("clientVendorName"," ", "A Client/Vendor with this name already exists. Please, try again.");
+                }
+                model.addAttribute("countries", StaticConstants.COUNTRY_LIST);
+                model.addAttribute("clientVendorTypes", ClientVendorType.values());
+                return "clientVendor/clientVendor-update";
+            }
+            clientVendorService.update(clientVendorDto);
+            return "redirect:/clientVendors/list";
     }
 
     @GetMapping("/delete/{id}")

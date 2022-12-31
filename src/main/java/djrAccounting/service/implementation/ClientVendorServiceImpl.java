@@ -5,7 +5,6 @@ import djrAccounting.dto.ClientVendorDto;
 import djrAccounting.entity.ClientVendor;
 import djrAccounting.entity.Company;
 import djrAccounting.enums.ClientVendorType;
-
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.ClientVendorRepository;
 import djrAccounting.service.ClientVendorService;
@@ -84,6 +83,11 @@ public class ClientVendorServiceImpl implements ClientVendorService {
                 .stream()
                 .map(client -> mapperUtil.convert(client, ClientVendorDto.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean nameExists(String name) {
+        return clientVendorRepository.existsByClientVendorName(name);
     }
 }
 
