@@ -24,6 +24,12 @@ public class ProductController {
         return "/product/product-list";
     }
 
+    @GetMapping("/create")
+    public String getProductCreate(){
+        //todo it is created to redirect after Client added
+        return "";
+    }
+
 
 
 }

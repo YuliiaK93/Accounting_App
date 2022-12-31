@@ -39,14 +39,16 @@ public class CompanyController {
 
     @PostMapping("/create")
     public String insertCompany(@Valid @ModelAttribute("newCompany") CompanyDto company,
-                                BindingResult bindingResult) {
-
-        if (bindingResult.hasErrors()) {
-            return "company/company-create";
-        }
+                                BindingResult bindingResult, Model model) {
 
         if (companyService.isTitleExist(company.getTitle())) {
             bindingResult.rejectValue("title", " ", "This title already exists");
+            return "company/company-create";
+        }
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("countries", StaticConstants.COUNTRY_LIST);
+            return "company/company-create";
         }
 
         companyService.save(company);
@@ -64,7 +66,13 @@ public class CompanyController {
     }
 
     @PostMapping("/update/{id}")
-    public String updateCompany(@ModelAttribute("company") CompanyDto companyDto) {
+    public String updateCompany(@Valid @ModelAttribute("company") CompanyDto companyDto,
+                                BindingResult bindingResult, Model model) {
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("countries", StaticConstants.COUNTRY_LIST);
+            return "company/company-update";
+        }
 
         companyService.update(companyDto);
 
