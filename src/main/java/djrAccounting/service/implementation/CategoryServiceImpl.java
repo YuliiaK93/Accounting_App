@@ -16,11 +16,8 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
-
     private final SecurityService securityService;
-
     private final ProductServiceImpl productService;
-
     private final MapperUtil mapper;
 
     public CategoryServiceImpl(CategoryRepository categoryRepository, SecurityService securityService, ProductServiceImpl productService, MapperUtil mapper) {
@@ -53,16 +50,11 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = mapper.convert(categoryDto, Category.class);
         category.setCompany(mapper.convert(securityService.getLoggedInUser().getCompany(), Company.class));
         categoryRepository.save(category);
-
-
     }
-
 
     @Override
     public boolean isCategoryDescriptionExist(String description){
-
         return categoryRepository.existsByDescription(description);
-
     }
-
 }
+

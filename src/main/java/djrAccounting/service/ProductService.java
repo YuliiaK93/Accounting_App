@@ -6,12 +6,9 @@ import java.util.List;
 
 public interface ProductService {
 
-    ProductDto findById( Long id);
+    ProductDto findById(Long id);
 
     List<ProductDto> getAllProducts();
-
-
-
 
     void deleteProductById(Long id);
 

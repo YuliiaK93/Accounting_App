@@ -19,14 +19,11 @@ public class DashboardController {
         this.dashboardService = dashboardService;
     }
 
-
     @GetMapping
     public String dashboard(Model model) {
-
         model.addAttribute("exchangeRates", dashboardService.getExchangeRates());
         model.addAttribute("invoices", invoiceService.getLast3ApprovedInvoicesForCurrentUserCompany());
         model.addAttribute("summaryNumbers", dashboardService.financialSummaryForCurrentCompany());
-
         return "dashboard";
     }
 }

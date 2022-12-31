@@ -24,23 +24,18 @@ public class CategoryController {
 
     @GetMapping("/list")
     public String getCategories(Model model) {
-
         model.addAttribute("categories", categoryService.listAllCategories());
         return "category/category-list";
     }
 
     @GetMapping("/create")
     public String createCategory(Model model){
-
         model.addAttribute("newCategory", new CategoryDto());
-
         return "category/category-create";
     }
 
     @PostMapping("/create")
     public String insertCategory(@Valid @ModelAttribute("newCategory")CategoryDto category, BindingResult bindingResult){
-
-
         if(categoryService.isCategoryDescriptionExist(category.getDescription())){
             bindingResult.rejectValue("description", " ",
                     "You already have a category name with this description");
@@ -51,9 +46,6 @@ public class CategoryController {
         }
 
         categoryService.save(category);
-
         return "redirect:/categories/list";
-
     }
-
 }

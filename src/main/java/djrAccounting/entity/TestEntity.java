@@ -14,10 +14,7 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @Table(name = "test")
 public class TestEntity {
-
     @Id
     private Integer id;
     private String testval;
-    //this line
-
 }

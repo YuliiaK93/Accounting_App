@@ -5,7 +5,6 @@ import djrAccounting.dto.ClientVendorDto;
 import djrAccounting.entity.ClientVendor;
 import djrAccounting.entity.Company;
 import djrAccounting.enums.ClientVendorType;
-
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.ClientVendorRepository;
 import djrAccounting.service.ClientVendorService;
@@ -25,7 +24,6 @@ public class ClientVendorServiceImpl implements ClientVendorService {
     private final MapperUtil mapperUtil;
     private final SecurityService securityService;
     private final InvoiceService invoiceService;
-
 
     public ClientVendorServiceImpl(ClientVendorRepository clientVendorRepository, MapperUtil mapperUtil, SecurityService securityService, InvoiceService invoiceService) {
         this.clientVendorRepository = clientVendorRepository;
@@ -80,7 +78,6 @@ public class ClientVendorServiceImpl implements ClientVendorService {
 
     @Override
     public List<ClientVendorDto> listClientsBySelectedUserCompany() {
-
         return clientVendorRepository.findAllByCompanyIdAndClientVendorTypeOrderByClientVendorName(securityService.getLoggedInUser()
                         .getCompany().getId(), ClientVendorType.CLIENT)
                 .stream()
@@ -92,8 +89,6 @@ public class ClientVendorServiceImpl implements ClientVendorService {
     public boolean nameExists(String name) {
         return clientVendorRepository.existsByClientVendorName(name);
     }
-
-
 }
 
 

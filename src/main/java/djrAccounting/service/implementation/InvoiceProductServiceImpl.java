@@ -8,6 +8,7 @@ import djrAccounting.repository.InvoiceProductRepository;
 import djrAccounting.service.InvoiceProductService;
 import djrAccounting.service.SecurityService;
 import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
@@ -28,7 +29,6 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
     public BigDecimal getTotalPriceByInvoice(String invoiceNo) {
-
         return invoiceProductRepository.findByInvoice_InvoiceNoAndInvoice_Company_Id(invoiceNo, getCurrentCompanyId())
                 .stream()
                 .map(invoiceProduct -> invoiceProduct.getPrice()
@@ -44,19 +44,16 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
     public BigDecimal getTotalCostForCurrentCompany() {
-
         return calculatePriceWithTax(invoiceProductRepository.findAllInvoicesByInvoice_Company_IdAndInvoice_InvoiceStatusIsApproved(getCurrentCompanyId(), InvoiceType.PURCHASE));
     }
 
     @Override
     public BigDecimal getTotalSalesForCurrentCompany() {
-
         return calculatePriceWithTax(invoiceProductRepository.findAllInvoicesByInvoice_Company_IdAndInvoice_InvoiceStatusIsApproved(getCurrentCompanyId(), InvoiceType.SALES));
     }
 
     @Override
     public BigDecimal getTotalProfitLossForCurrentCompany() {
-
         return invoiceProductRepository.findByInvoice_Company_Id(getCurrentCompanyId())
                 .stream()
                 .map(InvoiceProduct::getProfitLoss)
@@ -66,7 +63,6 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
     public List<InvoiceProductDto> getAllByInvoiceStatusApprovedForCurrentCompany() {
-
         return invoiceProductRepository.findByInvoice_Company_IdAndInvoice_InvoiceStatusIsApprovedOrderByInvoice_DateDesc(getCurrentCompanyId())
                 .stream()
                 .map(invoiceProduct -> mapper.convert(invoiceProduct, InvoiceProductDto.class))
@@ -87,7 +83,6 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     private BigDecimal calculatePriceWithTax(List<InvoiceProduct> list) {
-
         return list.stream()
                 .map(invoiceProduct -> invoiceProduct.getPrice()
                         .add(invoiceProduct.getPrice()
