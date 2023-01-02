@@ -34,21 +34,20 @@ public class UserController {
 
     @GetMapping("/create")
     public String createUser(Model model) {
-        model.addAttribute("user", new UserDto());
-        //TODO will be implemented after security context @Yuliia
-        model.addAttribute("roles", roleService.listRoles());
-        model.addAttribute("companies", companyService.listAllCompanies());
+        model.addAttribute("newUser", new UserDto());
+        model.addAttribute("userRoles", roleService.listRoleByLoggedInUser());
+        model.addAttribute("companies", companyService.listAllCompanies()); //TODO
 
-        return "/user-create";
+        return "user/user-create";
     }
 
     @PostMapping("/create")
-    public String insertUser( @ModelAttribute("user") UserDto user, BindingResult bindingResult, Model model) {
+    public String insertUser( @Valid @ModelAttribute("newUser") UserDto user, BindingResult bindingResult, Model model) {
         //TODO will be implemented after security context of companies, roles
         if (bindingResult.hasErrors()) {
-            model.addAttribute("users", userService.findAllFilterForLoggedInUser());
-            model.addAttribute("roles", roleService.listRoles());
-            model.addAttribute("companies", companyService.listAllCompanies());
+            model.addAttribute("newUser", user);
+            model.addAttribute("userRoles", roleService.listRoleByLoggedInUser());
+            model.addAttribute("companies", companyService.listAllCompanies());//TODO
 
             return "user/user-create";
         }
