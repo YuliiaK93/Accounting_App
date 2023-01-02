@@ -16,4 +16,6 @@ public interface InvoiceService {
     void save(InvoiceDto invoiceDto);
 
     String nextSalesInvoiceNo();
+
+    List<InvoiceDto> getAllPurchaseInvoiceForCurrentCompany();
 }

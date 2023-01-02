@@ -39,7 +39,7 @@ public class ProductServiceImpl implements ProductService {
     public void deleteProductById(Long id) {
         Product product = productRepository.findById(id).orElseThrow();
 
-        // if (productDto.getQuantityInStock()>0 || )
+       // if (productDto.getQuantityInStock()>0 || )
         // TODO: 12/28/2022
         product.setIsDeleted(true);
         productRepository.save(product);
@@ -51,6 +51,14 @@ public class ProductServiceImpl implements ProductService {
 
     }
 
+    @Override
+    public void update(ProductDto productDto) {
+        productRepository.save(mapper.convert(productDto, Product.class));
+    }
 
+    @Override
+    public void save(ProductDto productDto) {
+        productRepository.save(mapper.convert(productDto, Product.class));
+    }
 
 }
