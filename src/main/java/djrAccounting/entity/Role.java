@@ -15,6 +15,5 @@ import javax.persistence.Table;
 @Where(clause = "is_deleted = false")
 @NoArgsConstructor
 public class Role extends BaseEntity {
-
     private String description;
 }

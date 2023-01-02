@@ -16,6 +16,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class ClientVendor extends BaseEntity {
 
+    @Column(unique = true)
     private String clientVendorName;
     private String phone;
     private String website;

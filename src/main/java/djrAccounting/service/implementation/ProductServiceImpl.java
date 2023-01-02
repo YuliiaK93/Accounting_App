@@ -15,11 +15,8 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
-
     private final SecurityService securityService;
-
     private final MapperUtil mapper;
-
 
     public ProductServiceImpl(ProductRepository productRepository, SecurityService securityService, MapperUtil mapper) {
         this.productRepository = productRepository;
@@ -29,24 +26,29 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDto findById(Long id) {
-        return mapper.convert(productRepository.findById(id).orElseThrow(),ProductDto.class);
+        return mapper.convert(productRepository.findById(id).orElseThrow(), ProductDto.class);
     }
 
     @Override
     public List<ProductDto> getAllProducts() {
         Long companyId = securityService.getLoggedInUser().getCompany().getId();
-        return productRepository.findAll().stream().filter(product -> product.getCategory().getCompany().getId()== companyId).map(product -> mapper.convert(product, new ProductDto())).collect(Collectors.toList());
+        return productRepository.findAll().stream().filter(product -> product.getCategory().getCompany().getId() == companyId).map(product -> mapper.convert(product, new ProductDto())).collect(Collectors.toList());
     }
 
     @Override
-    public void deleteProductById(Long id){
+    public void deleteProductById(Long id) {
         Product product = productRepository.findById(id).orElseThrow();
-
 
        // if (productDto.getQuantityInStock()>0 || )
         // TODO: 12/28/2022
         product.setIsDeleted(true);
         productRepository.save(product);
+    }
+
+    @Override
+    public boolean productExistByCategory(Long categoryId){
+        return productRepository.existsByCategory_Id(categoryId);
+
     }
 
     @Override
@@ -58,6 +60,5 @@ public class ProductServiceImpl implements ProductService {
     public void save(ProductDto productDto) {
         productRepository.save(mapper.convert(productDto, Product.class));
     }
-
 
 }

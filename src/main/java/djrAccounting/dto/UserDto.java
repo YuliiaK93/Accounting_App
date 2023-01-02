@@ -60,7 +60,6 @@ public class UserDto {
     @NotNull(message = "Please select a Customer.")
     private CompanyDto company;
 
-
     public boolean isOnlyAdmin() {
         return true; //TODO will be implemented by @Yuliia after security context
     }

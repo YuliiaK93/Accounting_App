@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import org.springframework.core.convert.converter.Converter;
+
 @Component
 @ConfigurationPropertiesBinding
 public class InvoiceDTOConverter implements Converter<String, InvoiceDto> {
@@ -20,10 +21,9 @@ public class InvoiceDTOConverter implements Converter<String, InvoiceDto> {
 
     @Override
     public InvoiceDto convert(String source) {
-        if(source == null || source.isBlank()){
+        if (source == null || source.isBlank()) {
             return null;
         }
-
-       return invoiceService.findById(Long.parseLong(source));
+        return invoiceService.findById(Long.parseLong(source));
     }
 }

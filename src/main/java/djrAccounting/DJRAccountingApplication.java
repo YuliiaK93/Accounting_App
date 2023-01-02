@@ -18,7 +18,6 @@ public class DJRAccountingApplication {
 
     @Bean
     public ModelMapper mapper() {
-
         return new ModelMapper();
     }
 
