@@ -39,7 +39,7 @@ public class UserController {
         model.addAttribute("roles", roleService.listRoles());
         model.addAttribute("companies", companyService.listAllCompanies());
 
-        return "/user/user-create";
+        return "/user-create";
     }
 
     @PostMapping("/create")
