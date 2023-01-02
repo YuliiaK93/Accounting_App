@@ -8,6 +8,7 @@ import djrAccounting.repository.InvoiceRepository;
 import djrAccounting.service.InvoiceProductService;
 import djrAccounting.service.InvoiceService;
 import djrAccounting.service.SecurityService;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -53,13 +54,22 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public List<InvoiceDto> getAllPurchaseInvoiceForCurrentCompany(){
-        return invoiceRepository.findAllPurchaseInvoiceForCurrentCompany(((UserPrincipal) SecurityContextHolder.getContext()
+    public List<InvoiceDto> getAllPurchaseInvoiceForCurrentCompany() {
+        List<InvoiceDto> purchaseInvoice = invoiceRepository.findAllPurchaseInvoiceForCurrentCompany(((UserPrincipal) SecurityContextHolder.getContext()
                         .getAuthentication()
                         .getPrincipal()).getCompanyTitleForProfile(), InvoiceType.PURCHASE)
                 .stream()
                 .map(invoice -> mapper.convert(invoice, InvoiceDto.class))
                 .collect(Collectors.toList());
+
+       purchaseInvoice.
+
+        // get all the products for each invoice
+        // than multiply product quantity x product price
+        // than sum all of than to find the total price of each invoice
+        // when iterate over each product we need keep the tax rate for calculate the tax value
+        // we need to find total coast of each invoice by add tax value to price for each product and
+        // than update price and total tax values of each invoiceDTO
 
     }
 
