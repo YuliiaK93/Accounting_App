@@ -1,21 +1,29 @@
 package djrAccounting.controller;
 
+import djrAccounting.dto.ProductDto;
+import djrAccounting.enums.ProductUnit;
+import djrAccounting.service.CategoryService;
 import djrAccounting.service.ProductService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Controller
-@RequestMapping("products")
+@RequestMapping("/products")
 
 
 public class ProductController {
 
-    private ProductService productService;
+    private final ProductService productService;
 
-    public ProductController(ProductService productService) {
+    private final CategoryService categoryService;
+
+    public ProductController(ProductService productService, CategoryService categoryService) {
         this.productService = productService;
+        this.categoryService = categoryService;
     }
 
     @GetMapping("/list")
@@ -24,9 +32,46 @@ public class ProductController {
         return "/product/product-list";
     }
 
-    @GetMapping("/create")
-    public String getProductCreate() {
-        //todo it is created to redirect after Client added
-        return "";
+    @GetMapping("/update/{id}")
+    public String updateProduct(Model model, @PathVariable Long id){
+        model.addAttribute("product", productService.findById(id));
+        model.addAttribute("categories", categoryService.listAllCategories());
+        model.addAttribute("productUnits", ProductUnit.values());
+        return "/product/product-update";
     }
+@PostMapping("/update/{id}")
+    public String updateProduct(@Valid @ModelAttribute("product") ProductDto productDto, BindingResult bindingResult, Model model){
+        if (bindingResult.hasErrors()){
+            model.addAttribute("categories", categoryService.listAllCategories());
+            model.addAttribute("productUnits", ProductUnit.values());
+            return "/product/product-update";
+        }
+        productService.update(productDto);
+        return "redirect:/products/list";
+}
+    @GetMapping("/create")
+    public String createProduct(Model model){
+        model.addAttribute("newProduct", new ProductDto());
+        model.addAttribute("categories", categoryService.listAllCategories());
+        model.addAttribute("productUnits", ProductUnit.values());
+        return "/product/product-create";
+    }
+@PostMapping("/create")
+    public String createProduct(@Valid @ModelAttribute("newProduct") ProductDto productDto, BindingResult bindingResult, Model model){
+        if (bindingResult.hasErrors()){
+            model.addAttribute("categories", categoryService.listAllCategories());
+            model.addAttribute("productUnits", ProductUnit.values());
+            return "/product/product-create";
+        }
+        productService.save(productDto);
+        return "redirect:/products/list";
+}
+    @GetMapping("/delete/{id}")
+    public String deleteProduct(@PathVariable Long id) {
+
+        productService.deleteProductById(id);
+
+        return "redirect:/products/list";
+    }
+
 }

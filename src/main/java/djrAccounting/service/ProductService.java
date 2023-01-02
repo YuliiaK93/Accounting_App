@@ -13,4 +13,8 @@ public interface ProductService {
     void deleteProductById(Long id);
 
     boolean productExistByCategory(Long categoryId);
+
+    void update(ProductDto productDto);
+
+    void save(ProductDto productDto);
 }
