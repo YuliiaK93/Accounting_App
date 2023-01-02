@@ -36,24 +36,25 @@ public class UserController {
     public String createUser(Model model) {
         model.addAttribute("user", new UserDto());
         //TODO will be implemented after security context @Yuliia
-        model.addAttribute("roles", roleService.findById(1L));
+        model.addAttribute("roles", roleService.listRoles());
         model.addAttribute("companies", companyService.listAllCompanies());
 
         return "/user/user-create";
     }
 
     @PostMapping("/create")
-    public String insertUser(@Valid @ModelAttribute("user") UserDto user, UserDto userDto, BindingResult bindingResult, Model model) {
+    public String insertUser( @ModelAttribute("user") UserDto user, BindingResult bindingResult, Model model) {
         //TODO will be implemented after security context of companies, roles
         if (bindingResult.hasErrors()) {
-            model.addAttribute("user", userDto);
-            model.addAttribute("roles", roleService.findById(1L));
+            model.addAttribute("users", userService.findAllFilterForLoggedInUser());
+            model.addAttribute("roles", roleService.listRoles());
+            model.addAttribute("companies", companyService.listAllCompanies());
 
-            return "/user-create";
+            return "user/user-create";
         }
 
         userService.save(user);
-        return "redirect:/user-create";
+        return "redirect:/users/list";
     }
 
     @GetMapping("/delete/{id}")
