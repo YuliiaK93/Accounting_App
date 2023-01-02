@@ -1,6 +1,8 @@
 package djrAccounting.controller;
 
 import djrAccounting.dto.InvoiceDto;
+import djrAccounting.dto.InvoiceProductDto;
+import djrAccounting.dto.ProductDto;
 import djrAccounting.service.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,12 +20,14 @@ public class SalesInvoiceController {
     private final InvoiceService invoiceService;
     private final InvoiceProductService invoiceProductService;
     private final ClientVendorService clientVendorService;
+    private final ProductService productService;
 
-    public SalesInvoiceController(CompanyService companyService, InvoiceService invoiceService, InvoiceProductService invoiceProductService, ClientVendorService clientVendorService) {
+    public SalesInvoiceController(CompanyService companyService, InvoiceService invoiceService, InvoiceProductService invoiceProductService, ClientVendorService clientVendorService, ProductService productService) {
         this.companyService = companyService;
         this.invoiceService = invoiceService;
         this.invoiceProductService = invoiceProductService;
         this.clientVendorService = clientVendorService;
+        this.productService = productService;
     }
 
     @GetMapping("/list")
@@ -62,8 +66,30 @@ public class SalesInvoiceController {
         }
 
         invoiceService.save(invoiceDto);
-        return "redirect:/products/create";
+        return "redirect:/salesInvoices/update/"+invoiceDto.getId();
     }
+
+    @GetMapping("/update/{id}")
+    public String getUpdateSalesInvoice(@PathVariable("id") Long id,Model model){
+        model.addAttribute("invoice", invoiceService.findById(id));
+        model.addAttribute("clients", clientVendorService.listClientsBySelectedUserCompany());
+        InvoiceProductDto invoiceProductDto= new InvoiceProductDto();
+        model.addAttribute("newInvoiceProduct",invoiceProductDto);
+        model.addAttribute("products",productService.listProductsBySelectedUserCompany());
+        model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
+
+        return "invoice/sales-invoice-update";
+    }
+
+    @PostMapping("/addInvoiceProduct/{id}")
+    public String addInvoiceProduct(@PathVariable("id") Long id,@ModelAttribute("newInvoiceProduct") InvoiceProductDto invoiceProductDto,Model model){
+      //  model.addAttribute()
+
+
+        //return "redirect:/salesInvoices/update/"+invoiceProductDto.;
+        return "";
+    }
+
 
     @PostMapping("/update/{id}")
     public String updateSalesInvoice(@PathVariable("id") Long id, InvoiceDto invoiceDto) {

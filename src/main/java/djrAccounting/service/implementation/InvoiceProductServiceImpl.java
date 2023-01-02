@@ -34,7 +34,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
                 .map(invoiceProduct -> invoiceProduct.getPrice()
                         .multiply(BigDecimal.valueOf(invoiceProduct.getQuantity())))
                 .reduce(BigDecimal::add)
-                .orElseThrow();
+                .orElse(BigDecimal.ZERO);
     }
 
     @Override
@@ -90,7 +90,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
                                 .divide(BigDecimal.valueOf(100), RoundingMode.HALF_EVEN))
                         .multiply(BigDecimal.valueOf(invoiceProduct.getQuantity())))
                 .reduce(BigDecimal::add)
-                .orElseThrow();
+                .orElse(BigDecimal.ZERO);
     }
 
     private Long getCurrentCompanyId() {

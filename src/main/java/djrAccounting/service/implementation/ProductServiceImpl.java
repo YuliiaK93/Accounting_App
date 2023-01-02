@@ -1,11 +1,15 @@
 package djrAccounting.service.implementation;
 
+import djrAccounting.dto.CompanyDto;
 import djrAccounting.dto.ProductDto;
+import djrAccounting.entity.Company;
 import djrAccounting.entity.Product;
+import djrAccounting.entity.User;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.ProductRepository;
 import djrAccounting.service.ProductService;
 import djrAccounting.service.SecurityService;
+import djrAccounting.service.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,10 +22,12 @@ public class ProductServiceImpl implements ProductService {
     private final SecurityService securityService;
     private final MapperUtil mapper;
 
+
     public ProductServiceImpl(ProductRepository productRepository, SecurityService securityService, MapperUtil mapper) {
         this.productRepository = productRepository;
         this.securityService = securityService;
         this.mapper = mapper;
+
     }
 
     @Override
@@ -51,6 +57,16 @@ public class ProductServiceImpl implements ProductService {
 
     }
 
+    @Override
+    public List<ProductDto> listProductsBySelectedUserCompany() {
+        CompanyDto companyDto = securityService.getLoggedInUser().getCompany();
+        Company company = mapper.convert(companyDto,Company.class);
+
+        return productRepository.findAllByCategoryCompany(company)
+                .stream()
+                .map(product -> mapper.convert(product,ProductDto.class))
+                .collect(Collectors.toList());
+    }
 
 
 }

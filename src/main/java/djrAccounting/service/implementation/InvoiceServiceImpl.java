@@ -87,6 +87,8 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoiceDto.setCompany(securityService.getLoggedInUser().getCompany());
         Invoice invoice = mapper.convert(invoiceDto, Invoice.class);
         invoiceRepository.save(invoice);
+        invoiceDto.setId(invoice.getId());
+
     }
 
     @Override
