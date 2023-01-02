@@ -89,8 +89,7 @@
                                                                     <label>Product Unit</label>
                                                                     <select class="custom-select"
                                                                             th:field="*{productUnit}">
-                                                                        <option th:if="${productUnits.size() > 1}"
-                                                                                th:value="''"
+                                                                        <option th:value="''"
                                                                                 th:text="'Select'"></option>
                                                                         <option th:each="productUnit:${productUnits}"
                                                                                 th:value="${productUnit}"
@@ -108,7 +107,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-12 d-flex flex-sm-row flex-column justify-content-end mt-3 mt-sm-2">
+                                             <div class="col-12 d-flex flex-sm-row flex-column justify-content-end mt-3 mt-sm-2">
                                                         <button class="btn btn-success mb-2 mb-sm-0 mr-sm-2"
                                                                 type="submit" name="action" value="save">Save
                                                         </button>
@@ -138,8 +137,8 @@
             </div>
         </div>
     </div>
-</div>
-<div th:replace="/fragments/footer :: footer"></div>
-<div th:replace="/fragments/javascript :: js"></div>
+    </div>
+    <div th:replace="/fragments/footer :: footer"></div>
+    <div th:replace="/fragments/javascript :: js"></div>
 </body>
 </html>
