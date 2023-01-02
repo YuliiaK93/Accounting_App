@@ -21,5 +21,4 @@ public class MapperUtil {
     public <T> T convert(Object objectToBeConverted, Class<T> convertedObject) {
         return modelMapper.map(objectToBeConverted, convertedObject);
     }
-
 }

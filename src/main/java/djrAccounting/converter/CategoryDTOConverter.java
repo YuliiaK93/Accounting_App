@@ -13,16 +13,15 @@ public class CategoryDTOConverter implements Converter<String, CategoryDto> {
 
     CategoryService categoryService;
 
-    public CategoryDTOConverter(@Lazy CategoryService categoryService){this.categoryService = categoryService;}
-
+    public CategoryDTOConverter(@Lazy CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
 
     @Override
     public CategoryDto convert(String source) {
         if (source == null || source.isBlank()) {
             return null;
         }
-
         return categoryService.findById(Long.parseLong(source));
-
     }
 }

@@ -32,4 +32,12 @@ public class InvoiceProductDto {
 
     @NotNull
     private ProductDto product;
+
+    private BigDecimal total;
+
+    public BigDecimal getTotal() {
+        BigDecimal beforeTax = BigDecimal.valueOf(quantity).multiply(price);
+        BigDecimal taxValue = BigDecimal.valueOf(tax).multiply(beforeTax).divide(BigDecimal.valueOf(100L));
+        return beforeTax.add(taxValue);
+    }
 }

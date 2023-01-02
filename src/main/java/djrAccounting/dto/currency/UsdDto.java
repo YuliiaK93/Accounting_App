@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 @Builder
 @ToString
 public class UsdDto {
-
     @JsonAlias("eur")
     private BigDecimal euro;
 
@@ -26,6 +25,4 @@ public class UsdDto {
 
     @JsonAlias("inr")
     private BigDecimal indianRupee;
-
-
 }

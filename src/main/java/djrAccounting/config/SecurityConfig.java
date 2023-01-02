@@ -13,6 +13,7 @@ public class SecurityConfig {
 
     private final SecurityService securityService;
     private final AuthSuccessHandler authSuccessHandler;
+
     public SecurityConfig(SecurityService securityService, AuthSuccessHandler authSuccessHandler) {
         this.securityService = securityService;
         this.authSuccessHandler = authSuccessHandler;
@@ -25,11 +26,11 @@ public class SecurityConfig {
                 .antMatchers("/company/**").hasAuthority("Root User")
                 .antMatchers("/user/**").hasAnyAuthority("Root User", "Admin")
                 .antMatchers("/clientVendor/**").hasAnyAuthority("Admin", "Manager", "Employee")
-                .antMatchers("/category/**").hasAnyAuthority("Admin","Manager", "Employee")
-                .antMatchers("/product/**").hasAnyAuthority("Admin","Manager", "Employee")
+                .antMatchers("/category/**").hasAnyAuthority("Admin", "Manager", "Employee")
+                .antMatchers("/product/**").hasAnyAuthority("Admin", "Manager", "Employee")
                 .antMatchers("/report/**").hasAnyAuthority("Admin", "Manager")
                 .antMatchers("/dashboard").hasAnyAuthority("Manager", "Employee")
-                .antMatchers("/invoice/**").hasAnyAuthority("Manager", "Employee", "Admin" )
+                .antMatchers("/invoice/**").hasAnyAuthority("Manager", "Employee", "Admin")
                 .antMatchers(               // except these
                         "/",
                         "/login",
