@@ -59,7 +59,7 @@ public class ClientVendorController {
         return "/clientVendor/clientVendor-update";
     }
 
-    @PostMapping("/update/{id}")                             //TODO @Ekaterina will implement UI validation
+    @PostMapping("/update/{id}")
     public String editClientVendor(@Valid @ModelAttribute("clientVendor") ClientVendorDto clientVendorDto, BindingResult bindingResult,@PathVariable("id") Long id, Model model){
             boolean duplicatedName = clientVendorService.nameExists(clientVendorDto.getClientVendorName());
             if(bindingResult.hasErrors() || duplicatedName){
