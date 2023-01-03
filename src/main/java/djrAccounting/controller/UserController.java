@@ -27,8 +27,8 @@ public class UserController {
     }
 
     @GetMapping("/list")
-    public String listAllUsers(Model model) throws Exception{
-        model.addAttribute("users", userService.getFilteredUsers());
+    public String listAllUsers(Model model) {
+        model.addAttribute("users", userService.listAllUsers());
         return "user/user-list";
     }
 

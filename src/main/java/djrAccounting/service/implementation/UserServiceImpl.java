@@ -5,6 +5,7 @@ import djrAccounting.entity.Company;
 import djrAccounting.entity.User;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.UserRepository;
+import djrAccounting.service.CompanyService;
 import djrAccounting.service.SecurityService;
 import djrAccounting.service.UserService;
 import org.springframework.context.annotation.Lazy;
@@ -25,11 +26,14 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final SecurityService securityService;
 
-    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder, @Lazy SecurityService securityService) {
+    private final CompanyService companyService;
+
+    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder, @Lazy SecurityService securityService, @Lazy CompanyService companyService) {
         this.userRepository = userRepository;
         this.mapperUtil = mapperUtil;
         this.passwordEncoder = passwordEncoder;
         this.securityService = securityService;
+        this.companyService = companyService;
     }
 
     @Override
@@ -65,13 +69,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto update(UserDto userDto) {
-        Optional<User> user = userRepository.findById(userDto.getId());
+    public void update(UserDto userDto) {
+        User user = userRepository.findById(userDto.getId()).get();
         User convertedUser = mapperUtil.convert(userDto, new User());
-        convertedUser.setId(user.get().getId());
-        convertedUser.setPassword(user.get().getPassword());
+        convertedUser.setId(user.getId());
+        convertedUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        convertedUser.setEnabled(user.isEnabled());
         userRepository.save(convertedUser);
-        return findById(userDto.getId());
+
     }
 
     private List<UserDto> findAllOrderByCompanyAndRole() {
@@ -106,8 +111,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean isEmailExist(UserDto userDto) {
 
-        boolean anyMatch = userRepository.findAll().stream().anyMatch(user -> user.getUsername().equals(userDto));
-        return anyMatch;
+       Optional<User> user = Optional.ofNullable(userRepository.findByUsername(userDto.getUsername()));
+       return user.filter(value -> !value.getId().equals(userDto.getId())).isPresent();
     }
 
     @Override
@@ -144,5 +149,27 @@ public class UserServiceImpl implements UserService {
             return true;
         }
         return false;
+    }
+    public List<UserDto> listAllUsers() {
+        if (securityService.getLoggedInUser().getRole().getDescription().equals("Root User")) {
+            return userRepository.findAllByRoleDescriptionOrderByCompanyTitle("Admin").stream()
+                    .map(user -> mapperUtil.convert(user, new UserDto()))
+                    .peek(userDto -> userDto.setIsOnlyAdmin(isOnlyAdmin(userDto)))
+                    .collect(Collectors.toList());
+        } else {
+
+            Company company = mapperUtil.convert(companyService.listCompaniesByLoggedInUser(), new Company());
+
+            return userRepository.findAllByCompanyOrderByRoleDescription(company).stream()
+                    .map(user -> mapperUtil.convert(user, new UserDto()))
+                    .peek(userDto -> userDto.setIsOnlyAdmin(isOnlyAdmin(userDto)))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    private boolean isOnlyAdmin(UserDto userDto) {
+        Company company = mapperUtil.convert(userDto.getCompany(), new Company());
+        List<User> admins = userRepository.findAllByRoleDescriptionAndCompanyOrderByCompanyTitleAscRoleDescription("Admin", company);
+        return userDto.getRole().getDescription().equals("Admin") && admins.size() == 1;
     }
     }

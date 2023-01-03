@@ -16,12 +16,14 @@ public interface UserService {
 
     void deleteUserById(Long id);
 
-    UserDto update(UserDto user);
+    void update(UserDto user);
 
     List<UserDto> findAllFilterForLoggedInUser(UserDto user);
 
     boolean isEmailExist(UserDto userDto);
 
     List<UserDto> getFilteredUsers() throws Exception;
+
+    List<UserDto> listAllUsers();
 }
 
