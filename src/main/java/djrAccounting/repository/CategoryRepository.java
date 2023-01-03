@@ -9,5 +9,4 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     List<Category> findByCompany_IdOrderByDescriptionAsc(Long id);
 
     boolean existsByDescription(String description);
-
 }

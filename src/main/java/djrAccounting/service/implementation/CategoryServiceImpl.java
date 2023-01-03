@@ -56,5 +56,11 @@ public class CategoryServiceImpl implements CategoryService {
     public boolean isCategoryDescriptionExist(String description){
         return categoryRepository.existsByDescription(description);
     }
-}
 
+    @Override
+    public void deleteCategoryById(Long id) {
+        Category category = categoryRepository.findById(id).orElseThrow();
+        category.setIsDeleted(true);
+        categoryRepository.save(category);
+    }
+}
