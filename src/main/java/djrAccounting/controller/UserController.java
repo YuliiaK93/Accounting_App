@@ -28,7 +28,7 @@ public class UserController {
 
     @GetMapping("/list")
     public String listAllUsers(Model model) {
-        model.addAttribute("users", userService.listAllUsers());
+        model.addAttribute("users", userService.findAllFilterForLoggedInUser());
         return "user/user-list";
     }
 
@@ -44,18 +44,23 @@ public class UserController {
     @PostMapping("/create")
     public String insertUser( @Valid @ModelAttribute("newUser") UserDto user, BindingResult bindingResult, Model model) {
 
-        boolean emailExist = userService.isEmailExist(user);
+        boolean isUsernameExist = userService.isUsernameExist(user);
 
-        if (bindingResult.hasErrors() || emailExist) {
-            if(emailExist){
-                bindingResult.rejectValue("username", " ", "User already exist. Please try with different username");
+            if(isUsernameExist){
+                bindingResult.rejectValue("username", " ", "User already exist. Please try with different email");
             }
+            if(bindingResult.hasErrors()) {
+                return "/user/user_create";
+            }
+            /*
             model.addAttribute("newUser", user);
             model.addAttribute("userRoles", roleService.listRoleByLoggedInUser());
             model.addAttribute("companies", companyService.listCompaniesByLoggedInUser());
 
-            return "user/user-create";
+            return "/user/user-create";
         }
+
+             */
 
         userService.save(user);
         return "redirect:/users/list";
@@ -66,7 +71,7 @@ public class UserController {
         model.addAttribute("user", userService.findById(userId));
         model.addAttribute("roles", roleService.listRoleByLoggedInUser());
         model.addAttribute("companies", companyService.listCompaniesByLoggedInUser());
-        return "user/user-update";
+        return "/user/user-update";
     }
 
     @PostMapping("/update/{userId}")
@@ -77,7 +82,10 @@ public class UserController {
             if (emailExist) {
                 bindingResult.rejectValue("username", " ", "User already exist. Please try with different username");
             }
-            return "/user/user-update";
+            UserDto userDto = userService.findById(userId);
+            user.setIsOnlyAdmin(userDto.getIsOnlyAdmin());
+            userService.save(user);
+            return "redirect:/users/list";
         }
         userService.update(user);
         return "redirect:/users/list";

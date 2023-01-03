@@ -12,10 +12,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,11 +47,12 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public UserDto save(UserDto userDto) {
+    public void save(UserDto userDto) {
+
+        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
         User user1 = mapperUtil.convert(userDto, new User());
-        user1.setPassword(passwordEncoder.encode(user1.getPassword()));
+        user1.setEnabled(true);
         userRepository.save(user1);
-        return userDto;
     }
 
     @Override
@@ -90,7 +88,7 @@ public class UserServiceImpl implements UserService {
         return list;
     }
 
-    public List<UserDto> findAllFilterForLoggedInUser(UserDto userDto) {
+    public List<UserDto> findAllFilterForLoggedInUser() {
         UserDto loggedInUser = securityService.getLoggedInUser();
         switch (loggedInUser.getRole().getDescription()) {
             case "Root User":
@@ -99,7 +97,7 @@ public class UserServiceImpl implements UserService {
                         .collect(Collectors.toList());
             case "Admin":
                 return findAllOrderByCompanyAndRole().stream()
-                        .filter(user -> user.getCompany().equals(loggedInUser.getCompany()))
+                        .filter(user -> user.getCompany().getId().equals(loggedInUser.getCompany().getId()))
                         .collect(Collectors.toList());
             default:
                 return findAllOrderByCompanyAndRole();
@@ -165,6 +163,14 @@ public class UserServiceImpl implements UserService {
                     .peek(userDto -> userDto.setIsOnlyAdmin(isOnlyAdmin(userDto)))
                     .collect(Collectors.toList());
         }
+    }
+
+    @Override
+    public boolean isUsernameExist(UserDto userDto) {
+        User user = userRepository.findByUsername(userDto.getUsername());
+        if(user==null)
+            return false;
+        return !Objects.equals(userDto.getId(), user.getId());
     }
 
     private boolean isOnlyAdmin(UserDto userDto) {
