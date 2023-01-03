@@ -1,6 +1,7 @@
 package djrAccounting.service;
 
 import djrAccounting.dto.ProductDto;
+import djrAccounting.entity.Product;
 
 import java.util.List;
 
@@ -17,4 +18,6 @@ public interface ProductService {
     void update(ProductDto productDto);
 
     void save(ProductDto productDto);
+
+    List<ProductDto> listProductsBySelectedUserCompany();
 }

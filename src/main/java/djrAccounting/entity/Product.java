@@ -23,7 +23,7 @@ public class Product extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ProductUnit productUnit;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 }

@@ -93,6 +93,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoiceDto.setCompany(securityService.getLoggedInUser().getCompany());
         Invoice invoice = mapper.convert(invoiceDto, Invoice.class);
         invoiceRepository.save(invoice);
+        invoiceDto.setId(invoice.getId());
     }
 
     @Override
@@ -134,7 +135,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         String substring = invoiceNo.substring(2);
         int number = Integer.parseInt(substring) + 1;
         if (number < 10) {
-            return "1-" + "00" + number;
+            return "P-" + "00" + number;
         } else if (number < 100) {
             return "P-" + "0" + number;
         }
