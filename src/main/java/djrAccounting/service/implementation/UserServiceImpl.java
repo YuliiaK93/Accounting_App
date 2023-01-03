@@ -106,4 +106,11 @@ public class UserServiceImpl implements UserService {
                 return findAllOrderByCompanyAndRole();
         }
     }
+
+    @Override
+    public boolean isEmailExist(String username) {
+
+        boolean anyMatch = userRepository.findAll().stream().anyMatch(user -> user.getUsername().equals(username));
+        return anyMatch;
+    }
 }

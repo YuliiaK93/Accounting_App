@@ -21,5 +21,7 @@ public interface UserService {
     UserDto update(UserDto user);
 
     List<UserDto> findAllFilterForLoggedInUser();
+
+    boolean isEmailExist(String username);
 }
 

@@ -56,12 +56,6 @@ public class UserController {
         return "redirect:/users/list";
     }
 
-    @GetMapping("/delete/{id}")
-    public String deleteUser(@PathVariable("id") Long id) {
-        userService.deleteUserById(id);
-        return "redirect:/user-list";
-    }
-
     @GetMapping("update/{id}")
     public String editUser(@PathVariable("id") Long userId, Model model) {
         model.addAttribute("user", userService.findById(userId));
@@ -76,5 +70,11 @@ public class UserController {
         user.setIsOnlyAdmin(userDto.getIsOnlyAdmin());
         userService.save(user);
         return "redirect:/users/list";
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deleteUser(@PathVariable("id") Long id) {
+        userService.deleteUserById(id);
+        return "redirect:/users/ist";
     }
 }
