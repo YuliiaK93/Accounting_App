@@ -62,8 +62,5 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findById(id).orElseThrow();
         category.setIsDeleted(true);
         categoryRepository.save(category);
-
     }
-
 }
-
