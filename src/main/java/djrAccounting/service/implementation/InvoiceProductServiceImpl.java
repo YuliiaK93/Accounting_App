@@ -6,7 +6,9 @@ import djrAccounting.enums.InvoiceType;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.InvoiceProductRepository;
 import djrAccounting.service.InvoiceProductService;
+import djrAccounting.service.InvoiceService;
 import djrAccounting.service.SecurityService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,11 +22,14 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     private final InvoiceProductRepository invoiceProductRepository;
     private final SecurityService securityService;
     private final MapperUtil mapper;
+    private final InvoiceService invoiceService;
 
-    public InvoiceProductServiceImpl(InvoiceProductRepository invoiceProductRepository, SecurityService securityService, MapperUtil mapper) {
+
+    public InvoiceProductServiceImpl(InvoiceProductRepository invoiceProductRepository, SecurityService securityService, MapperUtil mapper, @Lazy InvoiceService invoiceService ) {
         this.invoiceProductRepository = invoiceProductRepository;
         this.securityService = securityService;
         this.mapper = mapper;
+        this.invoiceService = invoiceService;
     }
 
     @Override
@@ -80,6 +85,17 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
                 .stream()
                 .map(invoiceProduct -> mapper.convert(invoiceProduct, InvoiceProductDto.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void save(InvoiceProductDto invoiceProductDto, Long id) {
+
+        invoiceProductDto.setProfitLoss(BigDecimal.ZERO); //todo profit loss calculation
+        invoiceProductDto.setInvoice(invoiceService.findById(id));
+        InvoiceProduct invoiceProduct = mapper.convert(invoiceProductDto, InvoiceProduct.class);
+        invoiceProductRepository.save(invoiceProduct);
+
+
     }
 
     private BigDecimal calculatePriceWithTax(List<InvoiceProduct> list) {

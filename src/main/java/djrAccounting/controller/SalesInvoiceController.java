@@ -3,6 +3,7 @@ package djrAccounting.controller;
 import djrAccounting.dto.InvoiceDto;
 import djrAccounting.dto.InvoiceProductDto;
 import djrAccounting.dto.ProductDto;
+import djrAccounting.entity.Invoice;
 import djrAccounting.service.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -83,11 +84,10 @@ public class SalesInvoiceController {
 
     @PostMapping("/addInvoiceProduct/{id}")
     public String addInvoiceProduct(@PathVariable("id") Long id,@ModelAttribute("newInvoiceProduct") InvoiceProductDto invoiceProductDto,Model model){
-      //  model.addAttribute()
+        invoiceProductService.save(invoiceProductDto,id);
 
+        return "redirect:/salesInvoices/update/"+id;
 
-        //return "redirect:/salesInvoices/update/"+invoiceProductDto.;
-        return "";
     }
 
 
