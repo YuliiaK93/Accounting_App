@@ -1,6 +1,7 @@
 package djrAccounting.controller;
 
 import djrAccounting.dto.InvoiceDto;
+import djrAccounting.dto.InvoiceProductDto;
 import djrAccounting.service.ClientVendorService;
 import djrAccounting.service.CompanyService;
 import djrAccounting.service.InvoiceProductService;
@@ -65,6 +66,13 @@ public class PurchaseInvoiceController {
             return "invoice/purchase-invoice-create";
         }
         invoiceService.save(invoiceDto);
-        return "redirect:/purchaseInvoices/update/"+invoiceDto.getId();
+     //   return "redirect:/purchaseInvoices/addInvoiceProduct/"+invoiceDto.getId();
+      return "invoice/purchase-invoice-update/"+invoiceDto.getId();
     }
+
+   @GetMapping("/update/{id}")
+    public String updatePurchaseInvoice(@PathVariable("id") Long id, Model model){
+        model.addAttribute("invoiceNo", invoiceService.findById(id));
+        model.addAttribute("vendors",clientVendorService.listVendorsBySelectedUserCompany());
+   }
 }
