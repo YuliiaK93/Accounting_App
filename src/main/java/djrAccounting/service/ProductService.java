@@ -1,5 +1,6 @@
 package djrAccounting.service;
 
+import djrAccounting.dto.InvoiceProductDto;
 import djrAccounting.dto.ProductDto;
 
 import java.util.List;
@@ -15,4 +16,6 @@ public interface ProductService {
     boolean productExistByCategory(Long categoryId);
 
     List<ProductDto> listProductsBySelectedUserCompany();
+
+    boolean isStockEnough(InvoiceProductDto invoiceProductDto);
 }

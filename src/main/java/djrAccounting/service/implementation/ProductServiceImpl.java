@@ -1,6 +1,7 @@
 package djrAccounting.service.implementation;
 
 import djrAccounting.dto.CompanyDto;
+import djrAccounting.dto.InvoiceProductDto;
 import djrAccounting.dto.ProductDto;
 import djrAccounting.entity.Company;
 import djrAccounting.entity.Product;
@@ -52,7 +53,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public boolean productExistByCategory(Long categoryId){
+    public boolean productExistByCategory(Long categoryId) {
         return productRepository.existsByCategory_Id(categoryId);
 
     }
@@ -60,12 +61,20 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductDto> listProductsBySelectedUserCompany() {
         CompanyDto companyDto = securityService.getLoggedInUser().getCompany();
-        Company company = mapper.convert(companyDto,Company.class);
+        Company company = mapper.convert(companyDto, Company.class);
 
         return productRepository.findAllByCategoryCompany(company)
                 .stream()
-                .map(product -> mapper.convert(product,ProductDto.class))
+                .map(product -> mapper.convert(product, ProductDto.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean isStockEnough(InvoiceProductDto invoiceProductDto) {
+
+        int remainingStock = productRepository.findByName(invoiceProductDto.getProduct().getName()).getQuantityInStock();
+
+        return remainingStock > invoiceProductDto.getQuantity();
     }
 
 

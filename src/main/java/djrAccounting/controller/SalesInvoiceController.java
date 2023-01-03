@@ -83,7 +83,28 @@ public class SalesInvoiceController {
     }
 
     @PostMapping("/addInvoiceProduct/{id}")
-    public String addInvoiceProduct(@PathVariable("id") Long id,@ModelAttribute("newInvoiceProduct") InvoiceProductDto invoiceProductDto,Model model){
+    public String addInvoiceProduct( @PathVariable("id") Long id, @Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDto invoiceProductDto,BindingResult bindingResult, Model model){
+        if (bindingResult.hasErrors() ){
+
+            model.addAttribute("invoice", invoiceService.findById(id));
+            model.addAttribute("clients", clientVendorService.listClientsBySelectedUserCompany());
+            model.addAttribute("products",productService.listProductsBySelectedUserCompany());
+            model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
+            return "invoice/sales-invoice-update";
+        }
+
+        boolean isStockEnough =productService.isStockEnough(invoiceProductDto);
+
+        if (!isStockEnough) {
+            bindingResult.rejectValue("quantity", " ", "Not enough " +invoiceProductDto.getProduct().getName() +" quantity yo sell." );
+            model.addAttribute("invoice", invoiceService.findById(id));
+            model.addAttribute("clients", clientVendorService.listClientsBySelectedUserCompany());
+            model.addAttribute("products",productService.listProductsBySelectedUserCompany());
+            model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
+            return "invoice/sales-invoice-update";
+        }
+
+
         invoiceProductService.save(invoiceProductDto,id);
 
         return "redirect:/salesInvoices/update/"+id;
@@ -91,9 +112,9 @@ public class SalesInvoiceController {
     }
 
 
-    @PostMapping("/update/{id}")
-    public String updateSalesInvoice(@PathVariable("id") Long id, InvoiceDto invoiceDto) {
-        //todo @mehmet will implement update
-        return "redirect:/salesInvoices/list";
-    }
+//    @PostMapping("/update/{id}")
+//    public String updateSalesInvoice(@PathVariable("id") Long id, InvoiceDto invoiceDto) {
+//        //todo @mehmet will implement update
+//        return "redirect:/salesInvoices/list";
+//    }
 }

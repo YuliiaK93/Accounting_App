@@ -25,7 +25,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     private final InvoiceService invoiceService;
 
 
-    public InvoiceProductServiceImpl(InvoiceProductRepository invoiceProductRepository, SecurityService securityService, MapperUtil mapper, @Lazy InvoiceService invoiceService ) {
+    public InvoiceProductServiceImpl(InvoiceProductRepository invoiceProductRepository, SecurityService securityService, MapperUtil mapper, @Lazy InvoiceService invoiceService) {
         this.invoiceProductRepository = invoiceProductRepository;
         this.securityService = securityService;
         this.mapper = mapper;
@@ -90,11 +90,10 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     @Override
     public void save(InvoiceProductDto invoiceProductDto, Long id) {
 
-        invoiceProductDto.setProfitLoss(BigDecimal.ZERO); //todo profit loss calculation
+        invoiceProductDto.setProfitLoss(BigDecimal.ZERO); //todo profit loss calculation @mehmet
         invoiceProductDto.setInvoice(invoiceService.findById(id));
         InvoiceProduct invoiceProduct = mapper.convert(invoiceProductDto, InvoiceProduct.class);
         invoiceProductRepository.save(invoiceProduct);
-
 
     }
 
