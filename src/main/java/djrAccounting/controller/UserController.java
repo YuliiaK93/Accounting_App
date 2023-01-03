@@ -65,16 +65,16 @@ public class UserController {
     @GetMapping("update/{id}")
     public String editUser(@PathVariable("id") Long userId, Model model) {
         model.addAttribute("user", userService.findById(userId));
-        model.addAttribute("roles", roleService.findById(1L));
-        model.addAttribute("users", userService.listAllUsers());
-        return "/user/update";
+        model.addAttribute("roles", roleService.listRoleByLoggedInUser());
+        model.addAttribute("companies", companyService.listCompaniesByLoggedInUser());
+        return "user/user-update";
     }
 
     @PostMapping("/update/{id}")
-    public String updateUser(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("user", userService.findById(id));
-        model.addAttribute("roles", roleService.findById(1L));
-        model.addAttribute("companies", companyService.listAllCompanies());
-        return "/user/user_update";
+    public String updateUser(@PathVariable("id") Long id, @ModelAttribute("user") UserDto user, Model model) {
+        UserDto userDto = userService.findById(user.getId());
+        user.setIsOnlyAdmin(userDto.getIsOnlyAdmin());
+        userService.save(user);
+        return "redirect:/users/list";
     }
 }

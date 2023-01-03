@@ -23,7 +23,7 @@ public class UserDto {
 
     @NotNull
     @NotBlank(message = "Passwords should match.")
-    private String confirmPassWord;
+    private String confirmPassword;
 
     @NotBlank(message = "First Name is required field. First Name must be between 2 and 50 characters long.")
     @Size(max = 50, min = 2)
@@ -60,13 +60,14 @@ public class UserDto {
     @NotNull(message = "Please select a Customer.")
     private CompanyDto company;
 
-    public boolean isOnlyAdmin() {
-        return true; //TODO will be implemented by @Yuliia after security context
+
+    Boolean isOnlyAdmin;
+
+    public Boolean getIsOnlyAdmin() {
+        return isOnlyAdmin;
     }
 
-    public void setOnlyAdmin(boolean onlyAdmin) {
+    public void setIsOnlyAdmin(Boolean onlyAdmin) {
         isOnlyAdmin = onlyAdmin;
     }
-
-    private boolean isOnlyAdmin;
 }

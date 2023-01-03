@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -60,10 +61,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUserById(Long id) {
-        User user = userRepository.findById(id).get();
-        user.setIsDeleted(true);
-        user.setUsername(user.getUsername() + "-" + user.getId());
-        userRepository.save(user);
+        Optional<User> user = userRepository.findById(id);
+        if (user == null){
+            throw new NoSuchElementException("User was not found");
+        }
+        user.get().setIsDeleted(true);
+        user.get().setUsername(user.get().getUsername() + "-" + user.get().getId());
+        userRepository.save(user.get());
     }
 
     @Override
@@ -80,7 +84,7 @@ public class UserServiceImpl implements UserService {
         List<UserDto> list = userRepository.findAllOrderByCompanyAndRole(false).stream().map(currentUser -> {
                     Boolean isOnlyAdmin = currentUser.getRole().getDescription().equals("Admin");
                     UserDto userDto = mapperUtil.convert(currentUser, new UserDto());
-                    userDto.setOnlyAdmin(isOnlyAdmin);
+                    userDto.setIsOnlyAdmin(isOnlyAdmin);
                     return userDto;
                 })
                 .collect(Collectors.toList());
