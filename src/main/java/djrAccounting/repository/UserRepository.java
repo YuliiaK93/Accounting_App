@@ -31,4 +31,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllByCompanyOrderByRoleDescription(Company company);
 
     List<User> findAllByRoleDescriptionAndCompanyOrderByCompanyTitleAscRoleDescription(String admin, Company company);
+
+    List <User> findAllByCompanyId(Long id);
+
 }

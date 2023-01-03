@@ -38,7 +38,7 @@ public class UserController {
         model.addAttribute("userRoles", roleService.listRoleByLoggedInUser());
         model.addAttribute("companies", companyService.listCompaniesByLoggedInUser());
 
-        return "user/user-create";
+        return "/user/user-create";
     }
 
     @PostMapping("/create")
@@ -50,7 +50,7 @@ public class UserController {
                 bindingResult.rejectValue("username", " ", "User already exist. Please try with different email");
             }
             if(bindingResult.hasErrors()) {
-                return "/user/user_create";
+                return "/user/user-create";
             }
             /*
             model.addAttribute("newUser", user);

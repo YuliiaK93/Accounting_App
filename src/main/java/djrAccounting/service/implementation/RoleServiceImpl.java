@@ -3,26 +3,33 @@ package djrAccounting.service.implementation;
 import djrAccounting.dto.RoleDto;
 import djrAccounting.dto.UserDto;
 import djrAccounting.entity.Role;
+import djrAccounting.entity.User;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.RoleRepository;
+import djrAccounting.repository.UserRepository;
 import djrAccounting.service.RoleService;
 import djrAccounting.service.SecurityService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
     private final MapperUtil mapper;
     private final SecurityService securityService;
+    private final UserRepository userRepository;
 
-    public RoleServiceImpl(RoleRepository roleRepository, MapperUtil mapper, SecurityService securityService) {
+    public RoleServiceImpl(RoleRepository roleRepository, MapperUtil mapper, SecurityService securityService, UserRepository userRepository) {
         this.roleRepository = roleRepository;
         this.mapper = mapper;
         this.securityService = securityService;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -40,18 +47,21 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public List<RoleDto> listRoleByLoggedInUser() {
         UserDto loggedInUser = securityService.getLoggedInUser();
-        switch (loggedInUser.getRole().getDescription()) {
-            case "Root User":
-                return listRoles().stream()
-                        .filter(role -> role.getDescription().equals("Admin"))
-                        .collect(Collectors.toList());
-            case "Admin":
-                return listRoles().stream()
-                        .filter(role -> !role.getDescription().equals("Admin")
-                                && !role.getDescription().equals("Root User"))
-                        .collect(Collectors.toList());
-            default:
-                return listRoles();
+        List<Role> roleslist = roleRepository.findAll();
+        if (loggedInUser.getRole().getDescription().equals("Root User")) {
+            return roleslist.stream()
+                    .filter(role -> role.getDescription().equals("Admin"))
+                    .map(role -> mapper.convert(role, new RoleDto()))
+                    .collect(Collectors.toList());
+        } else if (loggedInUser.getRole().getDescription().equals("Admin")) {
+            List<User> userList = userRepository.findAllByCompanyId(loggedInUser.getCompany().getId());
+            log.info("User Roles size " + roleslist.size());
+            return listRoles().stream()
+                    .filter(role -> !role.getDescription().equals("Root User"))
+                    .map(role -> mapper.convert(role, new RoleDto()))
+                    .collect(Collectors.toList());
         }
+            return Collections.emptyList();
+
     }
 }
