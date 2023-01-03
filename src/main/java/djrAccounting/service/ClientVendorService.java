@@ -1,6 +1,7 @@
 package djrAccounting.service;
 
 import djrAccounting.dto.ClientVendorDto;
+
 import java.util.List;
 
 public interface ClientVendorService {
@@ -17,4 +18,7 @@ public interface ClientVendorService {
     boolean nameExists(String name);
 
     List<ClientVendorDto> listClientsBySelectedUserCompany();
+
+    List<ClientVendorDto> listVendorsBySelectedUserCompany();
+
 }

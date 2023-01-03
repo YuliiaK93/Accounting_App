@@ -22,4 +22,5 @@ public interface InvoiceProductService {
     InvoiceProductDto findById(Long id);
 
     List<InvoiceProductDto> findByInvoiceId(Long id);
+
 }

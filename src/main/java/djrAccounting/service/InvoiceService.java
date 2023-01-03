@@ -18,4 +18,6 @@ public interface InvoiceService {
     String nextSalesInvoiceNo();
 
     List<InvoiceDto> getAllPurchaseInvoiceForCurrentCompany();
+    String nextPurchaseInvoiceNo();
+
 }

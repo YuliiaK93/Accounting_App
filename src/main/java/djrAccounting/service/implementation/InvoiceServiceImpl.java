@@ -3,6 +3,7 @@ package djrAccounting.service.implementation;
 import djrAccounting.dto.InvoiceDto;
 import djrAccounting.entity.Invoice;
 import djrAccounting.entity.common.UserPrincipal;
+import djrAccounting.enums.ClientVendorType;
 import djrAccounting.enums.InvoiceStatus;
 import djrAccounting.enums.InvoiceType;
 import djrAccounting.mapper.MapperUtil;
@@ -83,7 +84,11 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public void save(InvoiceDto invoiceDto) {
-        invoiceDto.setInvoiceType(InvoiceType.SALES);
+        if(invoiceDto.getClientVendor().getClientVendorType().equals(ClientVendorType.CLIENT)){
+            invoiceDto.setInvoiceType(InvoiceType.SALES);
+        }else{
+                invoiceDto.setInvoiceType(InvoiceType.PURCHASE);}
+
         invoiceDto.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
         invoiceDto.setCompany(securityService.getLoggedInUser().getCompany());
         Invoice invoice = mapper.convert(invoiceDto, Invoice.class);
@@ -101,15 +106,13 @@ public class InvoiceServiceImpl implements InvoiceService {
         } else if (number < 100) {
             return "S-" + "0" + number;
         }
-
         return "S-" + number;
     }
 
     @Override
     public List<InvoiceDto> getAllPurchaseInvoiceForCurrentCompany() {
-        List<InvoiceDto> purchaseInvoiceList = invoiceRepository.findAllPurchaseInvoiceForCurrentCompany(((UserPrincipal) SecurityContextHolder.getContext()
-                        .getAuthentication()
-                        .getPrincipal()).getCompanyTitleForProfile(), InvoiceType.PURCHASE)
+        List<InvoiceDto> purchaseInvoiceList = invoiceRepository.findAllByCompanyIdAndInvoiceType(securityService.getLoggedInUser()
+                        .getCompany().getId(), InvoiceType.PURCHASE)
                 .stream()
                 .map(invoice -> mapper.convert(invoice, InvoiceDto.class))
                 .collect(Collectors.toList());
@@ -122,5 +125,19 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         return purchaseInvoiceList;
 
+    }
+
+    @Override
+    public String nextPurchaseInvoiceNo() {//get the Last one created invoice for the company
+        Invoice invoice = invoiceRepository.findTopByCompanyIdOrderByIdDesc(securityService.getLoggedInUser().getCompany().getId());
+        String invoiceNo = invoice.getInvoiceNo();//get number
+        String substring = invoiceNo.substring(2);
+        int number = Integer.parseInt(substring) + 1;
+        if (number < 10) {
+            return "1-" + "00" + number;
+        } else if (number < 100) {
+            return "P-" + "0" + number;
+        }
+        return "P-" + number;
     }
 }
