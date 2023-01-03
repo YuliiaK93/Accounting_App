@@ -18,4 +18,8 @@ public interface ProductService {
     List<ProductDto> listProductsBySelectedUserCompany();
 
     boolean isStockEnough(InvoiceProductDto invoiceProductDto);
+
+    void update(ProductDto productDto);
+
+    void save(ProductDto productDto);
 }

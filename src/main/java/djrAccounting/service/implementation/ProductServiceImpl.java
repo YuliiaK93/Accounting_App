@@ -23,12 +23,10 @@ public class ProductServiceImpl implements ProductService {
     private final SecurityService securityService;
     private final MapperUtil mapper;
 
-
     public ProductServiceImpl(ProductRepository productRepository, SecurityService securityService, MapperUtil mapper) {
         this.productRepository = productRepository;
         this.securityService = securityService;
         this.mapper = mapper;
-
     }
 
     @Override
@@ -53,9 +51,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public boolean productExistByCategory(Long categoryId) {
+    public boolean productExistByCategory(Long categoryId){
         return productRepository.existsByCategory_Id(categoryId);
-
     }
 
     @Override
@@ -76,6 +73,13 @@ public class ProductServiceImpl implements ProductService {
 
         return remainingStock > invoiceProductDto.getQuantity();
     }
-
+    @Override
+    public void update(ProductDto productDto) {
+        productRepository.save(mapper.convert(productDto, Product.class));
+    }
+    @Override
+    public void save(ProductDto productDto) {
+        productRepository.save(mapper.convert(productDto, Product.class));
+    }
 
 }
