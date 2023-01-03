@@ -5,14 +5,11 @@ import djrAccounting.dto.InvoiceProductDto;
 import djrAccounting.dto.ProductDto;
 import djrAccounting.entity.Company;
 import djrAccounting.entity.Product;
-import djrAccounting.entity.User;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.ProductRepository;
 import djrAccounting.service.ProductService;
 import djrAccounting.service.SecurityService;
-import djrAccounting.service.UserService;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,9 +65,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public boolean isStockEnough(InvoiceProductDto invoiceProductDto) {
-
         int remainingStock = productRepository.findByName(invoiceProductDto.getProduct().getName()).getQuantityInStock();
-
         return remainingStock > invoiceProductDto.getQuantity();
     }
     @Override
@@ -81,5 +76,4 @@ public class ProductServiceImpl implements ProductService {
     public void save(ProductDto productDto) {
         productRepository.save(mapper.convert(productDto, Product.class));
     }
-
 }
