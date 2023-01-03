@@ -36,18 +36,23 @@ public class UserController {
     public String createUser(Model model) {
         model.addAttribute("newUser", new UserDto());
         model.addAttribute("userRoles", roleService.listRoleByLoggedInUser());
-        model.addAttribute("companies", companyService.listAllCompanies()); //TODO
+        model.addAttribute("companies", companyService.listCompaniesByLoggedInUser());
 
         return "user/user-create";
     }
 
     @PostMapping("/create")
     public String insertUser( @Valid @ModelAttribute("newUser") UserDto user, BindingResult bindingResult, Model model) {
-        //TODO will be implemented after security context of companies, roles
-        if (bindingResult.hasErrors()) {
+
+        boolean emailExist = userService.isEmailExist(user);
+
+        if (bindingResult.hasErrors() || emailExist) {
+            if(emailExist){
+                bindingResult.rejectValue("username", " ", "User already exist. Please try with different username");
+            }
             model.addAttribute("newUser", user);
             model.addAttribute("userRoles", roleService.listRoleByLoggedInUser());
-            model.addAttribute("companies", companyService.listAllCompanies());//TODO
+            model.addAttribute("companies", companyService.listCompaniesByLoggedInUser());
 
             return "user/user-create";
         }
@@ -56,25 +61,31 @@ public class UserController {
         return "redirect:/users/list";
     }
 
-    @GetMapping("update/{id}")
-    public String editUser(@PathVariable("id") Long userId, Model model) {
+    @GetMapping("update/{userId}")
+    public String editUser(@PathVariable("userId") Long userId, Model model) {
         model.addAttribute("user", userService.findById(userId));
         model.addAttribute("roles", roleService.listRoleByLoggedInUser());
         model.addAttribute("companies", companyService.listCompaniesByLoggedInUser());
         return "user/user-update";
     }
 
-    @PostMapping("/update/{id}")
-    public String updateUser(@PathVariable("id") Long id, @ModelAttribute("user") UserDto user, Model model) {
-        UserDto userDto = userService.findById(user.getId());
-        user.setIsOnlyAdmin(userDto.getIsOnlyAdmin());
-        userService.save(user);
+    @PostMapping("/update/{userId}")
+    public String updateUser(@PathVariable("userId") Long userId, @ModelAttribute("user") UserDto user,BindingResult bindingResult, Model model) {
+       user.setId(userId);
+       boolean emailExist = userService.isEmailExist(user);
+        if (bindingResult.hasErrors() || emailExist) {
+            if (emailExist) {
+                bindingResult.rejectValue("username", " ", "User already exist. Please try with different username");
+            }
+            return "/user/user-update";
+        }
+        userService.update(user);
         return "redirect:/users/list";
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteUser(@PathVariable("id") Long id) {
-        userService.deleteUserById(id);
-        return "redirect:/users/ist";
+    public String deleteUser(@PathVariable("userId") Long userId) {
+        userService.deleteUserById(userId);
+        return "redirect:/users/list";
     }
 }
