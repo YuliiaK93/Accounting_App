@@ -1,6 +1,7 @@
 package djrAccounting.service.implementation;
 
 import djrAccounting.dto.UserDto;
+import djrAccounting.entity.Company;
 import djrAccounting.entity.User;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.UserRepository;
@@ -42,21 +43,14 @@ public class UserServiceImpl implements UserService {
         return mapperUtil.convert(user, new UserDto());
     }
 
-    @Override
-    public List<UserDto> listAllUsers() {
-        List<User> userList = userRepository.findAll();
-        return userList.stream().map(user -> mapperUtil.convert(user, new UserDto()))
-                .sorted(Comparator.comparing((UserDto user) ->
-                                user.getCompany().getTitle())
-                        .thenComparing(userDto -> userDto.getRole().getDescription()))
-                .collect(Collectors.toList());
-    }
+
 
     @Override
-    public void save(UserDto userDto) {
+    public UserDto save(UserDto userDto) {
         User user1 = mapperUtil.convert(userDto, new User());
         user1.setPassword(passwordEncoder.encode(user1.getPassword()));
         userRepository.save(user1);
+        return userDto;
     }
 
     @Override
@@ -91,7 +85,7 @@ public class UserServiceImpl implements UserService {
         return list;
     }
 
-    public List<UserDto> findAllFilterForLoggedInUser() {
+    public List<UserDto> findAllFilterForLoggedInUser(UserDto userDto) {
         UserDto loggedInUser = securityService.getLoggedInUser();
         switch (loggedInUser.getRole().getDescription()) {
             case "Root User":
@@ -107,10 +101,48 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    @Override
-    public boolean isEmailExist(String username) {
 
-        boolean anyMatch = userRepository.findAll().stream().anyMatch(user -> user.getUsername().equals(username));
+
+    @Override
+    public boolean isEmailExist(UserDto userDto) {
+
+        boolean anyMatch = userRepository.findAll().stream().anyMatch(user -> user.getUsername().equals(userDto));
         return anyMatch;
     }
-}
+
+    @Override
+    public List<UserDto> getFilteredUsers() {
+
+        List<User> userList;
+        if (isCurrentUserRootUser()) {
+            userList = userRepository.findAllByRole_Description("Admin");
+        } else {
+            userList = userRepository.findAllByCompany_Title(getCurrentUserCompanyTitle());
+        }
+        return userList.stream()
+                .sorted(Comparator.comparing((User u) -> u.getCompany().getTitle()).thenComparing(u -> u.getRole().getDescription()))
+                .map(entity -> {
+                    UserDto dto = mapperUtil.convert(entity, new UserDto());
+                    dto.setIsOnlyAdmin(checkIfOnlyAdminForCompany(dto));
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+    private boolean checkIfOnlyAdminForCompany(UserDto userDto) {
+        Company company= mapperUtil.convert(userDto.getCompany(),new Company());
+        List<User> admins = userRepository.findAllByCompany_Title(company.getTitle().equals("Admin"));
+        return userDto.getRole().getDescription().equals("Admin") && admins.size() == 1;
+    }
+
+    private Object getCurrentUserCompanyTitle() {
+        return  securityService.getLoggedInUser().getCompany().getTitle();
+    }
+
+    private boolean isCurrentUserRootUser() {
+        User user= mapperUtil.convert(securityService.getLoggedInUser(),new User());
+        if (user.getRole().getDescription().equals("Root User")){
+            return true;
+        }
+        return false;
+    }
+    }

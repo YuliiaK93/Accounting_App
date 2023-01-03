@@ -27,8 +27,8 @@ public class UserController {
     }
 
     @GetMapping("/list")
-    public String listAllUsers(Model model) {
-        model.addAttribute("users", userService.findAllFilterForLoggedInUser());
+    public String listAllUsers(Model model) throws Exception{
+        model.addAttribute("users", userService.getFilteredUsers());
         return "user/user-list";
     }
 
@@ -70,7 +70,7 @@ public class UserController {
     }
 
     @PostMapping("/update/{userId}")
-    public String updateUser(@PathVariable("userId") Long userId, @ModelAttribute("user") UserDto user,BindingResult bindingResult, Model model) {
+    public String updateUser(@PathVariable("userId") Long userId, @Valid @ModelAttribute("user") UserDto user,BindingResult bindingResult) {
        user.setId(userId);
        boolean emailExist = userService.isEmailExist(user);
         if (bindingResult.hasErrors() || emailExist) {
@@ -83,7 +83,7 @@ public class UserController {
         return "redirect:/users/list";
     }
 
-    @GetMapping("/delete/{id}")
+    @GetMapping("/delete/{userId}")
     public String deleteUser(@PathVariable("userId") Long userId) {
         userService.deleteUserById(userId);
         return "redirect:/users/list";
