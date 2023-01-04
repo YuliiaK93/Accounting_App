@@ -36,10 +36,20 @@ public class UserDto {
     @Size(max = 50, min = 2, message = "Last Name must be between 2 and 50 characters long.")
     private String lastname;
 
-    @NotBlank(message = "Phone Number is required field.")
-    @Pattern(regexp = "^((\\(\\d{3}\\))|\\d{3})[- .]?\\d{3}[- .]?\\d{4}$", message = "Phone Number is required field and may be in any valid phone number format.")
+    @NotBlank
+    @Pattern(regexp = "^(\\+\\d{1,3}( )?)?((\\(\\d{3}\\))|\\d{3})[- .]?\\d{3}[- .]?\\d{4}$"
+            + "|^(\\+\\d{1,3}( )?)?(\\d{3}[ ]?){2}\\d{3}$"
+            + "|^(\\+\\d{1,3}( )?)?(\\d{3}[ ]?)(\\d{2}[ ]?){2}\\d{2}$", message = "Phone Number is required field and may be in any valid phone number format.")
     private String phone;
     private boolean enabled = true;
+
+    @NotNull(message = "Please select a Role")
+    private RoleDto role;
+
+    @NotNull(message = "Please select a Customer.")
+    private CompanyDto company;
+
+    Boolean isOnlyAdmin;
 
     public RoleDto getRole() {
         return role;
@@ -49,9 +59,6 @@ public class UserDto {
         this.role = role;
     }
 
-    @NotNull(message = "Please select a Role")
-    private RoleDto role;
-
     public CompanyDto getCompany() {
         return company;
     }
@@ -59,12 +66,6 @@ public class UserDto {
     public void setCompany(CompanyDto company) {
         this.company = company;
     }
-
-    @NotNull(message = "Please select a Customer.")
-    private CompanyDto company;
-
-
-    Boolean isOnlyAdmin;
 
 
     public Long getId() {

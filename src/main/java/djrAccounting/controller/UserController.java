@@ -84,8 +84,8 @@ public class UserController {
             return "user/user-update";
         }
 
-        userService.update(user);
-        return "user/user-list";
+        userService.save(user);
+        return "redirect:/users/list";
     }
 
     @GetMapping("/delete/{id}")
