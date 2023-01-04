@@ -131,19 +131,17 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
     @Override
     public void approveInvoiceById(Long id) {
-
         Invoice invoice = invoiceRepository.findById(id).orElseThrow();
         CompanyDto companyDto = securityService.getLoggedInUser().getCompany();
-        Company company =mapper.convert(companyDto,Company.class);
+        Company company = mapper.convert(companyDto, Company.class);
 //- all stock quantities of items that are purchased in the invoice should be decreased by the amount on the invoice"
         List<InvoiceProduct> invoiceProductList = invoice.getInvoiceProducts();
         List<Product> productList = productRepository.findAllByCategoryCompany(company);
-
+        List<Invoice> purchaseInvoiceList = invoiceRepository.findAllPurchaseInvoiceForCurrentCompany(company.getTitle(), InvoiceType.PURCHASE);
 
         invoice.setInvoiceStatus(InvoiceStatus.APPROVED); //Transaction???
 
         invoice.setDate(LocalDate.now());
 // - profit/loss should be calculated for all sales invoice products and saved
     }
-
 }
