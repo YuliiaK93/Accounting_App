@@ -61,7 +61,6 @@ public class PurchaseInvoiceController {
 
     @PostMapping("/create")
     public String createPurchaseInvoice(@Valid @ModelAttribute("newPurchaseInvoice") InvoiceDto invoiceDto, BindingResult bindingResult, Model model){
-       // model.addAttribute("vendors", clientVendorService.listVendorsBySelectedUserCompany());
         if(bindingResult.hasErrors()){
             model.addAttribute("vendors", clientVendorService.listVendorsBySelectedUserCompany());
             return "invoice/purchase-invoice-create";
