@@ -8,6 +8,7 @@ import djrAccounting.repository.UserRepository;
 import djrAccounting.service.CompanyService;
 import djrAccounting.service.SecurityService;
 import djrAccounting.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -57,15 +59,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUserById(Long id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user == null){
-            throw new NoSuchElementException("User was not found");
+        User user = userRepository.findById(id).get();
+        UserDto userDto = mapperUtil.convert(user, new UserDto());
+        if (isOnlyAdmin(userDto)) {
+            userDto.setOnlyAdmin(true);
+        } else {
+            user.setIsDeleted(true);
+            user.setEnabled(false);
+            user.setUsername(user.getUsername() + "-" + user.getId());
+            userRepository.save(user);
+            log.info("User is deleted");
         }
-        user.get().setIsDeleted(true);
-        user.get().setUsername(user.get().getUsername() + "-" + user.get().getId());
-        userRepository.save(user.get());
     }
-
     @Override
     public void update(UserDto userDto) {
         User user = userRepository.findById(userDto.getId()).get();
