@@ -49,7 +49,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void save(UserDto userDto) {
-
         userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
         User user1 = mapperUtil.convert(userDto, new User());
         user1.setEnabled(true);
@@ -80,14 +79,13 @@ public class UserServiceImpl implements UserService {
         convertedUser.setEnabled(user.isEnabled());
         userRepository.save(convertedUser);
         return findUserById(userDto.getId());
-
     }
+
     public UserDto findUserById(Long id) {
         User user = userRepository.findUserById(id);
         UserDto dto =  mapperUtil.convert(user, new UserDto());
         dto.setIsOnlyAdmin(checkIfOnlyAdminForCompany(dto));
         return dto;
-
     }
 
     private List<UserDto> findAllOrderByCompanyAndRole() {
@@ -116,7 +114,6 @@ public class UserServiceImpl implements UserService {
                 return findAllOrderByCompanyAndRole();
         }
     }
-
 
     @Override
     public boolean isEmailExist(UserDto userDto) {
