@@ -1,5 +1,6 @@
 package djrAccounting.service.implementation;
 
+import djrAccounting.dto.InvoiceProductDto;
 import djrAccounting.entity.InvoiceProduct;
 import djrAccounting.enums.InvoiceType;
 import djrAccounting.mapper.MapperUtil;
@@ -107,12 +108,10 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
     public void save(InvoiceProductDto invoiceProductDto, Long id) {
-
         invoiceProductDto.setProfitLoss(BigDecimal.ZERO);//required calc
         invoiceProductDto.setInvoice(invoiceService.findById(id));
         invoiceProductDto.setRemainingQuantity(invoiceProductDto.getQuantity());
         InvoiceProduct invoiceProduct = mapper.convert(invoiceProductDto, InvoiceProduct.class);
         invoiceProductRepository.save(invoiceProduct);
-
     }
 }

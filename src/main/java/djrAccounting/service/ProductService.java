@@ -1,5 +1,6 @@
 package djrAccounting.service;
 
+import djrAccounting.dto.InvoiceProductDto;
 import djrAccounting.dto.ProductDto;
 
 import java.util.List;

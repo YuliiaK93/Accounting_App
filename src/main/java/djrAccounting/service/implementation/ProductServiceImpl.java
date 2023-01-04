@@ -1,6 +1,7 @@
 package djrAccounting.service.implementation;
 
 import djrAccounting.dto.CompanyDto;
+import djrAccounting.dto.InvoiceProductDto;
 import djrAccounting.dto.ProductDto;
 import djrAccounting.entity.Company;
 import djrAccounting.entity.Product;
