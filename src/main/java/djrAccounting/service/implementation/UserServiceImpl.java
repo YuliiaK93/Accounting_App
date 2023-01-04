@@ -47,7 +47,6 @@ public class UserServiceImpl implements UserService {
     }
 
 
-
     @Override
     public void save(UserDto userDto) {
 
@@ -71,14 +70,23 @@ public class UserServiceImpl implements UserService {
             log.info("User is deleted");
         }
     }
+
     @Override
-    public void update(UserDto userDto) {
-        User user = userRepository.findById(userDto.getId()).get();
+    public UserDto update(UserDto userDto) {
+        User user = userRepository.findUserById(userDto.getId());
         User convertedUser = mapperUtil.convert(userDto, new User());
         convertedUser.setId(user.getId());
         convertedUser.setPassword(passwordEncoder.encode(user.getPassword()));
         convertedUser.setEnabled(user.isEnabled());
         userRepository.save(convertedUser);
+        return findUserById(userDto.getId());
+
+    }
+    public UserDto findUserById(Long id) {
+        User user = userRepository.findUserById(id);
+        UserDto dto =  mapperUtil.convert(user, new UserDto());
+        dto.setIsOnlyAdmin(checkIfOnlyAdminForCompany(dto));
+        return dto;
 
     }
 
@@ -110,12 +118,11 @@ public class UserServiceImpl implements UserService {
     }
 
 
-
     @Override
     public boolean isEmailExist(UserDto userDto) {
 
-       Optional<User> user = Optional.ofNullable(userRepository.findByUsername(userDto.getUsername()));
-       return user.filter(value -> !value.getId().equals(userDto.getId())).isPresent();
+        Optional<User> user = Optional.ofNullable(userRepository.findByUsername(userDto.getUsername()));
+        return user.filter(value -> !value.getId().equals(userDto.getId())).isPresent();
     }
 
     @Override
@@ -136,23 +143,25 @@ public class UserServiceImpl implements UserService {
                 })
                 .collect(Collectors.toList());
     }
+
     private boolean checkIfOnlyAdminForCompany(UserDto userDto) {
-        Company company= mapperUtil.convert(userDto.getCompany(),new Company());
+        Company company = mapperUtil.convert(userDto.getCompany(), new Company());
         List<User> admins = userRepository.findAllByCompany_Title(company.getTitle().equals("Admin"));
         return userDto.getRole().getDescription().equals("Admin") && admins.size() == 1;
     }
 
     private Object getCurrentUserCompanyTitle() {
-        return  securityService.getLoggedInUser().getCompany().getTitle();
+        return securityService.getLoggedInUser().getCompany().getTitle();
     }
 
     private boolean isCurrentUserRootUser() {
-        User user= mapperUtil.convert(securityService.getLoggedInUser(),new User());
-        if (user.getRole().getDescription().equals("Root User")){
+        User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
+        if (user.getRole().getDescription().equals("Root User")) {
             return true;
         }
         return false;
     }
+
     public List<UserDto> listAllUsers() {
         if (securityService.getLoggedInUser().getRole().getDescription().equals("Root User")) {
             return userRepository.findAllByRoleDescriptionOrderByCompanyTitle("Admin").stream()
@@ -173,14 +182,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean isUsernameExist(UserDto userDto) {
         User user = userRepository.findByUsername(userDto.getUsername());
-        if(user==null)
+        if (user == null)
             return false;
         return !Objects.equals(userDto.getId(), user.getId());
     }
 
     private boolean isOnlyAdmin(UserDto userDto) {
-        Company company = mapperUtil.convert(userDto.getCompany(), new Company());
-        List<User> admins = userRepository.findAllByRoleDescriptionAndCompanyOrderByCompanyTitleAscRoleDescription("Admin", company);
-        return userDto.getRole().getDescription().equals("Admin") && admins.size() == 1;
+        List<User> admin = userRepository.findAllByCompanyId(userDto.getId()).stream()
+                .filter(user -> user.getRole().getDescription().equals("Admin"))
+                .collect(Collectors.toList());
+        return admin.size() == 1;
     }
-    }
+}

@@ -49,10 +49,11 @@ public class RoleServiceImpl implements RoleService {
         UserDto loggedInUser = securityService.getLoggedInUser();
         List<Role> roleslist = roleRepository.findAll();
         if (loggedInUser.getRole().getDescription().equals("Root User")) {
-            return roleslist.stream()
+            List<RoleDto> roleDtoList = roleslist.stream()
                     .filter(role -> role.getDescription().equals("Admin"))
                     .map(role -> mapper.convert(role, new RoleDto()))
                     .collect(Collectors.toList());
+            return roleDtoList;
         } else if (loggedInUser.getRole().getDescription().equals("Admin")) {
             List<User> userList = userRepository.findAllByCompanyId(loggedInUser.getCompany().getId());
             log.info("User Roles size " + roleslist.size());

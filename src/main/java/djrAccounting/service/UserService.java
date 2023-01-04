@@ -16,7 +16,7 @@ public interface UserService {
 
     void deleteUserById(Long id);
 
-    void update(UserDto user);
+    UserDto update(UserDto user);
 
     List<UserDto> findAllFilterForLoggedInUser();
 
