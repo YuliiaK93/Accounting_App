@@ -44,6 +44,12 @@ public class SalesInvoiceController {
         return "invoice/invoice_print";
     }
 
+    @PostMapping("/print/{id}")
+    public String approveInvoice(@PathVariable("id") Long id){
+        invoiceService.approveInvoiceById(id);
+        return "invoice/invoice_print";
+    }
+
     @GetMapping("/create")
     public String createSalesInvoicePage(Model model) {
         InvoiceDto invoiceDto = new InvoiceDto();
