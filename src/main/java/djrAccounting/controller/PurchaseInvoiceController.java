@@ -61,7 +61,7 @@ public class PurchaseInvoiceController {
 
     @PostMapping("/create")
     public String createPurchaseInvoice(@Valid @ModelAttribute("newPurchaseInvoice") InvoiceDto invoiceDto, BindingResult bindingResult, Model model){
-        model.addAttribute("vendors", clientVendorService.listVendorsBySelectedUserCompany());
+       // model.addAttribute("vendors", clientVendorService.listVendorsBySelectedUserCompany());
         if(bindingResult.hasErrors()){
             model.addAttribute("vendors", clientVendorService.listVendorsBySelectedUserCompany());
             return "invoice/purchase-invoice-create";
@@ -106,18 +106,5 @@ public class PurchaseInvoiceController {
         invoiceProductService.save(invoiceProductDto,id);
         return "redirect:/purchaseInvoices/update/"+id;
     }
-//
-////    @GetMapping("delete/{id}")
-////    public String deletePurchaseInvoice(@PathVariable Long id, Model model){
-////        model.addAttribute("invoices",invoiceService.getAllPurchaseInvoiceForCurrentCompany());
-////        invoiceService.deleteById(id);
-////        return "redirect:/purchaseInvoices/list";
-////    }
-//    @GetMapping("/removeInvoiceProduct/{invoiceId}")
-//    public String removeProductFromPurchaseInvoiceList(@PathVariable("invoiceId") Long id, Model model){
-//        model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
-//       return "invoice/purchase-invoice-update";
-//    }
-//    @PostMapping("/removeInvoiceProduct/{invoiceId}")
-//    public String removeProductFromPurchaseInvoiceList(@ModelAttribute)
+
 }
