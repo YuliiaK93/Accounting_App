@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
 import java.time.LocalDate;
 
@@ -64,54 +65,53 @@ public class SalesInvoiceController {
         }
 
         invoiceService.save(invoiceDto);
-        return "redirect:/salesInvoices/update/"+invoiceDto.getId();
+        return "redirect:/salesInvoices/update/" + invoiceDto.getId();
     }
 
     @GetMapping("/update/{id}")
-    public String getUpdateSalesInvoice(@PathVariable("id") Long id,Model model){
+    public String getUpdateSalesInvoice(@PathVariable("id") Long id, Model model) {
         model.addAttribute("invoice", invoiceService.findById(id));
         model.addAttribute("clients", clientVendorService.listClientsBySelectedUserCompany());
-        InvoiceProductDto invoiceProductDto= new InvoiceProductDto();
-        model.addAttribute("newInvoiceProduct",invoiceProductDto);
-        model.addAttribute("products",productService.listProductsBySelectedUserCompany());
+        InvoiceProductDto invoiceProductDto = new InvoiceProductDto();
+        model.addAttribute("newInvoiceProduct", invoiceProductDto);
+        model.addAttribute("products", productService.listProductsBySelectedUserCompany());
         model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
 
         return "invoice/sales-invoice-update";
     }
 
     @PostMapping("/addInvoiceProduct/{id}")
-    public String addInvoiceProduct( @PathVariable("id") Long id, @Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDto invoiceProductDto,BindingResult bindingResult, Model model){
-        if (bindingResult.hasErrors() ){
+    public String addInvoiceProduct(@PathVariable("id") Long id, @Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDto invoiceProductDto, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
             model.addAttribute("invoice", invoiceService.findById(id));
             model.addAttribute("clients", clientVendorService.listClientsBySelectedUserCompany());
-            model.addAttribute("products",productService.listProductsBySelectedUserCompany());
+            model.addAttribute("products", productService.listProductsBySelectedUserCompany());
             model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
             return "invoice/sales-invoice-update";
         }
 
-        boolean isStockEnough =productService.isStockEnough(invoiceProductDto);
+        boolean isStockEnough = productService.isStockEnough(invoiceProductDto);
 
         if (!isStockEnough) {
-            bindingResult.rejectValue("quantity", " ", "Not enough " +invoiceProductDto.getProduct().getName() +" quantity yo sell." );
+            bindingResult.rejectValue("quantity", " ", "Not enough " + invoiceProductDto.getProduct().getName() + " quantity yo sell.");
             model.addAttribute("invoice", invoiceService.findById(id));
             model.addAttribute("clients", clientVendorService.listClientsBySelectedUserCompany());
-            model.addAttribute("products",productService.listProductsBySelectedUserCompany());
+            model.addAttribute("products", productService.listProductsBySelectedUserCompany());
             model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
             return "invoice/sales-invoice-update";
         }
 
-        invoiceProductService.save(invoiceProductDto,id);
+        invoiceProductService.save(invoiceProductDto, id);
 
-        return "redirect:/salesInvoices/update/"+id;
+        return "redirect:/salesInvoices/update/" + id;
     }
 
     @GetMapping("/removeInvoiceProduct/{invoiceId}/{invoiceProuductId}")
-    public String removeProductFromTheInvoice(@PathVariable("invoiceId") Long invoiceId, @PathVariable("invoiceProuductId") Long invoiceProductId){
+    public String removeProductFromTheInvoice(@PathVariable("invoiceId") Long invoiceId, @PathVariable("invoiceProuductId") Long invoiceProductId) {
         invoiceProductService.deleteInvoiceProductById(invoiceProductId);
 
-        return "redirect:/salesInvoices/update/"+invoiceId;
+        return "redirect:/salesInvoices/update/" + invoiceId;
     }
-
 
 
 }
