@@ -1,10 +1,7 @@
 package djrAccounting.service.implementation;
 
 import djrAccounting.dto.InvoiceDto;
-import djrAccounting.dto.InvoiceProductDto;
 import djrAccounting.entity.Invoice;
-import djrAccounting.entity.InvoiceProduct;
-import djrAccounting.entity.common.UserPrincipal;
 import djrAccounting.enums.ClientVendorType;
 import djrAccounting.enums.InvoiceStatus;
 import djrAccounting.enums.InvoiceType;
@@ -13,11 +10,9 @@ import djrAccounting.repository.InvoiceRepository;
 import djrAccounting.service.InvoiceProductService;
 import djrAccounting.service.InvoiceService;
 import djrAccounting.service.SecurityService;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -87,11 +82,10 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public void save(InvoiceDto invoiceDto) {
-        if(invoiceDto.getClientVendor().getClientVendorType().equals(ClientVendorType.CLIENT)){
+        if (invoiceDto.getClientVendor().getClientVendorType().equals(ClientVendorType.CLIENT)) {
             invoiceDto.setInvoiceType(InvoiceType.SALES);
-        }
-        else{
-                invoiceDto.setInvoiceType(InvoiceType.PURCHASE);
+        } else {
+            invoiceDto.setInvoiceType(InvoiceType.PURCHASE);
         }
 
         invoiceDto.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);

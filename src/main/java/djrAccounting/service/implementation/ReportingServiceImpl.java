@@ -1,12 +1,10 @@
 package djrAccounting.service.implementation;
 
-import djrAccounting.dto.InvoiceProductDto;
 import djrAccounting.service.InvoiceProductService;
 import djrAccounting.service.ReportingService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 

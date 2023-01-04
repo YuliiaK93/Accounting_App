@@ -1,7 +1,6 @@
 package djrAccounting.controller;
 
 import djrAccounting.dto.InvoiceDto;
-import djrAccounting.dto.InvoiceProductDto;
 import djrAccounting.service.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -112,6 +111,4 @@ public class SalesInvoiceController {
 
         return "redirect:/salesInvoices/update/" + invoiceId;
     }
-
-
 }
