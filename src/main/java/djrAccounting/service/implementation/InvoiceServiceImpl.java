@@ -1,18 +1,23 @@
 package djrAccounting.service.implementation;
 
+import djrAccounting.dto.CompanyDto;
 import djrAccounting.dto.InvoiceDto;
+import djrAccounting.entity.Company;
 import djrAccounting.entity.Invoice;
+import djrAccounting.entity.InvoiceProduct;
+import djrAccounting.entity.Product;
 import djrAccounting.entity.common.UserPrincipal;
 import djrAccounting.enums.InvoiceStatus;
 import djrAccounting.enums.InvoiceType;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.InvoiceRepository;
+import djrAccounting.repository.ProductRepository;
 import djrAccounting.service.InvoiceProductService;
 import djrAccounting.service.InvoiceService;
 import djrAccounting.service.SecurityService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,12 +28,14 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final InvoiceProductService invoiceProductService;
     private final SecurityService securityService;
     private final MapperUtil mapper;
+    private final ProductRepository productRepository;
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, InvoiceProductService invoiceProductService, SecurityService securityService, MapperUtil mapper) {
+    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, InvoiceProductService invoiceProductService, SecurityService securityService, MapperUtil mapper, ProductRepository productRepository) {
         this.invoiceRepository = invoiceRepository;
         this.invoiceProductService = invoiceProductService;
         this.securityService = securityService;
         this.mapper = mapper;
+        this.productRepository=productRepository;
     }
 
     @Override
@@ -89,7 +96,6 @@ public class InvoiceServiceImpl implements InvoiceService {
         Invoice invoice = mapper.convert(invoiceDto, Invoice.class);
         invoiceRepository.save(invoice);
         invoiceDto.setId(invoice.getId());
-
     }
 
     @Override
@@ -103,7 +109,6 @@ public class InvoiceServiceImpl implements InvoiceService {
         } else if (number < 100) {
             return "S-" + "0" + number;
         }
-
         return "S-" + number;
     }
 
@@ -123,6 +128,22 @@ public class InvoiceServiceImpl implements InvoiceService {
         });
 
         return purchaseInvoiceList;
-
     }
+    @Override
+    public void approveInvoiceById(Long id) {
+
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+        CompanyDto companyDto = securityService.getLoggedInUser().getCompany();
+        Company company =mapper.convert(companyDto,Company.class);
+//- all stock quantities of items that are purchased in the invoice should be decreased by the amount on the invoice"
+        List<InvoiceProduct> invoiceProductList = invoice.getInvoiceProducts();
+        List<Product> productList = productRepository.findAllByCategoryCompany(company);
+
+
+        invoice.setInvoiceStatus(InvoiceStatus.APPROVED); //Transaction???
+
+        invoice.setDate(LocalDate.now());
+// - profit/loss should be calculated for all sales invoice products and saved
+    }
+
 }

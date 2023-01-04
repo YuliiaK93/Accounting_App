@@ -6,6 +6,7 @@ import djrAccounting.dto.UserDto;
 import djrAccounting.entity.Invoice;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.InvoiceRepository;
+import djrAccounting.repository.ProductRepository;
 import djrAccounting.service.InvoiceProductService;
 import djrAccounting.service.SecurityService;
 import djrAccounting.service.implementation.InvoiceServiceImpl;
@@ -36,12 +37,13 @@ class InvoiceServiceImplTest {
     private SecurityService securityService;
     @Mock
     private MapperUtil mapper;
-
+    @Mock
+    private ProductRepository productRepository;
 
     @BeforeEach
     void setUp() {
 
-        invoiceService = new InvoiceServiceImpl(invoiceRepository, invoiceProductService, securityService, mapper);
+        invoiceService = new InvoiceServiceImpl(invoiceRepository, invoiceProductService, securityService, mapper, productRepository);
     }
 
     @Test
