@@ -1,6 +1,7 @@
 package djrAccounting.service;
 
 import djrAccounting.dto.CompanyDto;
+import djrAccounting.dto.InvoiceDto;
 import djrAccounting.dto.InvoiceProductDto;
 
 import java.math.BigDecimal;
@@ -25,5 +26,6 @@ public interface InvoiceProductService {
 
     void save(InvoiceProductDto invoiceProductDto, Long id);
 
+    void deleteInvoiceProductById(Long id);
 
 }

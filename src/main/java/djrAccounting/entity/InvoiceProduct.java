@@ -26,8 +26,7 @@ public class InvoiceProduct extends BaseEntity {
     @JoinColumn(name = "invoice_id")
     private Invoice invoice;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
-
 }

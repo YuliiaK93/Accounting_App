@@ -1,5 +1,6 @@
 package djrAccounting.service;
 
+import djrAccounting.dto.InvoiceProductDto;
 import djrAccounting.dto.ProductDto;
 import djrAccounting.entity.Product;
 
@@ -14,6 +15,10 @@ public interface ProductService {
     void deleteProductById(Long id);
 
     boolean productExistByCategory(Long categoryId);
+
+    List<ProductDto> listProductsBySelectedUserCompany();
+
+    boolean isStockEnough(InvoiceProductDto invoiceProductDto);
 
     void update(ProductDto productDto);
 

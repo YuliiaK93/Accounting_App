@@ -89,8 +89,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     public void save(InvoiceDto invoiceDto) {
         if(invoiceDto.getClientVendor().getClientVendorType().equals(ClientVendorType.CLIENT)){
             invoiceDto.setInvoiceType(InvoiceType.SALES);
-        }else{
-                invoiceDto.setInvoiceType(InvoiceType.PURCHASE);}
+        }
+        else{
+                invoiceDto.setInvoiceType(InvoiceType.PURCHASE);
+        }
 
         invoiceDto.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
         invoiceDto.setCompany(securityService.getLoggedInUser().getCompany());
@@ -110,6 +112,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         } else if (number < 100) {
             return "S-" + "0" + number;
         }
+
         return "S-" + number;
     }
 
@@ -129,7 +132,6 @@ public class InvoiceServiceImpl implements InvoiceService {
         });
 
         return purchaseInvoiceList;
-
     }
 
     @Override
@@ -145,9 +147,4 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
         return "P-" + number;
     }
-
-//    @Override
-//    public void deleteById(Long id) {
-//
-//    }
 }

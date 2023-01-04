@@ -1,6 +1,5 @@
 package djrAccounting.service.implementation;
 
-import djrAccounting.dto.InvoiceProductDto;
 import djrAccounting.entity.InvoiceProduct;
 import djrAccounting.enums.InvoiceType;
 import djrAccounting.mapper.MapperUtil;
@@ -86,6 +85,11 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public void deleteInvoiceProductById(Long id) {
+        invoiceProductRepository.delete(invoiceProductRepository.findById(id).get());
+    }
+
     private BigDecimal calculatePriceWithTax(List<InvoiceProduct> list) {
         return list.stream()
                 .map(invoiceProduct -> invoiceProduct.getPrice()
@@ -111,6 +115,4 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         invoiceProductRepository.save(invoiceProduct);
 
     }
-
-
 }

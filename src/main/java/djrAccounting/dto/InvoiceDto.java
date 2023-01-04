@@ -1,5 +1,6 @@
 package djrAccounting.dto;
 
+import djrAccounting.entity.InvoiceProduct;
 import djrAccounting.enums.InvoiceStatus;
 import djrAccounting.enums.InvoiceType;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.OneToMany;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -36,4 +38,5 @@ public class InvoiceDto {
     private BigDecimal price;
     private BigDecimal tax;
     private BigDecimal total;
+    private List<InvoiceProductDto> invoiceProducts;
 }
