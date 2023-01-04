@@ -58,6 +58,12 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public void update(CategoryDto category) {
+        category.setCompany(securityService.getLoggedInUser().getCompany());
+        categoryRepository.save(mapper.convert(category, Category.class));
+    }
+
+    @Override
     public void deleteCategoryById(Long id) {
         Category category = categoryRepository.findById(id).orElseThrow();
         category.setIsDeleted(true);
