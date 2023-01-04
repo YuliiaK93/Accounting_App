@@ -2,14 +2,11 @@ package djrAccounting.controller;
 
 import djrAccounting.dto.InvoiceDto;
 import djrAccounting.dto.InvoiceProductDto;
-import djrAccounting.dto.ProductDto;
-import djrAccounting.entity.Invoice;
 import djrAccounting.service.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
 import java.time.LocalDate;
 
@@ -85,7 +82,6 @@ public class SalesInvoiceController {
     @PostMapping("/addInvoiceProduct/{id}")
     public String addInvoiceProduct( @PathVariable("id") Long id, @Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDto invoiceProductDto,BindingResult bindingResult, Model model){
         if (bindingResult.hasErrors() ){
-
             model.addAttribute("invoice", invoiceService.findById(id));
             model.addAttribute("clients", clientVendorService.listClientsBySelectedUserCompany());
             model.addAttribute("products",productService.listProductsBySelectedUserCompany());
@@ -104,17 +100,18 @@ public class SalesInvoiceController {
             return "invoice/sales-invoice-update";
         }
 
-
         invoiceProductService.save(invoiceProductDto,id);
 
         return "redirect:/salesInvoices/update/"+id;
+    }
 
+    @GetMapping("/removeInvoiceProduct/{invoiceId}/{invoiceProuductId}")
+    public String removeProductFromTheInvoice(@PathVariable("invoiceId") Long invoiceId, @PathVariable("invoiceProuductId") Long invoiceProductId){
+        invoiceProductService.deleteInvoiceProductById(invoiceProductId);
+
+        return "redirect:/salesInvoices/update/"+invoiceId;
     }
 
 
-//    @PostMapping("/update/{id}")
-//    public String updateSalesInvoice(@PathVariable("id") Long id, InvoiceDto invoiceDto) {
-//        //todo @mehmet will implement update
-//        return "redirect:/salesInvoices/list";
-//    }
+
 }

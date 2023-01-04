@@ -26,4 +26,6 @@ public interface InvoiceProductService {
 
     void save(InvoiceProductDto invoiceProductDto, Long id);
 
+    void deleteInvoiceProductById(Long id);
+
 }
