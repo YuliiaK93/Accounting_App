@@ -1,6 +1,7 @@
 package djrAccounting.controller;
 
 import djrAccounting.dto.InvoiceDto;
+import djrAccounting.dto.InvoiceProductDto;
 import djrAccounting.service.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,12 +19,14 @@ public class SalesInvoiceController {
     private final InvoiceService invoiceService;
     private final InvoiceProductService invoiceProductService;
     private final ClientVendorService clientVendorService;
+    private final ProductService productService;
 
-    public SalesInvoiceController(CompanyService companyService, InvoiceService invoiceService, InvoiceProductService invoiceProductService, ClientVendorService clientVendorService) {
+    public SalesInvoiceController(CompanyService companyService, InvoiceService invoiceService, InvoiceProductService invoiceProductService, ClientVendorService clientVendorService, ProductService productService) {
         this.companyService = companyService;
         this.invoiceService = invoiceService;
         this.invoiceProductService = invoiceProductService;
         this.clientVendorService = clientVendorService;
+        this.productService = productService;
     }
 
     @GetMapping("/list")
@@ -62,12 +65,53 @@ public class SalesInvoiceController {
         }
 
         invoiceService.save(invoiceDto);
-        return "redirect:/products/create";
+        return "redirect:/salesInvoices/update/" + invoiceDto.getId();
     }
 
-    @PostMapping("/update/{id}")
-    public String updateSalesInvoice(@PathVariable("id") Long id, InvoiceDto invoiceDto) {
-        //todo @mehmet will implement update
-        return "redirect:/salesInvoices/list";
+    @GetMapping("/update/{id}")
+    public String getUpdateSalesInvoice(@PathVariable("id") Long id, Model model) {
+        model.addAttribute("invoice", invoiceService.findById(id));
+        model.addAttribute("clients", clientVendorService.listClientsBySelectedUserCompany());
+        InvoiceProductDto invoiceProductDto = new InvoiceProductDto();
+        model.addAttribute("newInvoiceProduct", invoiceProductDto);
+        model.addAttribute("products", productService.listProductsBySelectedUserCompany());
+        model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
+
+        return "invoice/sales-invoice-update";
     }
+
+    @PostMapping("/addInvoiceProduct/{id}")
+    public String addInvoiceProduct(@PathVariable("id") Long id, @Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDto invoiceProductDto, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("invoice", invoiceService.findById(id));
+            model.addAttribute("clients", clientVendorService.listClientsBySelectedUserCompany());
+            model.addAttribute("products", productService.listProductsBySelectedUserCompany());
+            model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
+            return "invoice/sales-invoice-update";
+        }
+
+        boolean isStockEnough = productService.isStockEnough(invoiceProductDto);
+
+        if (!isStockEnough) {
+            bindingResult.rejectValue("quantity", " ", "Not enough " + invoiceProductDto.getProduct().getName() + " quantity yo sell.");
+            model.addAttribute("invoice", invoiceService.findById(id));
+            model.addAttribute("clients", clientVendorService.listClientsBySelectedUserCompany());
+            model.addAttribute("products", productService.listProductsBySelectedUserCompany());
+            model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
+            return "invoice/sales-invoice-update";
+        }
+
+        invoiceProductService.save(invoiceProductDto, id);
+
+        return "redirect:/salesInvoices/update/" + id;
+    }
+
+    @GetMapping("/removeInvoiceProduct/{invoiceId}/{invoiceProuductId}")
+    public String removeProductFromTheInvoice(@PathVariable("invoiceId") Long invoiceId, @PathVariable("invoiceProuductId") Long invoiceProductId) {
+        invoiceProductService.deleteInvoiceProductById(invoiceProductId);
+
+        return "redirect:/salesInvoices/update/" + invoiceId;
+    }
+
+
 }
