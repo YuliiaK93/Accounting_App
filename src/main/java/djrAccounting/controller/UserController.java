@@ -1,10 +1,9 @@
 package djrAccounting.controller;
 
-import djrAccounting.bootstrap.StaticConstants;
+
 import djrAccounting.dto.UserDto;
 import djrAccounting.service.CompanyService;
 import djrAccounting.service.RoleService;
-import djrAccounting.service.SecurityService;
 import djrAccounting.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -69,8 +68,8 @@ public class UserController {
     }
 
     @PostMapping("/update/{id}")
-    public String updateUser(@PathVariable("id") Long userId, @Valid @ModelAttribute("user") UserDto user, BindingResult bindingResult, Model model) {
-        //user.setId(userId);
+    public String updateUser(@PathVariable("id") @Valid @ModelAttribute("user") UserDto user, BindingResult bindingResult, Model model) {
+
         boolean emailExist = userService.isEmailExist(user);
         model.addAttribute("userRoles", roleService.listRoleByLoggedInUser());
         model.addAttribute("companies", companyService.listCompaniesByLoggedInUser());
