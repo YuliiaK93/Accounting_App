@@ -86,6 +86,16 @@ public class ClientVendorServiceImpl implements ClientVendorService {
     }
 
     @Override
+    public List<ClientVendorDto> listVendorsBySelectedUserCompany() {
+        return  clientVendorRepository.findAllByCompanyIdAndClientVendorTypeOrderByClientVendorName(securityService.getLoggedInUser()
+                        .getCompany().getId(), ClientVendorType.VENDOR)
+                .stream()
+                .map(client -> mapperUtil.convert(client, ClientVendorDto.class))
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
     public boolean nameExists(String name) {
         return clientVendorRepository.existsByClientVendorName(name);
     }
