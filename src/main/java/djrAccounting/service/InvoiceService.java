@@ -20,4 +20,6 @@ public interface InvoiceService {
     List<InvoiceDto> getAllPurchaseInvoiceForCurrentCompany();
     String nextPurchaseInvoiceNo();
 
+//    void deleteById(Long id);
+
 }

@@ -1,7 +1,9 @@
 package djrAccounting.service.implementation;
 
 import djrAccounting.dto.InvoiceDto;
+import djrAccounting.dto.InvoiceProductDto;
 import djrAccounting.entity.Invoice;
+import djrAccounting.entity.InvoiceProduct;
 import djrAccounting.entity.common.UserPrincipal;
 import djrAccounting.enums.ClientVendorType;
 import djrAccounting.enums.InvoiceStatus;
@@ -15,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -119,6 +122,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .collect(Collectors.toList());
 
         purchaseInvoiceList.forEach(invoiceDto -> {
+            invoiceDto.setInvoiceProducts(invoiceProductService.findByInvoiceId(invoiceDto.getId()));
             invoiceDto.setTotal(invoiceProductService.getTotalPriceWithTaxByInvoice(invoiceDto.getInvoiceNo()));
             invoiceDto.setPrice(invoiceProductService.getTotalPriceByInvoice(invoiceDto.getInvoiceNo()));
             invoiceDto.setTax(invoiceDto.getTotal().subtract(invoiceDto.getPrice()));
@@ -141,4 +145,9 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
         return "P-" + number;
     }
+
+//    @Override
+//    public void deleteById(Long id) {
+//
+//    }
 }
