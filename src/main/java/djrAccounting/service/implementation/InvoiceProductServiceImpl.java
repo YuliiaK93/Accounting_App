@@ -91,6 +91,12 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         invoiceProductRepository.delete(invoiceProductRepository.findById(id).get());
     }
 
+    @Override
+    public void removeInvoiceProduct(Long invoiceProductId) {
+        InvoiceProduct invoiceProduct=invoiceProductRepository.findById(invoiceProductId).get();
+        invoiceProduct.setIsDeleted(true);
+    }
+
     private BigDecimal calculatePriceWithTax(List<InvoiceProduct> list) {
         return list.stream()
                 .map(invoiceProduct -> invoiceProduct.getPrice()
