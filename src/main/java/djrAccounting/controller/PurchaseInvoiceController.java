@@ -106,4 +106,10 @@ public class PurchaseInvoiceController {
         invoiceProductService.save(invoiceProductDto, id);
         return "redirect:/purchaseInvoices/update/" + id;
     }
+
+    @GetMapping("/removeInvoiceProduct/{invoiceId}/{invoiceProductId}")
+    public String removeInvoiceProduct(@PathVariable Long invoiceId, @PathVariable Long invoiceProductId, Model model){
+        invoiceProductService.removeInvoiceProduct(invoiceProductId);
+        return "redirect:/purchaseInvoices/update/"+invoiceId;
+    }
 }
