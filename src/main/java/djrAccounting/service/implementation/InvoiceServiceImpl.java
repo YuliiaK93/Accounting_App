@@ -1,6 +1,8 @@
 package djrAccounting.service.implementation;
 
+import djrAccounting.dto.CompanyDto;
 import djrAccounting.dto.InvoiceDto;
+import djrAccounting.entity.Company;
 import djrAccounting.entity.Invoice;
 import djrAccounting.entity.InvoiceProduct;
 import djrAccounting.entity.Product;
@@ -8,15 +10,16 @@ import djrAccounting.enums.ClientVendorType;
 import djrAccounting.enums.InvoiceStatus;
 import djrAccounting.enums.InvoiceType;
 import djrAccounting.mapper.MapperUtil;
+import djrAccounting.repository.InvoiceProductRepository;
 import djrAccounting.repository.InvoiceRepository;
 import djrAccounting.repository.ProductRepository;
 import djrAccounting.service.InvoiceProductService;
 import djrAccounting.service.InvoiceService;
 import djrAccounting.service.SecurityService;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,7 +36,8 @@ public class InvoiceServiceImpl implements InvoiceService {
         this.invoiceProductService = invoiceProductService;
         this.securityService = securityService;
         this.mapper = mapper;
-        this.productRepository=productRepository;
+        this.productRepository = productRepository;
+
     }
 
     @Override
@@ -132,6 +136,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         return purchaseInvoiceList;
     }
+
     @Override
     public String nextPurchaseInvoiceNo() {//get the Last one created invoice for the company
         Invoice invoice = invoiceRepository.findTopByCompanyIdOrderByIdDesc(securityService.getLoggedInUser().getCompany().getId());
@@ -152,12 +157,45 @@ public class InvoiceServiceImpl implements InvoiceService {
         CompanyDto companyDto = securityService.getLoggedInUser().getCompany();
         Company company = mapper.convert(companyDto, Company.class);
 //- all stock quantities of items that are purchased in the invoice should be decreased by the amount on the invoice"
+ //       Map<InvoiceProduct, Integer> productMap = new LinkedHashMap<>();
         List<InvoiceProduct> invoiceProductList = invoice.getInvoiceProducts();
-        List<Product> productList = productRepository.findAllByCategoryCompany(company);
-        List<Invoice> purchaseInvoiceList = invoiceRepository.findAllPurchaseInvoiceForCurrentCompany(company.getTitle(), InvoiceType.PURCHASE);
-        invoice.setInvoiceStatus(InvoiceStatus.APPROVED); //Transaction???
+ //       List<Product> productList = productRepository.findAllByCategoryCompany(company);
+        List<Invoice> purchaseInvoiceList = new LinkedList<>();
 
+
+
+        invoiceProductList.forEach(invoiceProduct -> {
+
+            purchaseInvoiceList.addAll(invoiceRepository.findAllByInvoiceProductsContainingAndInvoiceTypeAndCompanyOrderById(invoiceProduct,InvoiceType.PURCHASE, company));
+            int temp = invoiceProduct.getProduct().getQuantityInStock();
+            invoiceProduct.getProduct().setQuantityInStock(temp-invoiceProduct.getQuantity());
+            decreaseRemainingQuantityOfInvoices(purchaseInvoiceList, invoiceProduct);
+
+        });
+        invoice.setInvoiceStatus(InvoiceStatus.APPROVED); //Transaction???
         invoice.setDate(LocalDate.now());
 // - profit/loss should be calculated for all sales invoice products and saved
+
+    }
+
+    private void decreaseRemainingQuantityOfInvoices(List<Invoice> purchaseInvoiceList, InvoiceProduct saleInvoiceProduct) {
+
+        purchaseInvoiceList.forEach(purchaseInvoice -> {
+            purchaseInvoice.getInvoiceProducts().forEach(purchaseInvoiceProduct -> {
+                while (purchaseInvoiceProduct.equals(saleInvoiceProduct) && purchaseInvoiceProduct.getRemainingQuantity()>0){
+                    if (saleInvoiceProduct.getQuantity() >= purchaseInvoiceProduct.getRemainingQuantity()){
+                        int saleTempQuantity = saleInvoiceProduct.getQuantity();
+                        int purchaseTempQuantity= purchaseInvoiceProduct.getRemainingQuantity();
+                        purchaseInvoiceProduct.setRemainingQuantity(0);
+                        saleInvoiceProduct.setQuantity(saleTempQuantity-purchaseTempQuantity);
+                    } else{
+                        int purchaseTempQuantity = purchaseInvoiceProduct.getRemainingQuantity();
+                        int saleTempQuantity = saleInvoiceProduct.getQuantity();
+                        purchaseInvoiceProduct.setRemainingQuantity(purchaseTempQuantity-saleTempQuantity);
+                        saleInvoiceProduct.setRemainingQuantity(0);
+                    }
+                }
+            });
+        });
     }
 }
