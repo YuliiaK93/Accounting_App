@@ -75,7 +75,7 @@ public class PurchaseInvoiceController {
         model.addAttribute("vendors", clientVendorService.listVendorsBySelectedUserCompany());
         model.addAttribute("newInvoiceProduct", new InvoiceProductDto());
         model.addAttribute("products", productService.listProductsBySelectedUserCompany());
-        model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
+      //  model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
 
         return "invoice/purchase-invoice-update";
     }
@@ -85,7 +85,7 @@ public class PurchaseInvoiceController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("vendors", clientVendorService.listVendorsBySelectedUserCompany());
             model.addAttribute("products", productService.listProductsBySelectedUserCompany());
-           //model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
+            model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
             return "invoice/purchase-invoice-update";
         }
 
@@ -99,7 +99,7 @@ public class PurchaseInvoiceController {
             model.addAttribute("invoice", invoiceService.findById(id));
             model.addAttribute("vendors", clientVendorService.listVendorsBySelectedUserCompany());
             model.addAttribute("products", productService.listProductsBySelectedUserCompany());
-        //    model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
+            model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
             return "invoice/purchase-invoice-update";
         }
 
