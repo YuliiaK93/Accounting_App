@@ -56,6 +56,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoiceDto.setPrice(invoiceProductService.getTotalPriceByInvoice(invoiceDto.getInvoiceNo()));
         invoiceDto.setTotal(invoiceProductService.getTotalPriceWithTaxByInvoice(invoiceDto.getInvoiceNo()));
         invoiceDto.setTax(invoiceDto.getTotal().subtract(invoiceDto.getPrice()));
+        invoiceDto.setInvoiceProducts(invoiceProductService.findByInvoiceId(id));
 
         return invoiceDto;
     }
