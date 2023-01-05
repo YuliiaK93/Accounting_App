@@ -10,6 +10,8 @@ import djrAccounting.service.InvoiceService;
 import djrAccounting.service.SecurityService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -90,13 +92,6 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     public void deleteInvoiceProductById(Long id) {
         invoiceProductRepository.delete(invoiceProductRepository.findById(id).get());
     }
-
-    @Override
-    public void removeInvoiceProduct(Long invoiceProductId) {
-        InvoiceProduct invoiceProduct=invoiceProductRepository.findById(invoiceProductId).get();
-        invoiceProduct.setIsDeleted(true);
-    }
-
     private BigDecimal calculatePriceWithTax(List<InvoiceProduct> list) {
         return list.stream()
                 .map(invoiceProduct -> invoiceProduct.getPrice()
@@ -120,4 +115,12 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         InvoiceProduct invoiceProduct = mapper.convert(invoiceProductDto, InvoiceProduct.class);
         invoiceProductRepository.save(invoiceProduct);
     }
+    @Override
+    public void removeInvoiceProduct(Long invoiceProductId) {
+        InvoiceProduct invoiceProduct=invoiceProductRepository.findById(invoiceProductId).get();
+        invoiceProduct.setIsDeleted(true);
+        invoiceProductRepository.save(invoiceProduct);
+    }
+
+
 }

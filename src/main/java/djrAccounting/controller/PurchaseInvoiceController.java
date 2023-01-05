@@ -85,7 +85,7 @@ public class PurchaseInvoiceController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("vendors", clientVendorService.listVendorsBySelectedUserCompany());
             model.addAttribute("products", productService.listProductsBySelectedUserCompany());
-            model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
+           //model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
             return "invoice/purchase-invoice-update";
         }
 
@@ -99,7 +99,7 @@ public class PurchaseInvoiceController {
             model.addAttribute("invoice", invoiceService.findById(id));
             model.addAttribute("vendors", clientVendorService.listVendorsBySelectedUserCompany());
             model.addAttribute("products", productService.listProductsBySelectedUserCompany());
-            model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
+        //    model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
             return "invoice/purchase-invoice-update";
         }
 
@@ -111,5 +111,11 @@ public class PurchaseInvoiceController {
     public String removeInvoiceProduct(@PathVariable Long invoiceId, @PathVariable Long invoiceProductId, Model model){
         invoiceProductService.removeInvoiceProduct(invoiceProductId);
         return "redirect:/purchaseInvoices/update/"+invoiceId;
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deletePurchaseInvoice(@PathVariable("id") Long id){
+        invoiceService.deletePurchaseInvoiceById(id);
+        return "redirect:/purchaseInvoices/list";
     }
 }

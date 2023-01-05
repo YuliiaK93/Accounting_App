@@ -1,7 +1,9 @@
 package djrAccounting.service.implementation;
 
 import djrAccounting.dto.InvoiceDto;
+import djrAccounting.dto.InvoiceProductDto;
 import djrAccounting.entity.Invoice;
+import djrAccounting.entity.InvoiceProduct;
 import djrAccounting.enums.ClientVendorType;
 import djrAccounting.enums.InvoiceStatus;
 import djrAccounting.enums.InvoiceType;
@@ -140,5 +142,17 @@ public class InvoiceServiceImpl implements InvoiceService {
             return "P-" + "0" + number;
         }
         return "P-" + number;
+    }
+
+    @Override
+    public void deletePurchaseInvoiceById(Long id) {
+        Invoice invoice=invoiceRepository.findById(id).get();
+        List<InvoiceProductDto> invoiceProductList=invoiceProductService.findByInvoiceId(id);
+        invoiceProductList.stream()
+                .map(invoiceProductDto -> mapper.convert(invoiceProductDto, InvoiceProduct.class))
+                .forEach(invoiceProduct -> invoiceProduct.setIsDeleted(true));
+        invoice.setIsDeleted(true);
+       invoiceRepository.save(invoice);
+
     }
 }
