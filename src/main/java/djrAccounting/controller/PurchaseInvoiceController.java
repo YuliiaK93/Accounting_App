@@ -14,25 +14,29 @@ import java.time.LocalDate;
 @Controller
 @RequestMapping("/purchaseInvoices")
 public class PurchaseInvoiceController {
-    private final CompanyService companyService;
     private final InvoiceService invoiceService;
     private final InvoiceProductService invoiceProductService;
     private final ClientVendorService clientVendorService;
 
     private final ProductService productService;
+    private final SecurityService securityService;
 
-    public PurchaseInvoiceController(CompanyService companyService, InvoiceService invoiceService, InvoiceProductService invoiceProductService, ClientVendorService clientVendorService, ProductService productService) {
-        this.companyService = companyService;
+    public PurchaseInvoiceController(InvoiceService invoiceService, InvoiceProductService invoiceProductService, ClientVendorService clientVendorService, ProductService productService, SecurityService securityService) {
         this.invoiceService = invoiceService;
         this.invoiceProductService = invoiceProductService;
         this.clientVendorService = clientVendorService;
         this.productService = productService;
+        this.securityService = securityService;
     }
 
     @GetMapping("/print/{id}")
     public String printPurchaseInvoice(@PathVariable("id") Long id, Model model) {
+
         InvoiceDto invoiceDto = invoiceService.findById(id);
-        model.addAttribute("company", companyService.findById(invoiceDto.getCompany().getId()));
+
+        if (!invoiceDto.getCompany().equals(securityService.getLoggedInUser().getCompany())) return "redirect:/purchaseInvoices/list";
+
+        model.addAttribute("company", securityService.getLoggedInUser().getCompany());
         model.addAttribute("invoice", invoiceDto);
         model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(invoiceDto.getId()));
 
@@ -71,7 +75,12 @@ public class PurchaseInvoiceController {
 
     @GetMapping({"/update/{id}", "/addInvoiceProduct/{id}"})
     public String updatePurchaseInvoice(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("invoice", invoiceService.findById(id));
+
+        InvoiceDto invoiceDto = invoiceService.findById(id);
+
+        if (!invoiceDto.getCompany().equals(securityService.getLoggedInUser().getCompany())) return "redirect:/purchaseInvoices/list";
+
+        model.addAttribute("invoice", invoiceDto);
         model.addAttribute("vendors", clientVendorService.listVendorsBySelectedUserCompany());
         model.addAttribute("newInvoiceProduct", new InvoiceProductDto());
         model.addAttribute("products", productService.listProductsBySelectedUserCompany());
