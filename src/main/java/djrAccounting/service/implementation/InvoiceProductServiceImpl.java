@@ -24,7 +24,6 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     private final MapperUtil mapper;
     private final InvoiceService invoiceService;
 
-
     public InvoiceProductServiceImpl(InvoiceProductRepository invoiceProductRepository, SecurityService securityService, MapperUtil mapper, @Lazy InvoiceService invoiceService) {
         this.invoiceProductRepository = invoiceProductRepository;
         this.securityService = securityService;
@@ -63,7 +62,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
                 .stream()
                 .map(InvoiceProduct::getProfitLoss)
                 .reduce(BigDecimal::add)
-                .orElseThrow();
+                .orElse(BigDecimal.ZERO);
     }
 
     @Override
@@ -88,16 +87,6 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     @Override
-    public void save(InvoiceProductDto invoiceProductDto, Long id) {
-
-        invoiceProductDto.setProfitLoss(BigDecimal.ZERO); //todo profit loss calculation @mehmet
-        invoiceProductDto.setInvoice(invoiceService.findById(id));
-        InvoiceProduct invoiceProduct = mapper.convert(invoiceProductDto, InvoiceProduct.class);
-        invoiceProductRepository.save(invoiceProduct);
-
-    }
-
-    @Override
     public void deleteInvoiceProductById(Long id) {
         invoiceProductRepository.delete(invoiceProductRepository.findById(id).get());
     }
@@ -115,5 +104,14 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     private Long getCurrentCompanyId() {
         return securityService.getLoggedInUser().getCompany().getId();
+    }
+
+    @Override
+    public void save(InvoiceProductDto invoiceProductDto, Long id) {
+        invoiceProductDto.setProfitLoss(BigDecimal.ZERO);//required calc
+        invoiceProductDto.setInvoice(invoiceService.findById(id));
+        invoiceProductDto.setRemainingQuantity(invoiceProductDto.getQuantity());
+        InvoiceProduct invoiceProduct = mapper.convert(invoiceProductDto, InvoiceProduct.class);
+        invoiceProductRepository.save(invoiceProduct);
     }
 }

@@ -7,6 +7,7 @@ import djrAccounting.entity.InvoiceProduct;
 import djrAccounting.enums.InvoiceType;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.InvoiceProductRepository;
+import djrAccounting.service.InvoiceService;
 import djrAccounting.service.SecurityService;
 import djrAccounting.service.implementation.InvoiceProductServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,10 +37,12 @@ class InvoiceProductServiceImplTest {
     @Mock
     private MapperUtil mapper;
 
+    @Mock
+    private InvoiceService invoiceService;
+
     @BeforeEach
     void setUp() {
-
-        invoiceProductService = new InvoiceProductServiceImpl(invoiceProductRepository, securityService, mapper);
+        invoiceProductService = new InvoiceProductServiceImpl(invoiceProductRepository, securityService, mapper, invoiceService);
     }
 
     @Test

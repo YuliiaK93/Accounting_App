@@ -118,6 +118,4 @@ public class SalesInvoiceController {
 
         return "redirect:/salesInvoices/update/" + invoiceId;
     }
-
-
 }

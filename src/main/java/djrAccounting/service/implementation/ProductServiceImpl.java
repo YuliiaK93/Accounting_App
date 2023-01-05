@@ -10,6 +10,7 @@ import djrAccounting.repository.ProductRepository;
 import djrAccounting.service.ProductService;
 import djrAccounting.service.SecurityService;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,10 +69,12 @@ public class ProductServiceImpl implements ProductService {
         int remainingStock = productRepository.findByName(invoiceProductDto.getProduct().getName()).getQuantityInStock();
         return remainingStock > invoiceProductDto.getQuantity();
     }
+
     @Override
     public void update(ProductDto productDto) {
         productRepository.save(mapper.convert(productDto, Product.class));
     }
+
     @Override
     public void save(ProductDto productDto) {
         productRepository.save(mapper.convert(productDto, Product.class));
