@@ -44,10 +44,15 @@ public class SalesInvoiceController {
         return "invoice/invoice_print";
     }
 
-    @PostMapping("/print/{id}")
-    public String approveInvoice(@PathVariable("id") Long id){
+    @GetMapping("/approve/{id}")
+    public String approveInvoiceGet(@PathVariable("id") Long id){
         invoiceService.approveInvoiceById(id);
-        return "invoice/invoice_print";
+        return "redirect:/salesInvoices/list";
+    }
+    @GetMapping("delete/{id}")
+    public String deleteInvoice(@PathVariable("id") Long id){
+        invoiceService.deleteInvoiceById(id);
+        return "redirect:/salesInvoices/list";
     }
 
     @GetMapping("/create")
@@ -86,8 +91,8 @@ public class SalesInvoiceController {
         return "invoice/sales-invoice-update";
     }
 
-    @PostMapping("/addInvoiceProduct/{id}")
-    public String addInvoiceProduct(@PathVariable("id") Long id, @Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDto invoiceProductDto, BindingResult bindingResult, Model model) {
+    @PostMapping("/addInvoiceProduct/{invoiceId}")
+    public String addInvoiceProduct(@PathVariable("invoiceId") Long id, @Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDto invoiceProductDto, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("invoice", invoiceService.findById(id));
             model.addAttribute("clients", clientVendorService.listClientsBySelectedUserCompany());
