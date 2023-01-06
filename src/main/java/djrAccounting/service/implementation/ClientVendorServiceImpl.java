@@ -97,9 +97,20 @@ public class ClientVendorServiceImpl implements ClientVendorService {
 
 
     @Override
+    public boolean duplicatedName(ClientVendorDto clientVendorDto){
+        String name=clientVendorRepository.findById(clientVendorDto.getId()).get().getClientVendorName();
+        Long id=clientVendorRepository.findById(clientVendorDto.getId()).get().getId();
+        if((clientVendorDto.getClientVendorName().equals(name) && (clientVendorDto.getId()==id))){
+            return false;
+        }
+      return true;
+    }
+
+    @Override
     public boolean nameExists(String name) {
         return clientVendorRepository.existsByClientVendorName(name);
     }
+
 }
 
 

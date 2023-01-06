@@ -15,6 +15,7 @@ public interface ClientVendorService {
 
     void deleteById(Long id) throws IllegalAccessException;
 
+    boolean duplicatedName(ClientVendorDto clientVendorDto);
     boolean nameExists(String name);
 
     List<ClientVendorDto> listClientsBySelectedUserCompany();
