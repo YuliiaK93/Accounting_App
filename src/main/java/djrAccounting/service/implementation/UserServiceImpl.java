@@ -76,6 +76,9 @@ public class UserServiceImpl implements UserService {
 
 
     public String checkIfUserCanBeDeleted(Long id) {
+        UserDto loggedInUser = securityService.getLoggedInUser();
+        User userWillBeDeleted = userRepository.
+
 
         return "";
     }
