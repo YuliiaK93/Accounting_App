@@ -2,6 +2,7 @@ package djrAccounting.service.implementation;
 
 import djrAccounting.dto.CompanyDto;
 import djrAccounting.dto.InvoiceDto;
+import djrAccounting.dto.InvoiceProductDto;
 import djrAccounting.entity.Company;
 import djrAccounting.entity.Invoice;
 import djrAccounting.entity.InvoiceProduct;
@@ -132,7 +133,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public String nextPurchaseInvoiceNo() {//get the Last one created invoice for the company
+    public String nextPurchaseInvoiceNo() {
         Invoice invoice = invoiceRepository.findTopByCompanyIdOrderByIdDesc(securityService.getLoggedInUser()
                 .getCompany()
                 .getId());
@@ -146,6 +147,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
         return "P-" + number;
     }
+
 
     @Override
     public void approveInvoiceById(Long id) {
@@ -196,7 +198,18 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .forEach(invoiceProductDto ->
                         invoiceProductService.deleteInvoiceProductById(invoiceProductDto.getId()));
     }
-    
+
+    @Override
+    public void deletePurchaseInvoiceById(Long id) {
+        Invoice invoice=invoiceRepository.findById(id).get();
+        List<InvoiceProductDto> invoiceProductList=invoiceProductService.findByInvoiceId(id);
+        invoiceProductList.stream()
+                .map(invoiceProductDto -> mapper.convert(invoiceProductDto, InvoiceProduct.class))
+                .forEach(invoiceProduct -> invoiceProduct.setIsDeleted(true));
+        invoice.setIsDeleted(true);
+        invoiceRepository.save(invoice);
+    }
+
     private Long getLoggedInCompanyId() {
         return securityService.getLoggedInUser().getCompany().getId();
     }
