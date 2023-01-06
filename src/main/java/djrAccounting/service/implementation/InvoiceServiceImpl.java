@@ -1,9 +1,7 @@
 package djrAccounting.service.implementation;
 
-import djrAccounting.dto.CompanyDto;
 import djrAccounting.dto.InvoiceDto;
 import djrAccounting.dto.InvoiceProductDto;
-import djrAccounting.entity.Company;
 import djrAccounting.entity.Invoice;
 import djrAccounting.entity.InvoiceProduct;
 import djrAccounting.enums.ClientVendorType;
@@ -208,6 +206,21 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .forEach(invoiceProduct -> invoiceProduct.setIsDeleted(true));
         invoice.setIsDeleted(true);
         invoiceRepository.save(invoice);
+    }
+
+    @Override
+    public void approvePurchaseInvoice(Long id) {
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+        if (isAuthoredToApproveInvoice()) {
+            invoice.setInvoiceStatus(InvoiceStatus.APPROVED);
+            invoice.setDate(LocalDate.now());
+            invoiceRepository.save(invoice);
+        }
+    }
+
+    private boolean isAuthoredToApproveInvoice() {
+        String loggedInUserRole=securityService.getLoggedInUser().getRole().getDescription();
+        return loggedInUserRole.equals("Manager");
     }
 
     private Long getLoggedInCompanyId() {
