@@ -32,27 +32,15 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public List<InvoiceDto> getLast3ApprovedInvoicesForCurrentUserCompany() {
-        List<InvoiceDto> invoiceDtoList = invoiceRepository.getLast3ApprovedInvoicesByCompanyId(securityService.getLoggedInUser()
-                        .getCompany()
-                        .getId())
-                .stream()
-                .map(invoice -> mapper.convert(invoice, InvoiceDto.class))
-                .collect(Collectors.toList());
 
-        invoiceDtoList.forEach(invoiceDto -> {
-            invoiceDto.setPrice(invoiceProductService.getTotalPriceByInvoice(invoiceDto.getInvoiceNo()));
-            invoiceDto.setTotal(invoiceProductService.getTotalPriceWithTaxByInvoice(invoiceDto.getInvoiceNo()));
-            invoiceDto.setTax(invoiceDto.getTotal().subtract(invoiceDto.getPrice()));
-        });
-
-        return invoiceDtoList;
+        return priceSetter(dtoMapper(invoiceRepository.getLast3ApprovedInvoicesByCompanyId(getLoggedInCompanyId())));
     }
 
     @Override
     public InvoiceDto findById(Long id) {
         InvoiceDto invoiceDto = mapper.convert(invoiceRepository.findById(id).orElseThrow(), InvoiceDto.class);
-        invoiceDto.setPrice(invoiceProductService.getTotalPriceByInvoice(invoiceDto.getInvoiceNo()));
-        invoiceDto.setTotal(invoiceProductService.getTotalPriceWithTaxByInvoice(invoiceDto.getInvoiceNo()));
+        invoiceDto.setPrice(invoiceProductService.getTotalPriceByInvoice(invoiceDto.getId()));
+        invoiceDto.setTotal(invoiceProductService.getTotalPriceWithTaxByInvoice(invoiceDto.getId()));
         invoiceDto.setTax(invoiceDto.getTotal().subtract(invoiceDto.getPrice()));
 
         return invoiceDto;
@@ -72,8 +60,8 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .collect(Collectors.toList());
 
         invoiceDtoList.forEach(invoiceDto -> {
-            invoiceDto.setPrice(invoiceProductService.getTotalPriceByInvoice(invoiceDto.getInvoiceNo()));
-            invoiceDto.setTotal(invoiceProductService.getTotalPriceWithTaxByInvoice(invoiceDto.getInvoiceNo()));
+            invoiceDto.setPrice(invoiceProductService.getTotalPriceByInvoice(invoiceDto.getId()));
+            invoiceDto.setTotal(invoiceProductService.getTotalPriceWithTaxByInvoice(invoiceDto.getId()));
             invoiceDto.setTax(invoiceDto.getTotal().subtract(invoiceDto.getPrice()));
         });
 
@@ -97,7 +85,9 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public String nextSalesInvoiceNo() {
-        Invoice invoice = invoiceRepository.findTopByCompanyIdOrderByIdDesc(securityService.getLoggedInUser().getCompany().getId());
+        Invoice invoice = invoiceRepository.findTopByCompanyIdOrderByIdDesc(securityService.getLoggedInUser()
+                .getCompany()
+                .getId());
         String invoiceNo = invoice.getInvoiceNo();
         String substring = invoiceNo.substring(2);
         int number = Integer.parseInt(substring) + 1;
@@ -120,8 +110,8 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         purchaseInvoiceList.forEach(invoiceDto -> {
             invoiceDto.setInvoiceProducts(invoiceProductService.findByInvoiceId(invoiceDto.getId()));
-            invoiceDto.setTotal(invoiceProductService.getTotalPriceWithTaxByInvoice(invoiceDto.getInvoiceNo()));
-            invoiceDto.setPrice(invoiceProductService.getTotalPriceByInvoice(invoiceDto.getInvoiceNo()));
+            invoiceDto.setTotal(invoiceProductService.getTotalPriceWithTaxByInvoice(invoiceDto.getId()));
+            invoiceDto.setPrice(invoiceProductService.getTotalPriceByInvoice(invoiceDto.getId()));
             invoiceDto.setTax(invoiceDto.getTotal().subtract(invoiceDto.getPrice()));
         });
 
@@ -130,7 +120,9 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public String nextPurchaseInvoiceNo() {//get the Last one created invoice for the company
-        Invoice invoice = invoiceRepository.findTopByCompanyIdOrderByIdDesc(securityService.getLoggedInUser().getCompany().getId());
+        Invoice invoice = invoiceRepository.findTopByCompanyIdOrderByIdDesc(securityService.getLoggedInUser()
+                .getCompany()
+                .getId());
         String invoiceNo = invoice.getInvoiceNo();//get number
         String substring = invoiceNo.substring(2);
         int number = Integer.parseInt(substring) + 1;
@@ -140,5 +132,28 @@ public class InvoiceServiceImpl implements InvoiceService {
             return "P-" + "0" + number;
         }
         return "P-" + number;
+    }
+
+    private Long getLoggedInCompanyId() {
+        return securityService.getLoggedInUser().getCompany().getId();
+    }
+
+    private List<InvoiceDto> priceSetter(List<InvoiceDto> invoiceDtoList) {
+
+        invoiceDtoList.forEach(invoiceDto -> {
+            invoiceDto.setPrice(invoiceProductService.getTotalPriceByInvoice(invoiceDto.getId()));
+            invoiceDto.setTotal(invoiceProductService.getTotalPriceWithTaxByInvoice(invoiceDto.getId()));
+            invoiceDto.setTax(invoiceDto.getTotal().subtract(invoiceDto.getPrice()));
+            invoiceDto.setInvoiceProducts(invoiceProductService.findByInvoiceId(invoiceDto.getId()));
+        });
+
+        return invoiceDtoList;
+    }
+
+    private List<InvoiceDto> dtoMapper(List<Invoice> clientVendors) {
+
+        return clientVendors.stream()
+                .map(invoice -> mapper.convert(invoice, InvoiceDto.class))
+                .collect(Collectors.toList());
     }
 }
