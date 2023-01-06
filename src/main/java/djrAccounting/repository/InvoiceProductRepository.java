@@ -26,7 +26,7 @@ public interface InvoiceProductRepository extends JpaRepository<InvoiceProduct, 
     @Query("SELECT i FROM InvoiceProduct i " +
             "WHERE i.remainingQuantity > 0 AND i.invoice.invoiceType = 'PURCHASE' AND i.product.id = ?1 AND i.invoice.invoiceStatus = 'APPROVED' " +
             "ORDER BY i.invoice.lastUpdateDateTime")
-    List<InvoiceProduct> findByRemainingQuantityGreaterThanAndInvoice_InvoiceTypeAndProduct_IdOrderByLastUpdateDateTimeAsc(Long invoiceProductId);
+    List<InvoiceProduct> findByRemainingQuantityGreaterThanAndInvoice_InvoiceTypeAndProduct_IdOrderByLastUpdateDateTimeAsc(Long productId);
 
 
 }

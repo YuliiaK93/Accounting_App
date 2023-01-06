@@ -104,7 +104,7 @@ public class SalesInvoiceController {
         boolean isStockEnough = productService.isStockEnough(invoiceProductDto);
 
         if (!isStockEnough) {
-            bindingResult.rejectValue("quantity", " ", "Not enough " + invoiceProductDto.getProduct().getName() + " quantity yo sell.");
+            bindingResult.rejectValue("quantity", " ", "Not enough " + invoiceProductDto.getProduct().getName() + " quantity to sell.");
             model.addAttribute("invoice", invoiceService.findById(id));
             model.addAttribute("clients", clientVendorService.listClientsBySelectedUserCompany());
             model.addAttribute("products", productService.listProductsBySelectedUserCompany());

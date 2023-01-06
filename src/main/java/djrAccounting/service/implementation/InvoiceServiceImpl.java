@@ -79,7 +79,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public List<InvoiceDto> findSalesInvoicesByCurrentUserCompany() {
-        List<InvoiceDto> invoiceDtoList = invoiceRepository.findAllByCompanyIdAndInvoiceType(securityService.getLoggedInUser()
+        List<InvoiceDto> invoiceDtoList = invoiceRepository.findAllByCompanyIdAndInvoiceTypeOrderByLastUpdateDateTimeDesc(securityService.getLoggedInUser()
                         .getCompany().getId(), InvoiceType.SALES)
                 .stream()
                 .map(invoice -> mapper.convert(invoice, InvoiceDto.class))
@@ -166,7 +166,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         List<InvoiceProduct> invoiceProductList = invoice.getInvoiceProducts();
 
         invoiceProductList.forEach(salesInvoiceProduct->{
-            List<InvoiceProduct> purchaseInvoiceProducts = invoiceProductRepository.findByRemainingQuantityGreaterThanAndInvoice_InvoiceTypeAndProduct_IdOrderByLastUpdateDateTimeAsc(salesInvoiceProduct.getId());
+            List<InvoiceProduct> purchaseInvoiceProducts = invoiceProductRepository.findByRemainingQuantityGreaterThanAndInvoice_InvoiceTypeAndProduct_IdOrderByLastUpdateDateTimeAsc(salesInvoiceProduct.getProduct().getId());
             int quantity =salesInvoiceProduct.getQuantity();
             int invoiceProductIndex = 0;
             BigDecimal totalCost  = BigDecimal.ZERO;
@@ -209,6 +209,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 //        });
         invoice.setInvoiceStatus(InvoiceStatus.APPROVED); //Transaction???
         invoice.setDate(LocalDate.now());
+        invoiceRepository.save(invoice);
 // - profit/loss should be calculated for all sales invoice products and saved
 
     }
