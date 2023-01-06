@@ -40,12 +40,25 @@ public class SalesInvoiceController {
 
         InvoiceDto invoiceDto = invoiceService.findById(id);
 
-        if (!invoiceDto.getCompany().equals(securityService.getLoggedInUser().getCompany())) return "redirect:/salesInvoices/list";
+        if (!invoiceDto.getCompany().equals(securityService.getLoggedInUser().getCompany()))
+            return "redirect:/salesInvoices/list";
 
         model.addAttribute("company", securityService.getLoggedInUser().getCompany());
         model.addAttribute("invoice", invoiceDto);
         model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(invoiceDto.getId()));
         return "invoice/invoice_print";
+    }
+
+    @GetMapping("/approve/{id}")
+    public String approveInvoiceGet(@PathVariable("id") Long id) {
+        invoiceService.approveInvoiceById(id);
+        return "redirect:/salesInvoices/list";
+    }
+
+    @GetMapping("delete/{id}")
+    public String deleteInvoice(@PathVariable("id") Long id) {
+        invoiceService.deleteInvoiceById(id);
+        return "redirect:/salesInvoices/list";
     }
 
     @GetMapping("/create")
@@ -77,7 +90,8 @@ public class SalesInvoiceController {
 
         InvoiceDto invoiceDto = invoiceService.findById(id);
 
-        if (!invoiceDto.getCompany().equals(securityService.getLoggedInUser().getCompany())) return "redirect:/salesInvoices/list";
+        if (!invoiceDto.getCompany().equals(securityService.getLoggedInUser().getCompany()))
+            return "redirect:/salesInvoices/list";
 
         model.addAttribute("invoice", invoiceDto);
         model.addAttribute("clients", clientVendorService.listClientsBySelectedUserCompany());
@@ -89,8 +103,8 @@ public class SalesInvoiceController {
         return "invoice/sales-invoice-update";
     }
 
-    @PostMapping("/addInvoiceProduct/{id}")
-    public String addInvoiceProduct(@PathVariable("id") Long id, @Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDto invoiceProductDto, BindingResult bindingResult, Model model) {
+    @PostMapping("/addInvoiceProduct/{invoiceId}")
+    public String addInvoiceProduct(@PathVariable("invoiceId") Long id, @Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDto invoiceProductDto, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("invoice", invoiceService.findById(id));
             model.addAttribute("clients", clientVendorService.listClientsBySelectedUserCompany());
@@ -102,7 +116,7 @@ public class SalesInvoiceController {
         boolean isStockEnough = productService.isStockEnough(invoiceProductDto);
 
         if (!isStockEnough) {
-            bindingResult.rejectValue("quantity", " ", "Not enough " + invoiceProductDto.getProduct().getName() + " quantity yo sell.");
+            bindingResult.rejectValue("quantity", " ", "Not enough " + invoiceProductDto.getProduct().getName() + " quantity to sell.");
             model.addAttribute("invoice", invoiceService.findById(id));
             model.addAttribute("clients", clientVendorService.listClientsBySelectedUserCompany());
             model.addAttribute("products", productService.listProductsBySelectedUserCompany());

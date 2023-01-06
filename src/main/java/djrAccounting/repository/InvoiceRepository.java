@@ -1,9 +1,12 @@
 package djrAccounting.repository;
 
+import djrAccounting.entity.Company;
 import djrAccounting.entity.Invoice;
+import djrAccounting.entity.InvoiceProduct;
 import djrAccounting.enums.InvoiceType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,8 +24,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
     Invoice findTopByCompanyIdOrderByIdDesc(Long id);
 
-    @Query(value = "SELECT i FROM Invoice i WHERE i.company.title = ?1 AND i.invoiceType = ?2 order by i.invoiceNo desc ")
-    List<Invoice> findAllPurchaseInvoiceForCurrentCompany(String companyTitle, InvoiceType invoiceType);
+    List<Invoice> findAllByCompanyIdAndInvoiceTypeOrderByLastUpdateDateTimeDesc(Long companyId, InvoiceType invoiceType);
 }
 
 

@@ -49,7 +49,7 @@ class InvoiceProductServiceImplTest {
     void getTotalPriceByInvoice() {
 
         Invoice invoice = new Invoice() {{
-            setInvoiceNo("S-001");
+            setId(1L);
         }};
 
         ArrayList<InvoiceProduct> invoiceProducts = new ArrayList<>() {{
@@ -71,21 +71,23 @@ class InvoiceProductServiceImplTest {
             }});
         }};
 
-        when(securityService.getLoggedInUser()).thenReturn(new UserDto() {{
+        UserDto userDto = new UserDto() {{
             setCompany(new CompanyDto() {{
                 setId(1L);
             }});
-        }});
-        when(invoiceProductRepository.findByInvoice_InvoiceNoAndInvoice_Company_Id(eq(invoice.getInvoiceNo()), eq(1L))).thenReturn(invoiceProducts);
+        }};
 
-        assertEquals(BigDecimal.valueOf(4588.0), invoiceProductService.getTotalPriceByInvoice(invoice.getInvoiceNo()));
+        when(securityService.getLoggedInUser()).thenReturn(userDto);
+        when(invoiceProductRepository.findByInvoice_IdAndInvoice_Company_Id(eq(invoice.getId()), eq(userDto.getCompany().getId()))).thenReturn(invoiceProducts);
+
+        assertEquals(BigDecimal.valueOf(4588.0), invoiceProductService.getTotalPriceByInvoice(invoice.getId()));
     }
 
     @Test
     void getTotalPriceWithTaxByInvoice() {
 
         Invoice invoice = new Invoice() {{
-            setInvoiceNo("S-001");
+            setId(1L);
         }};
 
         ArrayList<InvoiceProduct> invoiceProducts = new ArrayList<>() {{
@@ -107,14 +109,16 @@ class InvoiceProductServiceImplTest {
             }});
         }};
 
-        when(securityService.getLoggedInUser()).thenReturn(new UserDto() {{
+        UserDto userDto = new UserDto() {{
             setCompany(new CompanyDto() {{
                 setId(1L);
             }});
-        }});
-        when(invoiceProductRepository.findByInvoice_InvoiceNoAndInvoice_Company_Id(eq(invoice.getInvoiceNo()), eq(1L))).thenReturn(invoiceProducts);
+        }};
 
-        assertEquals(BigDecimal.valueOf(5047.2), invoiceProductService.getTotalPriceWithTaxByInvoice(invoice.getInvoiceNo()));
+        when(securityService.getLoggedInUser()).thenReturn(userDto);
+        when(invoiceProductRepository.findByInvoice_IdAndInvoice_Company_Id(eq(invoice.getId()), eq(userDto.getCompany().getId()))).thenReturn(invoiceProducts);
+
+        assertEquals(BigDecimal.valueOf(5047.2), invoiceProductService.getTotalPriceWithTaxByInvoice(invoice.getId()));
     }
 
     @Test
@@ -139,12 +143,14 @@ class InvoiceProductServiceImplTest {
             }});
         }};
 
-        when(securityService.getLoggedInUser()).thenReturn(new UserDto() {{
+        UserDto userDto = new UserDto() {{
             setCompany(new CompanyDto() {{
                 setId(1L);
             }});
-        }});
-        when(invoiceProductRepository.findAllInvoicesByInvoice_Company_IdAndInvoice_InvoiceStatusIsApproved(eq(1L), eq(InvoiceType.PURCHASE))).thenReturn(invoiceProducts);
+        }};
+
+        when(securityService.getLoggedInUser()).thenReturn(userDto);
+        when(invoiceProductRepository.findAllInvoicesByInvoice_Company_IdAndInvoice_InvoiceStatusIsApproved(eq(userDto.getCompany().getId()), eq(InvoiceType.PURCHASE))).thenReturn(invoiceProducts);
 
         assertEquals(BigDecimal.valueOf(5047.2), invoiceProductService.getTotalCostForCurrentCompany());
     }
@@ -171,12 +177,14 @@ class InvoiceProductServiceImplTest {
             }});
         }};
 
-        when(securityService.getLoggedInUser()).thenReturn(new UserDto() {{
+        UserDto userDto = new UserDto() {{
             setCompany(new CompanyDto() {{
                 setId(1L);
             }});
-        }});
-        when(invoiceProductRepository.findAllInvoicesByInvoice_Company_IdAndInvoice_InvoiceStatusIsApproved(eq(1L), eq(InvoiceType.SALES))).thenReturn(invoiceProducts);
+        }};
+
+        when(securityService.getLoggedInUser()).thenReturn(userDto);
+        when(invoiceProductRepository.findAllInvoicesByInvoice_Company_IdAndInvoice_InvoiceStatusIsApproved(eq(userDto.getCompany().getId()), eq(InvoiceType.SALES))).thenReturn(invoiceProducts);
 
         assertEquals(BigDecimal.valueOf(5047.2), invoiceProductService.getTotalSalesForCurrentCompany());
     }
@@ -197,12 +205,14 @@ class InvoiceProductServiceImplTest {
             }});
         }};
 
-        when(securityService.getLoggedInUser()).thenReturn(new UserDto() {{
+        UserDto userDto = new UserDto() {{
             setCompany(new CompanyDto() {{
                 setId(1L);
             }});
-        }});
-        when(invoiceProductRepository.findByInvoice_Company_Id(eq(1L))).thenReturn(invoiceProducts);
+        }};
+
+        when(securityService.getLoggedInUser()).thenReturn(userDto);
+        when(invoiceProductRepository.findByInvoice_Company_Id(eq(userDto.getCompany().getId()))).thenReturn(invoiceProducts);
 
         assertEquals(BigDecimal.valueOf(5047.2), invoiceProductService.getTotalProfitLossForCurrentCompany());
     }
