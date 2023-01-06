@@ -27,8 +27,8 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     @Query(value = "SELECT i FROM Invoice i WHERE i.company.title = ?1 AND i.invoiceType = ?2 order by i.invoiceNo desc ")
     List<Invoice> findAllPurchaseInvoiceForCurrentCompany(String companyTitle, InvoiceType invoiceType);
 
-    @Query(value ="SELECT i FROM invoices i WHERE i.invoice_type=?1 AND i.company_id=?2 AND i.invoiceProducts in (invoiceProduct=3?) ORDER BY i.id", nativeQuery = true)
-    List<Invoice> findAllByInvoiceProductsContainingAndInvoiceTypeAndCompanyOrderById(InvoiceType invoiceType, Long companyId, @Param("invoiceProduct")InvoiceProduct invoiceProduct);
+    @Query(value = "SELECT i FROM invoices i WHERE i.invoice_type=?1 AND i.company_id=?2 AND i.invoiceProducts in (invoiceProduct=3?) ORDER BY i.id", nativeQuery = true)
+    List<Invoice> findAllByInvoiceProductsContainingAndInvoiceTypeAndCompanyOrderById(InvoiceType invoiceType, Long companyId, @Param("invoiceProduct") InvoiceProduct invoiceProduct);
 
     List<Invoice> findAllByCompanyIdAndInvoiceTypeOrderByLastUpdateDateTimeDesc(Long companyId, InvoiceType invoiceType);
 }

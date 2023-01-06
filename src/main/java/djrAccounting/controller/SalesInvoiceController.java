@@ -40,7 +40,8 @@ public class SalesInvoiceController {
 
         InvoiceDto invoiceDto = invoiceService.findById(id);
 
-        if (!invoiceDto.getCompany().equals(securityService.getLoggedInUser().getCompany())) return "redirect:/salesInvoices/list";
+        if (!invoiceDto.getCompany().equals(securityService.getLoggedInUser().getCompany()))
+            return "redirect:/salesInvoices/list";
 
         model.addAttribute("company", securityService.getLoggedInUser().getCompany());
         model.addAttribute("invoice", invoiceDto);
@@ -49,12 +50,13 @@ public class SalesInvoiceController {
     }
 
     @GetMapping("/approve/{id}")
-    public String approveInvoiceGet(@PathVariable("id") Long id){
+    public String approveInvoiceGet(@PathVariable("id") Long id) {
         invoiceService.approveInvoiceById(id);
         return "redirect:/salesInvoices/list";
     }
+
     @GetMapping("delete/{id}")
-    public String deleteInvoice(@PathVariable("id") Long id){
+    public String deleteInvoice(@PathVariable("id") Long id) {
         invoiceService.deleteInvoiceById(id);
         return "redirect:/salesInvoices/list";
     }
@@ -88,7 +90,8 @@ public class SalesInvoiceController {
 
         InvoiceDto invoiceDto = invoiceService.findById(id);
 
-        if (!invoiceDto.getCompany().equals(securityService.getLoggedInUser().getCompany())) return "redirect:/salesInvoices/list";
+        if (!invoiceDto.getCompany().equals(securityService.getLoggedInUser().getCompany()))
+            return "redirect:/salesInvoices/list";
 
         model.addAttribute("invoice", invoiceDto);
         model.addAttribute("clients", clientVendorService.listClientsBySelectedUserCompany());

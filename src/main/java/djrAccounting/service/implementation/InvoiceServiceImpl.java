@@ -158,13 +158,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public void approveInvoiceById(Long id) {
         Invoice invoice = invoiceRepository.findById(id).orElseThrow();
- //       CompanyDto companyDto = securityService.getLoggedInUser().getCompany();
- //       Company company = mapper.convert(companyDto, Company.class);
-
-//- all stock quantities of items that are purchased in the invoice should be decreased by the amount on the invoice"
-
         List<InvoiceProduct> invoiceProductList = invoice.getInvoiceProducts();
-
         invoiceProductList.forEach(salesInvoiceProduct->{
             List<InvoiceProduct> purchaseInvoiceProducts = invoiceProductRepository.findByRemainingQuantityGreaterThanAndInvoice_InvoiceTypeAndProduct_IdOrderByLastUpdateDateTimeAsc(salesInvoiceProduct.getProduct().getId());
             int quantity =salesInvoiceProduct.getQuantity();
@@ -196,22 +190,9 @@ public class InvoiceServiceImpl implements InvoiceService {
                     .getId(),salesInvoiceProduct.getQuantity());
         });
 
-      //  List<Invoice> purchaseInvoiceList = new LinkedList<>();
-
-
-//        invoiceProductList.forEach(invoiceProduct -> {
-//
-//            purchaseInvoiceList.addAll(invoiceRepository.findAllByInvoiceProductsContainingAndInvoiceTypeAndCompanyOrderById(InvoiceType.PURCHASE,company,invoiceProduct ));
-//            int temp = invoiceProduct.getProduct().getQuantityInStock();
-//            invoiceProduct.getProduct().setQuantityInStock(temp-invoiceProduct.getQuantity());
-//            decreaseRemainingQuantityOfInvoices(purchaseInvoiceList, invoiceProduct);
-//
-//        });
-        invoice.setInvoiceStatus(InvoiceStatus.APPROVED); //Transaction???
+        invoice.setInvoiceStatus(InvoiceStatus.APPROVED); //todo ask kicchi if we need a transaction here. what if changing the status to approved will fail but all quantitites has already been changed
         invoice.setDate(LocalDate.now());
         invoiceRepository.save(invoice);
-// - profit/loss should be calculated for all sales invoice products and saved
-
     }
 
     @Override
@@ -224,25 +205,4 @@ public class InvoiceServiceImpl implements InvoiceService {
                         invoiceProductService.deleteInvoiceProductById(invoiceProductDto.getId()));
 
     }
-
-//    private void decreaseRemainingQuantityOfInvoices(List<Invoice> purchaseInvoiceList, InvoiceProduct saleInvoiceProduct) {
-//
-//        purchaseInvoiceList.forEach(purchaseInvoice -> {
-//            purchaseInvoice.getInvoiceProducts().forEach(purchaseInvoiceProduct -> {
-//                while (purchaseInvoiceProduct.equals(saleInvoiceProduct) && purchaseInvoiceProduct.getRemainingQuantity()>0){
-//                    if (saleInvoiceProduct.getQuantity() >= purchaseInvoiceProduct.getRemainingQuantity()){
-//                        int saleTempQuantity = saleInvoiceProduct.getQuantity();
-//                        int purchaseTempQuantity= purchaseInvoiceProduct.getRemainingQuantity();
-//                        purchaseInvoiceProduct.setRemainingQuantity(0);
-//                        saleInvoiceProduct.setQuantity(saleTempQuantity-purchaseTempQuantity);
-//                    } else{
-//                        int purchaseTempQuantity = purchaseInvoiceProduct.getRemainingQuantity();
-//                        int saleTempQuantity = saleInvoiceProduct.getQuantity();
-//                        purchaseInvoiceProduct.setRemainingQuantity(purchaseTempQuantity-saleTempQuantity);
-//                        saleInvoiceProduct.setRemainingQuantity(0);
-//                    }
-//                }
-//            });
-//        });
-//    }
 }

@@ -18,10 +18,8 @@ public interface InvoiceService {
     String nextSalesInvoiceNo();
 
     List<InvoiceDto> getAllPurchaseInvoiceForCurrentCompany();
+
     String nextPurchaseInvoiceNo();
-
-//    void deleteById(Long id);
-
 
     void approveInvoiceById(Long id);
 
