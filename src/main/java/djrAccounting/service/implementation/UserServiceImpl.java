@@ -63,28 +63,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUserById(Long id) {
 
-    User user = userRepository.findById(id).get();
+        User user = userRepository.findById(id).get();
 
-   // if (checkIfUserCanBeDeleted()) {
-       user.setIsDeleted(true);
-       user.setUsername(user.getUsername() + "-" + user.getId()
-        + user.getCompany().getId()
-        + user.getRole().getId());
-    userRepository.save(user);
+        // if (checkIfUserCanBeDeleted()) {
+        user.setIsDeleted(true);
+        user.setUsername(user.getUsername() + "-" + user.getId()
+                + user.getCompany().getId()
+                + user.getRole().getId());
+        userRepository.save(user);
 
-        }
+    }
 
 
+    public String checkIfUserCanBeDeleted(Long id) {
 
-    private boolean checkIfUserCanBeDeleted(Role role) {
-
-     switch(role.getDescription()) {
-         case "Root User":
-             List<RoleDto> roleDtoList = roleService.listRoleByLoggedInUser();
-             return roleDtoList.size() == 0;
-     }
-
-        return true;
+        return "";
     }
 
 
