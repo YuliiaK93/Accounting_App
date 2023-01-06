@@ -41,9 +41,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteProductById(Long id) {
         Product product = productRepository.findById(id).orElseThrow();
-
-        // if (productDto.getQuantityInStock()>0 || )
-        // TODO: 12/28/2022
         product.setIsDeleted(true);
         productRepository.save(product);
     }
