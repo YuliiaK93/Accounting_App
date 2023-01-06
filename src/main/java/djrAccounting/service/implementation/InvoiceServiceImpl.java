@@ -2,8 +2,10 @@ package djrAccounting.service.implementation;
 
 import djrAccounting.dto.InvoiceDto;
 import djrAccounting.dto.InvoiceProductDto;
+import djrAccounting.dto.ProductDto;
 import djrAccounting.entity.Invoice;
 import djrAccounting.entity.InvoiceProduct;
+import djrAccounting.entity.Product;
 import djrAccounting.enums.ClientVendorType;
 import djrAccounting.enums.InvoiceStatus;
 import djrAccounting.enums.InvoiceType;
@@ -208,10 +210,16 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoiceRepository.save(invoice);
     }
 
-    @Override
     public void approvePurchaseInvoice(Long id) {
         Invoice invoice = invoiceRepository.findById(id).orElseThrow();
-        if (isAuthoredToApproveInvoice()) {
+        List<InvoiceProduct> invoiceProductList =invoice.getInvoiceProducts();
+        boolean productReadyToOrder=invoiceProductList.size()>0;
+        if (isAuthoredToApproveInvoice() && productReadyToOrder) {
+            for (InvoiceProduct invoiceProduct : invoiceProductList) {
+                ProductDto productDto=productService.findById(invoiceProduct.getProduct().getId());
+                productDto.setQuantityInStock(productDto.getQuantityInStock()+invoiceProduct.getQuantity());
+                productService.save(productDto);
+            }
             invoice.setInvoiceStatus(InvoiceStatus.APPROVED);
             invoice.setDate(LocalDate.now());
             invoiceRepository.save(invoice);
@@ -222,7 +230,6 @@ public class InvoiceServiceImpl implements InvoiceService {
         String loggedInUserRole=securityService.getLoggedInUser().getRole().getDescription();
         return loggedInUserRole.equals("Manager");
     }
-
     private Long getLoggedInCompanyId() {
         return securityService.getLoggedInUser().getCompany().getId();
     }
