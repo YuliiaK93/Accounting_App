@@ -11,8 +11,6 @@ public interface ClientVendorRepository extends JpaRepository<ClientVendor, Long
 
     List<ClientVendor> findAllByCompanyIdAndClientVendorTypeOrderByClientVendorName(Long id, ClientVendorType clientVendorType);
 
-    boolean existsByClientVendorName(String name);
-
-
+   boolean existsByClientVendorName(String name);
     List<ClientVendor> findByCompany_IdOrderByClientVendorTypeAscClientVendorNameAsc(Long id);
 }

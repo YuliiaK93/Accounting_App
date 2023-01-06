@@ -37,9 +37,9 @@ public class ClientVendorController {
 
     @PostMapping("/create")
     public String createClientVendor(@Valid @ModelAttribute("newClientVendor") ClientVendorDto clientVendorDto, BindingResult bindingResult, Model model) {
-        boolean duplicatedName = clientVendorService.nameExists(clientVendorDto.getClientVendorName());
-        if (bindingResult.hasErrors() || duplicatedName) {
-            if (duplicatedName) {
+        boolean nameExists = clientVendorService.nameExists(clientVendorDto.getClientVendorName());
+        if (bindingResult.hasErrors() || nameExists) {
+            if (nameExists) {
                 bindingResult.rejectValue("clientVendorName", " ", "A Client/Vendor with this name already exists. Please, try again.");
             }
             model.addAttribute("clientVendorTypes", ClientVendorType.values());
@@ -61,7 +61,7 @@ public class ClientVendorController {
 
     @PostMapping("/update/{id}")
     public String editClientVendor(@Valid @ModelAttribute("clientVendor") ClientVendorDto clientVendorDto, BindingResult bindingResult,@PathVariable("id") Long id, Model model){
-            boolean duplicatedName = clientVendorService.nameExists(clientVendorDto.getClientVendorName());
+            boolean duplicatedName = clientVendorService.duplicatedName(clientVendorDto);//name same id different
             if(bindingResult.hasErrors() || duplicatedName){
                 if(duplicatedName){
                     bindingResult.rejectValue("clientVendorName"," ", "A Client/Vendor with this name already exists. Please, try again.");
