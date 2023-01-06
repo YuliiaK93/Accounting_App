@@ -18,4 +18,6 @@ public interface CompanyService {
     CompanyDto update(CompanyDto companyDto);
 
     boolean isTitleExist(String title);
+
+    List<CompanyDto> listCompaniesByLoggedInUser();
 }

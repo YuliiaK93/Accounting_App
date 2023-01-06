@@ -15,18 +15,18 @@ import java.time.LocalDate;
 @RequestMapping("/salesInvoices")
 public class SalesInvoiceController {
 
-    private final CompanyService companyService;
     private final InvoiceService invoiceService;
     private final InvoiceProductService invoiceProductService;
     private final ClientVendorService clientVendorService;
     private final ProductService productService;
+    private final SecurityService securityService;
 
-    public SalesInvoiceController(CompanyService companyService, InvoiceService invoiceService, InvoiceProductService invoiceProductService, ClientVendorService clientVendorService, ProductService productService) {
-        this.companyService = companyService;
+    public SalesInvoiceController(InvoiceService invoiceService, InvoiceProductService invoiceProductService, ClientVendorService clientVendorService, ProductService productService, SecurityService securityService) {
         this.invoiceService = invoiceService;
         this.invoiceProductService = invoiceProductService;
         this.clientVendorService = clientVendorService;
         this.productService = productService;
+        this.securityService = securityService;
     }
 
     @GetMapping("/list")
@@ -37,8 +37,12 @@ public class SalesInvoiceController {
 
     @GetMapping("/print/{id}")
     public String printSalesInvoice(@PathVariable("id") Long id, Model model) {
+
         InvoiceDto invoiceDto = invoiceService.findById(id);
-        model.addAttribute("company", companyService.findById(invoiceDto.getCompany().getId()));
+
+        if (!invoiceDto.getCompany().equals(securityService.getLoggedInUser().getCompany())) return "redirect:/salesInvoices/list";
+
+        model.addAttribute("company", securityService.getLoggedInUser().getCompany());
         model.addAttribute("invoice", invoiceDto);
         model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(invoiceDto.getId()));
         return "invoice/invoice_print";
@@ -81,7 +85,12 @@ public class SalesInvoiceController {
 
     @GetMapping("/update/{id}")
     public String getUpdateSalesInvoice(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("invoice", invoiceService.findById(id));
+
+        InvoiceDto invoiceDto = invoiceService.findById(id);
+
+        if (!invoiceDto.getCompany().equals(securityService.getLoggedInUser().getCompany())) return "redirect:/salesInvoices/list";
+
+        model.addAttribute("invoice", invoiceDto);
         model.addAttribute("clients", clientVendorService.listClientsBySelectedUserCompany());
         InvoiceProductDto invoiceProductDto = new InvoiceProductDto();
         model.addAttribute("newInvoiceProduct", invoiceProductDto);

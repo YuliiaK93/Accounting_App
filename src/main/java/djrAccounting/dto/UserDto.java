@@ -3,40 +3,53 @@ package djrAccounting.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
+import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@ToString
+@Valid
 public class UserDto {
 
     private Long id;
 
-    @NotBlank(message = "Email is required field. A user with this email already exists. Please try with different email.")
-    @Email
+    @NotBlank(message = "Username is required field.")
+    @Email(message = "A user with this email already exists. Please try with different email.")
     private String username;
 
-    @NotBlank(message = "Password should be at least 4 characters long and needs to contain 1 capital letter, 1 small letter and 1 special character or number.")
-    @Pattern(regexp = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{4,}")
+    @NotBlank(message = "Password is required field")
+    @Pattern(regexp = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{4,}", message = "Password should be at least 4 characters long and needs to contain 1 capital letter,1 small letter and 1 special character or number.")
     private String password;
 
-    @NotNull
-    @NotBlank(message = "Passwords should match.")
-    private String confirmPassWord;
+    @NotNull(message = "Passwords should match.")
+    private String confirmPassword;
 
-    @NotBlank(message = "First Name is required field. First Name must be between 2 and 50 characters long.")
-    @Size(max = 50, min = 2)
+    @NotBlank(message = "First Name is required field.")
+    @Size(max = 50, min = 2, message = "First Name must be between 2 and 50 characters long.")
     private String firstname;
 
-    @NotBlank(message = "Last Name is required field. First Name must be between 2 and 50 characters long.")
-    @Size(max = 50, min = 2)
+    @NotBlank(message = "Last Name is required field.")
+    @Size(max = 50, min = 2, message = "Last Name must be between 2 and 50 characters long.")
     private String lastname;
 
-    @NotBlank(message = "Phone Number is required field and may be in any valid phone number format.")
-    @Pattern(regexp = "^((\\(\\d{3}\\))|\\d{3})[- .]?\\d{3}[- .]?\\d{4}$")
+    @NotBlank
+    @Pattern(regexp = "^(\\+\\d{1,3}( )?)?((\\(\\d{3}\\))|\\d{3})[- .]?\\d{3}[- .]?\\d{4}$"
+            + "|^(\\+\\d{1,3}( )?)?(\\d{3}[ ]?){2}\\d{3}$"
+            + "|^(\\+\\d{1,3}( )?)?(\\d{3}[ ]?)(\\d{2}[ ]?){2}\\d{2}$", message = "Phone Number is required field and may be in any valid phone number format.")
     private String phone;
-    private boolean enabled;
+    private boolean enabled = true;
+
+    @NotNull(message = "Please select a Role")
+    private RoleDto role;
+
+    @NotNull(message = "Please select a Customer.")
+    private CompanyDto company;
+
+    Boolean isOnlyAdmin;
 
     public RoleDto getRole() {
         return role;
@@ -46,9 +59,6 @@ public class UserDto {
         this.role = role;
     }
 
-    @NotNull(message = "Please select a Role")
-    private RoleDto role;
-
     public CompanyDto getCompany() {
         return company;
     }
@@ -57,16 +67,76 @@ public class UserDto {
         this.company = company;
     }
 
-    @NotNull(message = "Please select a Customer.")
-    private CompanyDto company;
 
-    public boolean isOnlyAdmin() {
-        return true; //TODO will be implemented by @Yuliia after security context
+    public Long getId() {
+        return id;
     }
 
-    public void setOnlyAdmin(boolean onlyAdmin) {
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
+    }
+
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public Boolean getOnlyAdmin() {
+        return isOnlyAdmin;
+    }
+
+    public void setOnlyAdmin(Boolean onlyAdmin) {
         isOnlyAdmin = onlyAdmin;
     }
-
-    private boolean isOnlyAdmin;
 }
