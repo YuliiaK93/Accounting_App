@@ -59,31 +59,29 @@ public class UserController {
         return "redirect:/users/list";
     }
 
-    @GetMapping("update/{id}")
-    public String editUser(@PathVariable("id") Long userId, Model model) {
-        model.addAttribute("user", userService.findById(userId));
+    @GetMapping("/update/{id}")
+    public String editUser(@PathVariable("id") Long id, Model model) {
+        model.addAttribute("user", userService.findById(id));
         model.addAttribute("userRoles", roleService.listRoleByLoggedInUser());
         model.addAttribute("companies", companyService.listCompaniesByLoggedInUser());
-        return "user/user-update";
+        return "/user/user-update";
     }
 
     @PostMapping("/update/{id}")
-    public String updateUser(@PathVariable("id") @Valid @ModelAttribute("user") UserDto user, BindingResult bindingResult, Model model) {
+    public String updateUser(@Valid @ModelAttribute("user") UserDto user, BindingResult bindingResult, Model model) {
 
-        boolean emailExist = userService.isEmailExist(user);
+        boolean isUsernameExist = userService.isUsernameExist(user);
         model.addAttribute("userRoles", roleService.listRoleByLoggedInUser());
         model.addAttribute("companies", companyService.listCompaniesByLoggedInUser());
 
-        if (emailExist) {
+        if (isUsernameExist) {
             bindingResult.rejectValue("username", " ", "User already exist. Please try with different username");
-            return "user/user-update";
+            return "/user/user-update";
         }
-
         if (bindingResult.hasErrors()) {
-            return "user/user-update";
+            return "/user/user-update";
         }
-
-        userService.save(user);
+        userService.update(user);
         return "redirect:/users/list";
     }
 
