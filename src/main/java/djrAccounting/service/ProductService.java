@@ -22,4 +22,6 @@ public interface ProductService {
     void update(ProductDto productDto);
 
     void save(ProductDto productDto);
+
+    void decreaseQuantityInStock(Long productId, int quantity);
 }

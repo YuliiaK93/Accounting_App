@@ -11,7 +11,7 @@ import java.util.List;
 public interface InvoiceProductRepository extends JpaRepository<InvoiceProduct, Long> {
     List<InvoiceProduct> findByInvoice_Company_Id(Long id);
 
-    List<InvoiceProduct> findByInvoice_InvoiceNoAndInvoice_Company_Id(String invoiceNo, Long companyId);
+    List<InvoiceProduct> findByInvoice_IdAndInvoice_Company_Id(Long invoiceId, Long companyId);
 
     @Query(value = "SELECT i FROM InvoiceProduct i WHERE i.invoice.company.id = ?1 AND i.invoice.invoiceStatus = 'APPROVED' AND i.invoice.invoiceType = ?2")
     List<InvoiceProduct> findAllInvoicesByInvoice_Company_IdAndInvoice_InvoiceStatusIsApproved(Long companyId, InvoiceType invoiceType);
@@ -22,6 +22,11 @@ public interface InvoiceProductRepository extends JpaRepository<InvoiceProduct, 
     List<InvoiceProduct> findByInvoice_Company_IdAndInvoice_InvoiceStatusIsApprovedOrderByInvoice_DateDesc(@Param("id") Long companyId);
 
     List<InvoiceProduct> findByInvoiceId(Long id);
+
+    @Query("SELECT i FROM InvoiceProduct i " +
+            "WHERE i.remainingQuantity > 0 AND i.invoice.invoiceType = 'PURCHASE' AND i.product.id = ?1 AND i.invoice.invoiceStatus = 'APPROVED' " +
+            "ORDER BY i.invoice.lastUpdateDateTime")
+    List<InvoiceProduct> findByRemainingQuantityGreaterThanAndInvoice_InvoiceTypeAndProduct_IdOrderByLastUpdateDateTimeAsc(Long productId);
 
 
 }

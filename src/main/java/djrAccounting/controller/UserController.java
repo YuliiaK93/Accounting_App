@@ -1,9 +1,9 @@
 package djrAccounting.controller;
 
+
 import djrAccounting.dto.UserDto;
 import djrAccounting.service.CompanyService;
 import djrAccounting.service.RoleService;
-import djrAccounting.service.SecurityService;
 import djrAccounting.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,47 +34,62 @@ public class UserController {
 
     @GetMapping("/create")
     public String createUser(Model model) {
-        model.addAttribute("user", new UserDto());
-        //TODO will be implemented after security context @Yuliia
-        model.addAttribute("roles", roleService.findById(1L));
-        model.addAttribute("companies", companyService.listAllCompanies());
+        model.addAttribute("newUser", new UserDto());
+        model.addAttribute("userRoles", roleService.listRoleByLoggedInUser());
+        model.addAttribute("companies", companyService.listCompaniesByLoggedInUser());
 
         return "/user/user-create";
     }
 
     @PostMapping("/create")
-    public String insertUser(@Valid @ModelAttribute("user") UserDto user, UserDto userDto, BindingResult bindingResult, Model model) {
-        //TODO will be implemented after security context of companies, roles
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("user", userDto);
-            model.addAttribute("roles", roleService.findById(1L));
+    public String insertUser(@Valid @ModelAttribute("newUser") UserDto user, BindingResult bindingResult, Model model) {
 
-            return "/user-create";
+        boolean isUsernameExist = userService.isUsernameExist(user);
+
+        model.addAttribute("userRoles", roleService.listRoleByLoggedInUser());
+        model.addAttribute("companies", companyService.listCompaniesByLoggedInUser());
+        if (isUsernameExist) {
+            bindingResult.rejectValue("username", " ", "User already exist. Please try with different email");
+        }
+        if (bindingResult.hasErrors()) {
+            return "/user/user-create";
         }
 
         userService.save(user);
-        return "redirect:/user-create";
-    }
-
-    @GetMapping("/delete/{id}")
-    public String deleteUser(@PathVariable("id") Long id) {
-        userService.deleteUserById(id);
-        return "redirect:/user-list";
+        return "redirect:/users/list";
     }
 
     @GetMapping("update/{id}")
     public String editUser(@PathVariable("id") Long userId, Model model) {
         model.addAttribute("user", userService.findById(userId));
-        model.addAttribute("roles", roleService.findById(1L));
-        model.addAttribute("users", userService.listAllUsers());
-        return "/user/update";
+        model.addAttribute("userRoles", roleService.listRoleByLoggedInUser());
+        model.addAttribute("companies", companyService.listCompaniesByLoggedInUser());
+        return "user/user-update";
     }
 
     @PostMapping("/update/{id}")
-    public String updateUser(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("user", userService.findById(id));
-        model.addAttribute("roles", roleService.findById(1L));
-        model.addAttribute("companies", companyService.listAllCompanies());
-        return "/user/user_update";
+    public String updateUser(@PathVariable("id") @Valid @ModelAttribute("user") UserDto user, BindingResult bindingResult, Model model) {
+
+        boolean emailExist = userService.isEmailExist(user);
+        model.addAttribute("userRoles", roleService.listRoleByLoggedInUser());
+        model.addAttribute("companies", companyService.listCompaniesByLoggedInUser());
+
+        if (emailExist) {
+            bindingResult.rejectValue("username", " ", "User already exist. Please try with different username");
+            return "user/user-update";
+        }
+
+        if (bindingResult.hasErrors()) {
+            return "user/user-update";
+        }
+
+        userService.save(user);
+        return "redirect:/users/list";
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deleteUser(@PathVariable("id") Long id) {
+        userService.deleteUserById(id);
+        return "redirect:/users/list";
     }
 }
