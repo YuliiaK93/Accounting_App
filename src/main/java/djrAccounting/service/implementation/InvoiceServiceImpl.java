@@ -1,18 +1,26 @@
 package djrAccounting.service.implementation;
 
+import djrAccounting.dto.CompanyDto;
 import djrAccounting.dto.InvoiceDto;
+import djrAccounting.entity.Company;
 import djrAccounting.entity.Invoice;
+import djrAccounting.entity.InvoiceProduct;
 import djrAccounting.enums.ClientVendorType;
 import djrAccounting.enums.InvoiceStatus;
 import djrAccounting.enums.InvoiceType;
 import djrAccounting.mapper.MapperUtil;
+import djrAccounting.repository.InvoiceProductRepository;
 import djrAccounting.repository.InvoiceRepository;
+import djrAccounting.repository.ProductRepository;
 import djrAccounting.service.InvoiceProductService;
 import djrAccounting.service.InvoiceService;
+import djrAccounting.service.ProductService;
 import djrAccounting.service.SecurityService;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,12 +30,18 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final InvoiceProductService invoiceProductService;
     private final SecurityService securityService;
     private final MapperUtil mapper;
+    private final ProductRepository productRepository;
+    private final InvoiceProductRepository invoiceProductRepository;
+    private final ProductService productService;
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, InvoiceProductService invoiceProductService, SecurityService securityService, MapperUtil mapper) {
+    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, InvoiceProductService invoiceProductService, SecurityService securityService, MapperUtil mapper, ProductRepository productRepository, InvoiceProductRepository invoiceProductRepository, ProductService productService) {
         this.invoiceRepository = invoiceRepository;
         this.invoiceProductService = invoiceProductService;
         this.securityService = securityService;
         this.mapper = mapper;
+        this.productRepository = productRepository;
+        this.invoiceProductRepository = invoiceProductRepository;
+        this.productService = productService;
     }
 
     @Override
@@ -53,7 +67,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public List<InvoiceDto> findSalesInvoicesByCurrentUserCompany() {
-        List<InvoiceDto> invoiceDtoList = invoiceRepository.findAllByCompanyIdAndInvoiceType(securityService.getLoggedInUser()
+        List<InvoiceDto> invoiceDtoList = invoiceRepository.findAllByCompanyIdAndInvoiceTypeOrderByLastUpdateDateTimeDesc(securityService.getLoggedInUser()
                         .getCompany().getId(), InvoiceType.SALES)
                 .stream()
                 .map(invoice -> mapper.convert(invoice, InvoiceDto.class))
@@ -96,7 +110,6 @@ public class InvoiceServiceImpl implements InvoiceService {
         } else if (number < 100) {
             return "S-" + "0" + number;
         }
-
         return "S-" + number;
     }
 
@@ -134,10 +147,60 @@ public class InvoiceServiceImpl implements InvoiceService {
         return "P-" + number;
     }
 
+    @Override
+    public void approveInvoiceById(Long id) {
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+        List<InvoiceProduct> invoiceProductList = invoice.getInvoiceProducts();
+        invoiceProductList.forEach(salesInvoiceProduct->{
+            List<InvoiceProduct> purchaseInvoiceProducts = invoiceProductRepository.findByRemainingQuantityGreaterThanAndInvoice_InvoiceTypeAndProduct_IdOrderByLastUpdateDateTimeAsc(salesInvoiceProduct.getProduct().getId());
+            int quantity =salesInvoiceProduct.getQuantity();
+            int invoiceProductIndex = 0;
+            BigDecimal totalCost  = BigDecimal.ZERO;
+            while(quantity >=0){
+                InvoiceProduct currentInvoiceProduct = purchaseInvoiceProducts.get(invoiceProductIndex);
+                int remainingInvoiceQuantity = quantity - currentInvoiceProduct.getRemainingQuantity();
+                if (remainingInvoiceQuantity >0){
+                    totalCost = totalCost.add(currentInvoiceProduct.getPrice()
+                            .multiply(BigDecimal.valueOf(currentInvoiceProduct.getRemainingQuantity())));
+                    invoiceProductIndex++;
+                    quantity -=currentInvoiceProduct.getRemainingQuantity();
+                    currentInvoiceProduct.setRemainingQuantity(0);
+                }else {
+                    totalCost = totalCost.add(currentInvoiceProduct.getPrice())
+                            .multiply(BigDecimal.valueOf(quantity));
+                    int quantityBeforeReduction = quantity;
+                    quantity -= currentInvoiceProduct.getRemainingQuantity();
+                    currentInvoiceProduct.setRemainingQuantity(currentInvoiceProduct.getRemainingQuantity()-quantityBeforeReduction);
+                }
+                invoiceProductRepository.save(currentInvoiceProduct);
+            }
+            salesInvoiceProduct.setProfitLoss(salesInvoiceProduct.getPrice()
+                    .multiply(BigDecimal.valueOf(salesInvoiceProduct.getQuantity()))
+                    .subtract(totalCost));
+            invoiceProductRepository.save(salesInvoiceProduct);
+            productService.decreaseQuantityInStock(salesInvoiceProduct.getProduct()
+                    .getId(),salesInvoiceProduct.getQuantity());
+        });
+
+        invoice.setInvoiceStatus(InvoiceStatus.APPROVED); //todo ask kicchi if we need a transaction here. what if changing the status to approved will fail but all quantitites has already been changed
+        invoice.setDate(LocalDate.now());
+        invoiceRepository.save(invoice);
+    }
+
+    @Override
+    public void deleteInvoiceById(Long id) {
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+        invoice.setIsDeleted(true);
+        invoiceRepository.save(invoice);
+        invoiceProductService.findByInvoiceId(id)
+                .forEach(invoiceProductDto ->
+                        invoiceProductService.deleteInvoiceProductById(invoiceProductDto.getId()));
+    }
+    
     private Long getLoggedInCompanyId() {
         return securityService.getLoggedInUser().getCompany().getId();
     }
-
+    
     private List<InvoiceDto> priceSetter(List<InvoiceDto> invoiceDtoList) {
 
         invoiceDtoList.forEach(invoiceDto -> {
