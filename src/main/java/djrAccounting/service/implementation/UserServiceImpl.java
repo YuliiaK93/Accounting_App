@@ -77,10 +77,24 @@ public class UserServiceImpl implements UserService {
 
     public String checkIfUserCanBeDeleted(Long id) {
         UserDto loggedInUser = securityService.getLoggedInUser();
-        User userWillBeDeleted = userRepository.
+        Optional<User> userWillBeDeleted = userRepository.findUserNotDeleted(id);
+        User userDeleted = new User();
+                   if( userWillBeDeleted.isPresent())
+                   userDeleted=userWillBeDeleted.get();
+                       else return "There is no User with is id " + id;
+                   if( userDeleted.getRole().getDescription().equals("Root User"))
+                       return "Only Kicchi can delete it.";
+                   if(!userDeleted.getRole().getDescription().equals("Admin") &&
+                   loggedInUser.getRole().getDescription().equals("Root User"))
+                       return "As Root User you can only delete Admins";
+                   if( userDeleted.getRole().getDescription().equals("Admin") &&
+                           !loggedInUser.getRole().getDescription().equals("Root User"))
+                       return "Only Root User can delete Admins.";
+                   if( !userDeleted.getCompany().getId().equals(loggedInUser.getCompany().getId()) &&
+                   !loggedInUser.getRole().getDescription().equals("Root User"))
+                       return "As Admin, you can delete managers and employees only from your company";
 
-
-        return "";
+                       return "";
     }
 
 

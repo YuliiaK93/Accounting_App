@@ -21,7 +21,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findUserById(Long id);
 
     @Query("Select u from User u where u.isDeleted=false and u.id=?1")
-    User findUserNotDeleted(Long id);
+    Optional<User> findUserNotDeleted(Long id);
 
     List<User> findAllByRole_Description(String admin);
 
