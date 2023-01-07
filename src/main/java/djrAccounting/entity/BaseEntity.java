@@ -30,5 +30,4 @@ public abstract class BaseEntity {
     private LocalDateTime lastUpdateDateTime;
     @Column(nullable = false)
     private Long lastUpdateUserId;
-
 }

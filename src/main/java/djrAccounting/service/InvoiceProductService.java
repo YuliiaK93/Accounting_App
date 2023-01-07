@@ -6,9 +6,9 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface InvoiceProductService {
-    BigDecimal getTotalPriceByInvoice(String invoiceNo);
+    BigDecimal getTotalPriceByInvoice(Long invoiceId);
 
-    BigDecimal getTotalPriceWithTaxByInvoice(String invoiceNo);
+    BigDecimal getTotalPriceWithTaxByInvoice(Long invoiceId);
 
     BigDecimal getTotalCostForCurrentCompany();
 
@@ -26,4 +26,6 @@ public interface InvoiceProductService {
 
     void deleteInvoiceProductById(Long id);
 
+
+    void removeInvoiceProduct(Long invoiceProductId);
 }

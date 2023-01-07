@@ -40,10 +40,11 @@ public class ClientVendorServiceImpl implements ClientVendorService {
     @Override
     public List<ClientVendorDto> listAllClientVendors() {
         Long companyId = securityService.getLoggedInUser().getCompany().getId();
-        return clientVendorRepository.findAll(Sort.by("clientVendorType")).stream()
-                .filter(clientVendor -> clientVendor.getCompany().getId().equals(companyId))
-                .map(clientVendor -> mapperUtil.convert(clientVendor, new ClientVendorDto()))
-                .collect(Collectors.toList());
+       return clientVendorRepository.findByCompany_IdOrderByClientVendorTypeAscClientVendorNameAsc(companyId)
+               .stream()
+               .map(clientVendor -> mapperUtil.convert(clientVendor, new ClientVendorDto()))
+               .collect(Collectors.toList());
+
     }
 
     @Override
@@ -96,9 +97,16 @@ public class ClientVendorServiceImpl implements ClientVendorService {
 
 
     @Override
+    public boolean duplicatedName(ClientVendorDto clientVendorDto){
+    boolean nameMatch=clientVendorRepository.findById(clientVendorDto.getId()).orElseThrow().getClientVendorName().equals(clientVendorDto.getClientVendorName());
+    return !nameMatch && nameExists(clientVendorDto.getClientVendorName());
+    }
+
+    @Override
     public boolean nameExists(String name) {
         return clientVendorRepository.existsByClientVendorName(name);
     }
+
 }
 
 

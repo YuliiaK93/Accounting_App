@@ -32,8 +32,9 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     @Override
-    public BigDecimal getTotalPriceByInvoice(String invoiceNo) {
-        return invoiceProductRepository.findByInvoice_InvoiceNoAndInvoice_Company_Id(invoiceNo, getCurrentCompanyId())
+    public BigDecimal getTotalPriceByInvoice(Long invoiceId) {
+
+        return invoiceProductRepository.findByInvoice_IdAndInvoice_Company_Id(invoiceId, getCurrentCompanyId())
                 .stream()
                 .map(invoiceProduct -> invoiceProduct.getPrice()
                         .multiply(BigDecimal.valueOf(invoiceProduct.getQuantity())))
@@ -42,8 +43,8 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     @Override
-    public BigDecimal getTotalPriceWithTaxByInvoice(String invoiceNo) {
-        return calculatePriceWithTax(invoiceProductRepository.findByInvoice_InvoiceNoAndInvoice_Company_Id(invoiceNo, getCurrentCompanyId()));
+    public BigDecimal getTotalPriceWithTaxByInvoice(Long invoiceId) {
+        return calculatePriceWithTax(invoiceProductRepository.findByInvoice_IdAndInvoice_Company_Id(invoiceId, getCurrentCompanyId()));
     }
 
     @Override
@@ -58,6 +59,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
     public BigDecimal getTotalProfitLossForCurrentCompany() {
+
         return invoiceProductRepository.findByInvoice_Company_Id(getCurrentCompanyId())
                 .stream()
                 .map(InvoiceProduct::getProfitLoss)
@@ -67,10 +69,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
     public List<InvoiceProductDto> getAllByInvoiceStatusApprovedForCurrentCompany() {
-        return invoiceProductRepository.findByInvoice_Company_IdAndInvoice_InvoiceStatusIsApprovedOrderByInvoice_DateDesc(getCurrentCompanyId())
-                .stream()
-                .map(invoiceProduct -> mapper.convert(invoiceProduct, InvoiceProductDto.class))
-                .collect(Collectors.toList());
+        return dtoMapper(invoiceProductRepository.findByInvoice_Company_IdAndInvoice_InvoiceStatusIsApprovedOrderByInvoice_DateDesc(getCurrentCompanyId()));
     }
 
     @Override
@@ -91,6 +90,22 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         invoiceProductRepository.delete(invoiceProductRepository.findById(id).get());
     }
 
+    @Override
+    public void removeInvoiceProduct(Long invoiceProductId) {
+        InvoiceProduct invoiceProduct=invoiceProductRepository.findById(invoiceProductId).get();
+        invoiceProduct.setIsDeleted(true);
+        invoiceProductRepository.save(invoiceProduct);
+    }
+
+    @Override
+    public void save(InvoiceProductDto invoiceProductDto, Long id) {
+        invoiceProductDto.setProfitLoss(BigDecimal.ZERO);//required calc
+        invoiceProductDto.setInvoice(invoiceService.findById(id));
+        invoiceProductDto.setRemainingQuantity(invoiceProductDto.getQuantity());
+        InvoiceProduct invoiceProduct = mapper.convert(invoiceProductDto, InvoiceProduct.class);
+        invoiceProductRepository.save(invoiceProduct);
+    }
+
     private BigDecimal calculatePriceWithTax(List<InvoiceProduct> list) {
         return list.stream()
                 .map(invoiceProduct -> invoiceProduct.getPrice()
@@ -106,12 +121,10 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         return securityService.getLoggedInUser().getCompany().getId();
     }
 
-    @Override
-    public void save(InvoiceProductDto invoiceProductDto, Long id) {
-        invoiceProductDto.setProfitLoss(BigDecimal.ZERO);//required calc
-        invoiceProductDto.setInvoice(invoiceService.findById(id));
-        invoiceProductDto.setRemainingQuantity(invoiceProductDto.getQuantity());
-        InvoiceProduct invoiceProduct = mapper.convert(invoiceProductDto, InvoiceProduct.class);
-        invoiceProductRepository.save(invoiceProduct);
+    private List<InvoiceProductDto> dtoMapper(List<InvoiceProduct> invoiceProductList) {
+
+        return invoiceProductList.stream()
+                .map(invoiceProduct -> mapper.convert(invoiceProduct, InvoiceProductDto.class))
+                .collect(Collectors.toList());
     }
 }
