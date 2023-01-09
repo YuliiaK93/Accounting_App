@@ -51,7 +51,6 @@ public class UserServiceImpl implements UserService {
         return mapperUtil.convert(user, new UserDto());
     }
 
-
     @Override
     public void save(UserDto userDto) {
         userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
@@ -64,16 +63,11 @@ public class UserServiceImpl implements UserService {
     public void deleteUserById(Long id) {
 
         User user = userRepository.findById(id).get();
-
-        // if (checkIfUserCanBeDeleted()) {
         user.setIsDeleted(true);
-        user.setUsername(user.getUsername() + "-" + user.getId()
-                + user.getCompany().getId()
-                + user.getRole().getId());
+        user.setUsername(user.getUsername() + "-" + user.getId());
         userRepository.save(user);
 
     }
-
 
     public String checkIfUserCanBeDeleted(Long id) {
         UserDto loggedInUser = securityService.getLoggedInUser();
