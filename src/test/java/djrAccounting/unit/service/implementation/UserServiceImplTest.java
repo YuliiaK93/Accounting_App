@@ -7,6 +7,8 @@ import djrAccounting.repository.UserRepository;
 import djrAccounting.service.implementation.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -46,13 +48,19 @@ class UserServiceImplTest {
 
     }
 
-    @Test
-    void findById_Test(){
+    @ParameterizedTest
+    @ValueSource(longs = {1L, 2L, 3L})
+    void findById_Test(long id){
 
-        when(userRepository.findUserById(anyLong())).thenThrow(new NoSuchElementException("User Not Found"));
+        User user = new User();
 
-        Throwable throwable = assertThrows(NoSuchElementException.class, ()->userService.findUserById(anyLong()));
-        verify(userRepository).findUserById(anyLong());
+        when(userRepository.findById(id)).thenReturn(Optional.of(user));
+        when(mapperUtil.convert(user, UserDto.class)).thenReturn(new UserDto());
+
+        userService.findById(id);
+
+        verify(userRepository).findById(id);
+        verify(mapperUtil).convert(user, UserDto.class);
 
         }
          }
