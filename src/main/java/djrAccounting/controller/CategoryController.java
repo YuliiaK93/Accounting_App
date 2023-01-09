@@ -2,6 +2,7 @@ package djrAccounting.controller;
 
 import djrAccounting.dto.CategoryDto;
 import djrAccounting.service.CategoryService;
+import djrAccounting.service.SecurityService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,9 +15,12 @@ import javax.validation.Valid;
 public class CategoryController {
 
     private final CategoryService categoryService;
+    private final SecurityService securityService;
 
-    public CategoryController(CategoryService categoryService) {
+
+    public CategoryController(CategoryService categoryService, SecurityService securityService) {
         this.categoryService = categoryService;
+        this.securityService = securityService;
     }
 
     @GetMapping("/list")
@@ -48,7 +52,11 @@ public class CategoryController {
 
     @GetMapping("/update/{id}")
     public String editCategory(@PathVariable("id") Long id, Model model){
-        model.addAttribute("category", categoryService.findById(id));
+
+        CategoryDto categoryDto = categoryService.findById(id);
+        if (!categoryDto.getCompany().equals(securityService.getLoggedInUser().getCompany())) return "redirect:/categories/list";
+
+        model.addAttribute("category", categoryDto);
         return "category/category-update";
     }
 
@@ -67,7 +75,11 @@ public class CategoryController {
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteCategory(@PathVariable Long id)  {
+    public String deleteCategory(@PathVariable Long id){
+
+        CategoryDto categoryDto = categoryService.findById(id);
+        if (!categoryDto.getCompany().equals(securityService.getLoggedInUser().getCompany())) return "redirect:/categories/list";
+
         categoryService.deleteCategoryById(id);
         return "redirect:/categories/list";
     }

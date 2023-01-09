@@ -35,8 +35,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<CategoryDto> listAllCategories() {
         List<CategoryDto> newList = categoryRepository.findByCompany_IdOrderByDescriptionAsc(securityService.getLoggedInUser()
-            .getCompany().getId()).stream().map(category -> mapper.convert(category, CategoryDto.class))
-            .collect(Collectors.toList());
+                        .getCompany().getId()).stream().map(category -> mapper.convert(category, CategoryDto.class))
+                .collect(Collectors.toList());
 
         newList.forEach(categoryDto -> {
             categoryDto.setHasProduct(productService.productExistByCategory(categoryDto.getId()));
@@ -54,7 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public boolean isCategoryDescriptionExist(String description){
-        return categoryRepository.existsByDescription(description);
+        return categoryRepository.existsByDescriptionAndCompany_Id(description, securityService.getLoggedInUser().getCompany().getId() );
     }
 
     @Override

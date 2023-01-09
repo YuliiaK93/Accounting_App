@@ -4,6 +4,7 @@ import djrAccounting.dto.ProductDto;
 import djrAccounting.enums.ProductUnit;
 import djrAccounting.service.CategoryService;
 import djrAccounting.service.ProductService;
+import djrAccounting.service.SecurityService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -20,10 +21,12 @@ public class ProductController {
     private final ProductService productService;
 
     private final CategoryService categoryService;
+    private final SecurityService securityService;
 
-    public ProductController(ProductService productService, CategoryService categoryService) {
+    public ProductController(ProductService productService, CategoryService categoryService, SecurityService securityService) {
         this.productService = productService;
         this.categoryService = categoryService;
+        this.securityService = securityService;
     }
 
     @GetMapping("/list")
@@ -34,7 +37,11 @@ public class ProductController {
 
     @GetMapping("/update/{id}")
     public String updateProduct(Model model, @PathVariable Long id){
-        model.addAttribute("product", productService.findById(id));
+
+        ProductDto productDto = productService.findById(id);
+        if (!productDto.getCategory().getCompany().equals(securityService.getLoggedInUser().getCompany())) return "redirect:/products/list";
+
+        model.addAttribute("product", productDto);
         model.addAttribute("categories", categoryService.listAllCategories());
         model.addAttribute("productUnits", ProductUnit.values());
         return "/product/product-update";
