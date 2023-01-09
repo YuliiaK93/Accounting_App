@@ -88,4 +88,10 @@
 <div th:replace="/fragments/footer :: footer"></div>
 <div th:replace="/fragments/javascript :: js"></div>
 </body>
+<script>
+    let pressedButton = document.getElementsByTagName("button")[1];
+    pressedButton.addEventListener("click", function (event) {
+        alert("You have pressed on reset button..........")
+    })
+</script>
 </html>
