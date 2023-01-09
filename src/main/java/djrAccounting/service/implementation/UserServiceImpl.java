@@ -58,17 +58,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUserById(Long id) {
         User user = userRepository.findById(id).get();
-        UserDto userDto = mapperUtil.convert(user, new UserDto());
-        if (isOnlyAdmin(userDto)) {
-            userDto.setOnlyAdmin(true);
-        } else {
             user.setIsDeleted(true);
-            user.setEnabled(false);
             user.setUsername(user.getUsername() + "-" + user.getId());
             userRepository.save(user);
-            log.info("User is deleted");
+
         }
-    }
 
     @Override
     public UserDto update(UserDto userDto) {

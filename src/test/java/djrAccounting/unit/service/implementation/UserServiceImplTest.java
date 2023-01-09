@@ -18,6 +18,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,17 +53,21 @@ class UserServiceImplTest {
     @ValueSource(longs = {1L, 2L, 3L})
     void findById_Test(long id){
 
+        //Given
         User user = new User();
 
         when(userRepository.findById(id)).thenReturn(Optional.of(user));
         when(mapperUtil.convert(user, UserDto.class)).thenReturn(new UserDto());
 
+        //When
         userService.findById(id);
 
+        //Then
         verify(userRepository).findById(id);
         verify(mapperUtil).convert(user, UserDto.class);
 
         }
+
          }
 
 
