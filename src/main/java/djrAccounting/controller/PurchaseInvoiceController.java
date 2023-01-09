@@ -123,4 +123,10 @@ public class PurchaseInvoiceController {
         invoiceService.deletePurchaseInvoiceById(id);
         return "redirect:/purchaseInvoices/list";
     }
+
+    @GetMapping("/approve/{id}")
+    public String approvePurchaseInvoice(@PathVariable("id") Long id, Model model){
+        invoiceService.approvePurchaseInvoice(id);
+     return "redirect:/purchaseInvoices/list";
+    }
 }
