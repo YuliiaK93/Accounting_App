@@ -73,22 +73,22 @@ public class UserServiceImpl implements UserService {
         UserDto loggedInUser = securityService.getLoggedInUser();
         Optional<User> userWillBeDeleted = userRepository.findUserNotDeleted(id);
         User userDeleted = new User();
-                   if( userWillBeDeleted.isPresent())
-                   userDeleted=userWillBeDeleted.get();
-                       else return "There is no User with is id " + id;
-                   if( userDeleted.getRole().getDescription().equals("Root User"))
-                       return "Only Kicchi can delete it.";
-                   if(!userDeleted.getRole().getDescription().equals("Admin") &&
-                   loggedInUser.getRole().getDescription().equals("Root User"))
-                       return "As Root User you can only delete Admins";
-                   if( userDeleted.getRole().getDescription().equals("Admin") &&
-                           !loggedInUser.getRole().getDescription().equals("Root User"))
-                       return "Only Root User can delete Admins.";
-                   if( !userDeleted.getCompany().getId().equals(loggedInUser.getCompany().getId()) &&
-                   !loggedInUser.getRole().getDescription().equals("Root User"))
-                       return "As Admin, you can delete managers and employees only from your company";
+        if (userWillBeDeleted.isPresent()) {
+            userDeleted = userWillBeDeleted.get();
+            if (userDeleted.getRole().getDescription().equals("Root User"))
+                return "Root User cannot be deleted";
+            if (!userDeleted.getRole().getDescription().equals("Admin") &&
+                    loggedInUser.getRole().getDescription().equals("Root User"))
+                return "As Root User you can only delete Admins";
+            if (userDeleted.getRole().getDescription().equals("Admin") &&
+                    !loggedInUser.getRole().getDescription().equals("Root User"))
+                return "Only Root User can delete Admins.";
+            if (!userDeleted.getCompany().getId().equals(loggedInUser.getCompany().getId()) &&
+                    !loggedInUser.getRole().getDescription().equals("Root User"))
+                return "As Admin, you can delete managers and employees only from your company";
+        } else return "There is no User with this id " + id;
 
-                       return "";
+        return "";
     }
 
 
@@ -104,10 +104,10 @@ public class UserServiceImpl implements UserService {
         return findUserById(userDto.getId());
     }
 
-     public UserDto findUserById(Long id) {
+    public UserDto findUserById(Long id) {
         return mapperUtil.convert(userRepository.findById(id)
-                .orElseThrow(()-> new NoSuchElementException("User was not found")), new UserDto());
-     }
+                .orElseThrow(() -> new NoSuchElementException("User was not found")), new UserDto());
+    }
 
     /*
     public UserDto findUserById(Long id) {
@@ -121,7 +121,12 @@ public class UserServiceImpl implements UserService {
 
     private List<UserDto> findAllOrderByCompanyAndRole() {
         List<UserDto> list = userRepository.findAllOrderByCompanyAndRole(false).stream().map(currentUser -> {
-                    Boolean isOnlyAdmin = currentUser.getRole().getDescription().equals("Admin");
+                    Role admin = new Role();
+                    admin.setId(2L);
+                    admin.setDescription("Admin");
+                    List<User> listCurrentAdmins =
+                            userRepository.findAllByCompanyAndRole(currentUser.getCompany(), admin);
+                    Boolean isOnlyAdmin = listCurrentAdmins.size() == 1;
                     UserDto userDto = mapperUtil.convert(currentUser, new UserDto());
                     userDto.setIsOnlyAdmin(isOnlyAdmin);
                     return userDto;
@@ -132,6 +137,7 @@ public class UserServiceImpl implements UserService {
 
     public List<UserDto> findAllFilterForLoggedInUser() {
         UserDto loggedInUser = securityService.getLoggedInUser();
+        List<User> userList = null;
         switch (loggedInUser.getRole().getDescription()) {
             case "Root User":
                 return findAllOrderByCompanyAndRole().stream()
