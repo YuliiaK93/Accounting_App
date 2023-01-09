@@ -4,11 +4,13 @@ import djrAccounting.bootstrap.StaticConstants;
 import djrAccounting.dto.ClientVendorDto;
 import djrAccounting.enums.ClientVendorType;
 import djrAccounting.service.ClientVendorService;
+import djrAccounting.service.SecurityService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 @Controller
@@ -16,9 +18,11 @@ import javax.validation.Valid;
 public class ClientVendorController {
 
     private final ClientVendorService clientVendorService;
+    private final SecurityService securityService;
 
-    public ClientVendorController(ClientVendorService clientVendorService) {
+    public ClientVendorController(ClientVendorService clientVendorService, SecurityService securityService) {
         this.clientVendorService = clientVendorService;
+        this.securityService = securityService;
     }
 
     @GetMapping("/list")
@@ -53,9 +57,13 @@ public class ClientVendorController {
 
     @GetMapping("/update/{id}")
     public String editClientVendor(@PathVariable("id") Long id, Model model) {
+        if(!clientVendorService.hasRightToUpdate(id)){
+            return "redirect:/clientVendors/list";
+        }
         model.addAttribute("clientVendor", clientVendorService.findById(id));
         model.addAttribute("countries", StaticConstants.COUNTRY_LIST);
         model.addAttribute("clientVendorTypes", ClientVendorType.values());
+
         return "/clientVendor/clientVendor-update";
     }
 
