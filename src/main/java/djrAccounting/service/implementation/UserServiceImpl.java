@@ -1,11 +1,14 @@
 package djrAccounting.service.implementation;
 
+import djrAccounting.dto.RoleDto;
 import djrAccounting.dto.UserDto;
 import djrAccounting.entity.Company;
+import djrAccounting.entity.Role;
 import djrAccounting.entity.User;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.UserRepository;
 import djrAccounting.service.CompanyService;
+import djrAccounting.service.RoleService;
 import djrAccounting.service.SecurityService;
 import djrAccounting.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,13 +29,15 @@ public class UserServiceImpl implements UserService {
     private final SecurityService securityService;
 
     private final CompanyService companyService;
+    private final RoleService roleService;
 
-    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder, @Lazy SecurityService securityService, @Lazy CompanyService companyService) {
+    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder, @Lazy SecurityService securityService, @Lazy CompanyService companyService, @Lazy RoleService roleService) {
         this.userRepository = userRepository;
         this.mapperUtil = mapperUtil;
         this.passwordEncoder = passwordEncoder;
         this.securityService = securityService;
         this.companyService = companyService;
+        this.roleService = roleService;
     }
 
     @Override
@@ -57,18 +62,41 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUserById(Long id) {
+
         User user = userRepository.findById(id).get();
-        UserDto userDto = mapperUtil.convert(user, new UserDto());
-        if (isOnlyAdmin(userDto)) {
-            userDto.setOnlyAdmin(true);
-        } else {
-            user.setIsDeleted(true);
-            user.setEnabled(false);
-            user.setUsername(user.getUsername() + "-" + user.getId());
-            userRepository.save(user);
-            log.info("User is deleted");
-        }
+
+        // if (checkIfUserCanBeDeleted()) {
+        user.setIsDeleted(true);
+        user.setUsername(user.getUsername() + "-" + user.getId()
+                + user.getCompany().getId()
+                + user.getRole().getId());
+        userRepository.save(user);
+
     }
+
+
+    public String checkIfUserCanBeDeleted(Long id) {
+        UserDto loggedInUser = securityService.getLoggedInUser();
+        Optional<User> userWillBeDeleted = userRepository.findUserNotDeleted(id);
+        User userDeleted = new User();
+                   if( userWillBeDeleted.isPresent())
+                   userDeleted=userWillBeDeleted.get();
+                       else return "There is no User with is id " + id;
+                   if( userDeleted.getRole().getDescription().equals("Root User"))
+                       return "Only Kicchi can delete it.";
+                   if(!userDeleted.getRole().getDescription().equals("Admin") &&
+                   loggedInUser.getRole().getDescription().equals("Root User"))
+                       return "As Root User you can only delete Admins";
+                   if( userDeleted.getRole().getDescription().equals("Admin") &&
+                           !loggedInUser.getRole().getDescription().equals("Root User"))
+                       return "Only Root User can delete Admins.";
+                   if( !userDeleted.getCompany().getId().equals(loggedInUser.getCompany().getId()) &&
+                   !loggedInUser.getRole().getDescription().equals("Root User"))
+                       return "As Admin, you can delete managers and employees only from your company";
+
+                       return "";
+    }
+
 
     @Override
     public UserDto update(UserDto userDto) {
@@ -77,16 +105,25 @@ public class UserServiceImpl implements UserService {
         convertedUser.setId(user.getId());
         convertedUser.setPassword(passwordEncoder.encode(user.getPassword()));
         convertedUser.setEnabled(user.isEnabled());
+        convertedUser.setCompany(user.getCompany()); //changed
         userRepository.save(convertedUser);
         return findUserById(userDto.getId());
     }
 
+     public UserDto findUserById(Long id) {
+        return mapperUtil.convert(userRepository.findById(id)
+                .orElseThrow(()-> new NoSuchElementException("User was not found")), new UserDto());
+     }
+
+    /*
     public UserDto findUserById(Long id) {
         User user = userRepository.findUserById(id);
         UserDto dto =  mapperUtil.convert(user, new UserDto());
         dto.setIsOnlyAdmin(checkIfOnlyAdminForCompany(dto));
         return dto;
     }
+
+     */
 
     private List<UserDto> findAllOrderByCompanyAndRole() {
         List<UserDto> list = userRepository.findAllOrderByCompanyAndRole(false).stream().map(currentUser -> {
