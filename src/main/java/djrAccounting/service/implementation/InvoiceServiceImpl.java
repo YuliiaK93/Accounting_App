@@ -5,7 +5,6 @@ import djrAccounting.dto.InvoiceProductDto;
 import djrAccounting.dto.ProductDto;
 import djrAccounting.entity.Invoice;
 import djrAccounting.entity.InvoiceProduct;
-import djrAccounting.entity.Product;
 import djrAccounting.enums.ClientVendorType;
 import djrAccounting.enums.InvoiceStatus;
 import djrAccounting.enums.InvoiceType;
@@ -116,7 +115,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public List<InvoiceDto> getAllPurchaseInvoiceForCurrentCompany() {
-        List<InvoiceDto> purchaseInvoiceList = invoiceRepository.findAllByCompanyIdAndInvoiceType(securityService.getLoggedInUser()
+        List<InvoiceDto> purchaseInvoiceList = invoiceRepository.findAllByCompanyIdAndInvoiceTypeOrderByLastUpdateDateTimeDesc(securityService.getLoggedInUser()
                         .getCompany().getId(), InvoiceType.PURCHASE)
                 .stream()
                 .map(invoice -> mapper.convert(invoice, InvoiceDto.class))

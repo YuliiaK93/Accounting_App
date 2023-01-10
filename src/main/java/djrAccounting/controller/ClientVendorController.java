@@ -57,7 +57,7 @@ public class ClientVendorController {
 
     @GetMapping("/update/{id}")
     public String editClientVendor(@PathVariable("id") Long id, Model model) {
-        if(!clientVendorService.hasRightToUpdate(id)){
+        if (!clientVendorService.hasRightToUpdate(id)) {
             return "redirect:/clientVendors/list";
         }
         model.addAttribute("clientVendor", clientVendorService.findById(id));
@@ -68,18 +68,18 @@ public class ClientVendorController {
     }
 
     @PostMapping("/update/{id}")
-    public String editClientVendor(@Valid @ModelAttribute("clientVendor") ClientVendorDto clientVendorDto, BindingResult bindingResult,@PathVariable("id") Long id, Model model){
-            boolean duplicatedName = clientVendorService.duplicatedName(clientVendorDto);//name same id different
-            if(bindingResult.hasErrors() || duplicatedName){
-                if(duplicatedName){
-                    bindingResult.rejectValue("clientVendorName"," ", "A Client/Vendor with this name already exists. Please, try again.");
-                }
-                model.addAttribute("countries", StaticConstants.COUNTRY_LIST);
-                model.addAttribute("clientVendorTypes", ClientVendorType.values());
-                return "clientVendor/clientVendor-update";
+    public String editClientVendor(@Valid @ModelAttribute("clientVendor") ClientVendorDto clientVendorDto, BindingResult bindingResult, @PathVariable("id") Long id, Model model) {
+        boolean duplicatedName = clientVendorService.duplicatedName(clientVendorDto);
+        if (bindingResult.hasErrors() || duplicatedName) {
+            if (duplicatedName) {
+                bindingResult.rejectValue("clientVendorName", " ", "A Client/Vendor with this name already exists. Please, try again.");
             }
-            clientVendorService.update(clientVendorDto);
-            return "redirect:/clientVendors/list";
+            model.addAttribute("countries", StaticConstants.COUNTRY_LIST);
+            model.addAttribute("clientVendorTypes", ClientVendorType.values());
+            return "clientVendor/clientVendor-update";
+        }
+        clientVendorService.update(clientVendorDto);
+        return "redirect:/clientVendors/list";
     }
 
     @GetMapping("/delete/{id}")
