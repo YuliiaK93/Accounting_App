@@ -43,13 +43,15 @@ public class ProductController {
     }
 @PostMapping("/update/{id}")
     public String updateProduct(@Valid @ModelAttribute("product") ProductDto productDto, BindingResult bindingResult, Model model){
-    boolean isNameAlreadyInUse = productService.isNameAlreadyInUse(productDto);
-    if(bindingResult.hasErrors() || isNameAlreadyInUse){
-        if (productService.isNameAlreadyInUse(product.getName()) && productService.isNameNotPrevious(product.getId(), product.getName())) {
+
+        if (productService.isNameAlreadyInUse(productDto.getName()) && productService.isNameNotPrevious(productDto.getId(), productDto.getName())) {
 
             bindingResult.rejectValue("name", "", "You already have a product with same name");
 
         }
+
+        if (bindingResult.hasErrors()){
+
             model.addAttribute("categories", categoryService.listAllCategories());
             model.addAttribute("productUnits", ProductUnit.values());
             return "/product/product-update";
@@ -67,6 +69,12 @@ public class ProductController {
     }
 @PostMapping("/create")
     public String createProduct(@Valid @ModelAttribute("newProduct") ProductDto productDto, BindingResult bindingResult, Model model){
+
+        if (productService.isNameAlreadyInUse(productDto.getName())){
+
+            bindingResult.rejectValue("name","","You already have a product with same name");
+        }
+
         if (bindingResult.hasErrors()){
             model.addAttribute("categories", categoryService.listAllCategories());
             model.addAttribute("productUnits", ProductUnit.values());

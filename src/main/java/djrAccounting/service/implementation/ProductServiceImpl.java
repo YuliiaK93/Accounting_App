@@ -88,10 +88,6 @@ public class ProductServiceImpl implements ProductService {
         product.setQuantityInStock(quantityBeforeReduction-quantity);
     }
 
-    @Override
-    public boolean isNameAlreadyInUse(ProductDto productDto) {
-        return false;
-    }
 
     @Override
     public boolean isNameAlreadyInUse(String name) {

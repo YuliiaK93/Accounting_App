@@ -25,5 +25,7 @@ public interface ProductService {
 
     void decreaseQuantityInStock(Long productId, int quantity);
 
-    boolean isNameAlreadyInUse(ProductDto productDto);
+    boolean isNameNotPrevious(Long id, String name);
+
+    boolean isNameAlreadyInUse(String name);
 }
