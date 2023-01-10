@@ -21,6 +21,8 @@ public class ProductController {
 
     private final CategoryService categoryService;
 
+
+
     public ProductController(ProductService productService, CategoryService categoryService) {
         this.productService = productService;
         this.categoryService = categoryService;
@@ -41,7 +43,13 @@ public class ProductController {
     }
 @PostMapping("/update/{id}")
     public String updateProduct(@Valid @ModelAttribute("product") ProductDto productDto, BindingResult bindingResult, Model model){
-        if (bindingResult.hasErrors()){
+    boolean isNameAlreadyInUse = productService.isNameAlreadyInUse(productDto);
+    if(bindingResult.hasErrors() || isNameAlreadyInUse){
+        if (productService.isNameAlreadyInUse(product.getName()) && productService.isNameNotPrevious(product.getId(), product.getName())) {
+
+            bindingResult.rejectValue("name", "", "You already have a product with same name");
+
+        }
             model.addAttribute("categories", categoryService.listAllCategories());
             model.addAttribute("productUnits", ProductUnit.values());
             return "/product/product-update";
@@ -49,6 +57,7 @@ public class ProductController {
         productService.update(productDto);
         return "redirect:/products/list";
 }
+
     @GetMapping("/create")
     public String createProduct(Model model){
         model.addAttribute("newProduct", new ProductDto());

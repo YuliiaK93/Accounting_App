@@ -24,4 +24,6 @@ public interface ProductService {
     void save(ProductDto productDto);
 
     void decreaseQuantityInStock(Long productId, int quantity);
+
+    boolean isNameAlreadyInUse(ProductDto productDto);
 }
