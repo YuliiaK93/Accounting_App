@@ -5,7 +5,6 @@ import djrAccounting.dto.InvoiceProductDto;
 import djrAccounting.dto.ProductDto;
 import djrAccounting.entity.Invoice;
 import djrAccounting.entity.InvoiceProduct;
-import djrAccounting.entity.Product;
 import djrAccounting.enums.ClientVendorType;
 import djrAccounting.enums.InvoiceStatus;
 import djrAccounting.enums.InvoiceType;
@@ -158,27 +157,23 @@ public class InvoiceServiceImpl implements InvoiceService {
             int quantity = salesInvoiceProduct.getQuantity();
             int invoiceProductIndex = 0;
             BigDecimal totalCost = BigDecimal.ZERO;
-            while (quantity >= 0) {
+            while (quantity > 0) {
                 InvoiceProduct currentInvoiceProduct = purchaseInvoiceProducts.get(invoiceProductIndex);
                 int remainingInvoiceQuantity = quantity - currentInvoiceProduct.getRemainingQuantity();
                 if (remainingInvoiceQuantity > 0) {
-                    totalCost = totalCost.add(currentInvoiceProduct.getPrice()
-                            .multiply(BigDecimal.valueOf(currentInvoiceProduct.getRemainingQuantity())));
+                    totalCost = totalCost.add(getTotalWithTax(currentInvoiceProduct, currentInvoiceProduct.getRemainingQuantity()));
                     invoiceProductIndex++;
                     quantity -= currentInvoiceProduct.getRemainingQuantity();
                     currentInvoiceProduct.setRemainingQuantity(0);
                 } else {
-                    totalCost = totalCost.add(currentInvoiceProduct.getPrice())
-                            .multiply(BigDecimal.valueOf(quantity));
+                    totalCost = totalCost.add(getTotalWithTax(currentInvoiceProduct, quantity));
                     int quantityBeforeReduction = quantity;
                     quantity -= currentInvoiceProduct.getRemainingQuantity();
                     currentInvoiceProduct.setRemainingQuantity(currentInvoiceProduct.getRemainingQuantity() - quantityBeforeReduction);
                 }
                 invoiceProductRepository.save(currentInvoiceProduct);
             }
-            salesInvoiceProduct.setProfitLoss(salesInvoiceProduct.getPrice()
-                    .multiply(BigDecimal.valueOf(salesInvoiceProduct.getQuantity()))
-                    .subtract(totalCost));
+            salesInvoiceProduct.setProfitLoss(getTotalWithTax(salesInvoiceProduct, salesInvoiceProduct.getQuantity()).subtract(totalCost));
             invoiceProductRepository.save(salesInvoiceProduct);
             productService.decreaseQuantityInStock(salesInvoiceProduct.getProduct()
                     .getId(), salesInvoiceProduct.getQuantity());
@@ -187,6 +182,12 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoice.setInvoiceStatus(InvoiceStatus.APPROVED); //todo ask kicchi if we need a transaction here. what if changing the status to approved will fail but all quantitites has already been changed
         invoice.setDate(LocalDate.now());
         invoiceRepository.save(invoice);
+    }
+
+    private BigDecimal getTotalWithTax(InvoiceProduct invoiceProduct, int remainingQuantity) {
+        BigDecimal beforeTax = BigDecimal.valueOf(remainingQuantity).multiply(invoiceProduct.getPrice());
+        BigDecimal taxValue = BigDecimal.valueOf(invoiceProduct.getTax()).multiply(beforeTax).divide(BigDecimal.valueOf(100L));
+        return beforeTax.add(taxValue);
     }
 
     @Override
