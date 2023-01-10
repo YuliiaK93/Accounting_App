@@ -1,6 +1,7 @@
 package djrAccounting.repository;
 
 import djrAccounting.entity.Company;
+import djrAccounting.entity.Role;
 import djrAccounting.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -34,5 +35,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllByRoleDescriptionAndCompanyOrderByCompanyTitleAscRoleDescription(String admin, Company company);
 
     List <User> findAllByCompanyId(Long id);
+
+    List<User> findAllByCompanyAndRole(Company company, Role role);
 
 }
