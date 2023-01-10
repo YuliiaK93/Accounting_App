@@ -61,12 +61,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUserById(Long id) {
-
         User user = userRepository.findById(id).get();
         user.setIsDeleted(true);
         user.setUsername(user.getUsername() + "-" + user.getId());
         userRepository.save(user);
-
     }
 
     public String checkIfUserCanBeDeleted(Long id) {
@@ -91,7 +89,6 @@ public class UserServiceImpl implements UserService {
         return "";
     }
 
-
     @Override
     public UserDto update(UserDto userDto) {
         User user = userRepository.findUserById(userDto.getId());
@@ -104,6 +101,12 @@ public class UserServiceImpl implements UserService {
         return findUserById(userDto.getId());
     }
 
+     public UserDto findUserById(Long id) {
+        return mapperUtil.convert(userRepository.findById(id)
+                .orElseThrow(()-> new NoSuchElementException("User was not found")), new UserDto());
+     }
+
+    /*
     public UserDto findUserById(Long id) {
         return mapperUtil.convert(userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("User was not found")), new UserDto());
