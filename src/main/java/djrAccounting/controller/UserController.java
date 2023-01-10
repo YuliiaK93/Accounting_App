@@ -4,6 +4,7 @@ package djrAccounting.controller;
 import djrAccounting.dto.UserDto;
 import djrAccounting.service.CompanyService;
 import djrAccounting.service.RoleService;
+import djrAccounting.service.SecurityService;
 import djrAccounting.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,11 +20,13 @@ public class UserController {
     private final RoleService roleService;
     private final UserService userService;
     private final CompanyService companyService;
+    private final SecurityService securityService;
 
-    public UserController(RoleService roleService, UserService userService, CompanyService companyService) {
+    public UserController(RoleService roleService, UserService userService, CompanyService companyService, SecurityService securityService) {
         this.roleService = roleService;
         this.userService = userService;
         this.companyService = companyService;
+        this.securityService = securityService;
     }
 
     @GetMapping("/list")
@@ -59,36 +62,44 @@ public class UserController {
         return "redirect:/users/list";
     }
 
-    @GetMapping("update/{id}")
-    public String editUser(@PathVariable("id") Long userId, Model model) {
-        model.addAttribute("user", userService.findById(userId));
+    @GetMapping("/update/{id}")
+    public String editUser(@PathVariable("id") Long id, Model model) {
+
+        UserDto userDto = userService.findById(id);
+        if(!userDto.getCompany().equals(securityService.getLoggedInUser().getCompany()))
+        return "redirect:/users/list";
+        model.addAttribute("user", userService.findById(id));
         model.addAttribute("userRoles", roleService.listRoleByLoggedInUser());
         model.addAttribute("companies", companyService.listCompaniesByLoggedInUser());
-        return "user/user-update";
+        return "/user/user-update";
     }
 
     @PostMapping("/update/{id}")
-    public String updateUser(@PathVariable("id") @Valid @ModelAttribute("user") UserDto user, BindingResult bindingResult, Model model) {
+    public String updateUser(@Valid @ModelAttribute("user") UserDto user, BindingResult bindingResult, Model model) {
 
-        boolean emailExist = userService.isEmailExist(user);
+        boolean isUsernameExist = userService.isUsernameExist(user);
         model.addAttribute("userRoles", roleService.listRoleByLoggedInUser());
         model.addAttribute("companies", companyService.listCompaniesByLoggedInUser());
 
-        if (emailExist) {
+        if (isUsernameExist) {
             bindingResult.rejectValue("username", " ", "User already exist. Please try with different username");
-            return "user/user-update";
+            return "/user/user-update";
         }
-
         if (bindingResult.hasErrors()) {
-            return "user/user-update";
+            return "/user/user-update";
         }
-
-        userService.save(user);
+        userService.update(user);
         return "redirect:/users/list";
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteUser(@PathVariable("id") Long id) {
+    public String deleteUser(@PathVariable("id") Long id, Model model) {
+        String error = userService.checkIfUserCanBeDeleted(id);
+        if(!error.isBlank()) {
+            model.addAttribute("users", userService.findAllFilterForLoggedInUser());
+            model.addAttribute("error", error);
+            return "/user/user-list";
+        }
         userService.deleteUserById(id);
         return "redirect:/users/list";
     }

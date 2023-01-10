@@ -26,5 +26,7 @@ public interface UserService {
 
     List<UserDto> listAllUsers();
     boolean isUsernameExist(UserDto userDto);
+
+    String checkIfUserCanBeDeleted(Long id);
 }
 

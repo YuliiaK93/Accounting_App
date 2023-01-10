@@ -1,11 +1,14 @@
 package djrAccounting.service.implementation;
 
+import djrAccounting.dto.RoleDto;
 import djrAccounting.dto.UserDto;
 import djrAccounting.entity.Company;
+import djrAccounting.entity.Role;
 import djrAccounting.entity.User;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.UserRepository;
 import djrAccounting.service.CompanyService;
+import djrAccounting.service.RoleService;
 import djrAccounting.service.SecurityService;
 import djrAccounting.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,13 +29,15 @@ public class UserServiceImpl implements UserService {
     private final SecurityService securityService;
 
     private final CompanyService companyService;
+    private final RoleService roleService;
 
-    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder, @Lazy SecurityService securityService, @Lazy CompanyService companyService) {
+    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder, @Lazy SecurityService securityService, @Lazy CompanyService companyService, @Lazy RoleService roleService) {
         this.userRepository = userRepository;
         this.mapperUtil = mapperUtil;
         this.passwordEncoder = passwordEncoder;
         this.securityService = securityService;
         this.companyService = companyService;
+        this.roleService = roleService;
     }
 
     @Override
@@ -46,7 +51,6 @@ public class UserServiceImpl implements UserService {
         return mapperUtil.convert(user, new UserDto());
     }
 
-
     @Override
     public void save(UserDto userDto) {
         userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
@@ -58,16 +62,31 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUserById(Long id) {
         User user = userRepository.findById(id).get();
-        UserDto userDto = mapperUtil.convert(user, new UserDto());
-        if (isOnlyAdmin(userDto)) {
-            userDto.setOnlyAdmin(true);
-        } else {
-            user.setIsDeleted(true);
-            user.setEnabled(false);
-            user.setUsername(user.getUsername() + "-" + user.getId());
-            userRepository.save(user);
-            log.info("User is deleted");
-        }
+        user.setIsDeleted(true);
+        user.setUsername(user.getUsername() + "-" + user.getId());
+        userRepository.save(user);
+    }
+
+    public String checkIfUserCanBeDeleted(Long id) {
+        UserDto loggedInUser = securityService.getLoggedInUser();
+        Optional<User> userWillBeDeleted = userRepository.findUserNotDeleted(id);
+        User userDeleted = new User();
+        if (userWillBeDeleted.isPresent()) {
+            userDeleted = userWillBeDeleted.get();
+            if (userDeleted.getRole().getDescription().equals("Root User"))
+                return "Root User cannot be deleted";
+            if (!userDeleted.getRole().getDescription().equals("Admin") &&
+                    loggedInUser.getRole().getDescription().equals("Root User"))
+                return "As Root User you can only delete Admins";
+            if (userDeleted.getRole().getDescription().equals("Admin") &&
+                    !loggedInUser.getRole().getDescription().equals("Root User"))
+                return "Only Root User can delete Admins.";
+            if (!userDeleted.getCompany().getId().equals(loggedInUser.getCompany().getId()) &&
+                    !loggedInUser.getRole().getDescription().equals("Root User"))
+                return "As Admin, you can delete managers and employees only from your company";
+        } else return "There is no User with this id " + id;
+
+        return "";
     }
 
     @Override
@@ -77,10 +96,23 @@ public class UserServiceImpl implements UserService {
         convertedUser.setId(user.getId());
         convertedUser.setPassword(passwordEncoder.encode(user.getPassword()));
         convertedUser.setEnabled(user.isEnabled());
+        convertedUser.setCompany(user.getCompany()); //changed
         userRepository.save(convertedUser);
         return findUserById(userDto.getId());
     }
 
+     public UserDto findUserById(Long id) {
+        return mapperUtil.convert(userRepository.findById(id)
+                .orElseThrow(()-> new NoSuchElementException("User was not found")), new UserDto());
+     }
+
+    /*
+    public UserDto findUserById(Long id) {
+        return mapperUtil.convert(userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("User was not found")), new UserDto());
+    }
+
+    /*
     public UserDto findUserById(Long id) {
         User user = userRepository.findUserById(id);
         UserDto dto =  mapperUtil.convert(user, new UserDto());
@@ -88,9 +120,16 @@ public class UserServiceImpl implements UserService {
         return dto;
     }
 
+     */
+
     private List<UserDto> findAllOrderByCompanyAndRole() {
         List<UserDto> list = userRepository.findAllOrderByCompanyAndRole(false).stream().map(currentUser -> {
-                    Boolean isOnlyAdmin = currentUser.getRole().getDescription().equals("Admin");
+                    Role admin = new Role();
+                    admin.setId(2L);
+                    admin.setDescription("Admin");
+                    List<User> listCurrentAdmins =
+                            userRepository.findAllByCompanyAndRole(currentUser.getCompany(), admin);
+                    Boolean isOnlyAdmin = listCurrentAdmins.size() == 1;
                     UserDto userDto = mapperUtil.convert(currentUser, new UserDto());
                     userDto.setIsOnlyAdmin(isOnlyAdmin);
                     return userDto;
@@ -101,6 +140,7 @@ public class UserServiceImpl implements UserService {
 
     public List<UserDto> findAllFilterForLoggedInUser() {
         UserDto loggedInUser = securityService.getLoggedInUser();
+        List<User> userList = null;
         switch (loggedInUser.getRole().getDescription()) {
             case "Root User":
                 return findAllOrderByCompanyAndRole().stream()
