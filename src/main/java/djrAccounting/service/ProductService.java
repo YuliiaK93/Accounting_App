@@ -24,4 +24,8 @@ public interface ProductService {
     void save(ProductDto productDto);
 
     void decreaseQuantityInStock(Long productId, int quantity);
+
+    boolean isNameNotPrevious(Long id, String name);
+
+    boolean isNameAlreadyInUse(String name);
 }

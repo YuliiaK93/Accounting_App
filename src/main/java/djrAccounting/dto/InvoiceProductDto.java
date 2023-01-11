@@ -20,7 +20,6 @@ public class InvoiceProductDto {
     private int quantity;
 
     @NotNull(message = "Price is a required field.")
-    //@Min(value = 1, message = "Price should be at least $1")
     @DecimalMin(value = "1.00", message ="Price should be at least $1")
     private BigDecimal price;
 

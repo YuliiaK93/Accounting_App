@@ -34,7 +34,8 @@ public class PurchaseInvoiceController {
 
         InvoiceDto invoiceDto = invoiceService.findById(id);
 
-        if (!invoiceDto.getCompany().equals(securityService.getLoggedInUser().getCompany())) return "redirect:/purchaseInvoices/list";
+        if (!invoiceDto.getCompany().equals(securityService.getLoggedInUser().getCompany()))
+            return "redirect:/purchaseInvoices/list";
 
         model.addAttribute("company", securityService.getLoggedInUser().getCompany());
         model.addAttribute("invoice", invoiceDto);
@@ -78,13 +79,14 @@ public class PurchaseInvoiceController {
 
         InvoiceDto invoiceDto = invoiceService.findById(id);
 
-        if (!invoiceDto.getCompany().equals(securityService.getLoggedInUser().getCompany())) return "redirect:/purchaseInvoices/list";
+        if (!invoiceDto.getCompany().equals(securityService.getLoggedInUser().getCompany()))
+            return "redirect:/purchaseInvoices/list";
 
         model.addAttribute("invoice", invoiceDto);
         model.addAttribute("vendors", clientVendorService.listVendorsBySelectedUserCompany());
         model.addAttribute("newInvoiceProduct", new InvoiceProductDto());
         model.addAttribute("products", productService.listProductsBySelectedUserCompany());
-       // model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
+
         return "invoice/purchase-invoice-update";
     }
 
@@ -113,14 +115,20 @@ public class PurchaseInvoiceController {
     }
 
     @GetMapping("/removeInvoiceProduct/{invoiceId}/{invoiceProductId}")
-    public String removeInvoiceProduct(@PathVariable Long invoiceId, @PathVariable Long invoiceProductId, Model model){
+    public String removeInvoiceProduct(@PathVariable Long invoiceId, @PathVariable Long invoiceProductId, Model model) {
         invoiceProductService.removeInvoiceProduct(invoiceProductId);
-        return "redirect:/purchaseInvoices/update/"+invoiceId;
+        return "redirect:/purchaseInvoices/update/" + invoiceId;
     }
 
     @GetMapping("/delete/{id}")
-    public String deletePurchaseInvoice(@PathVariable("id") Long id){
+    public String deletePurchaseInvoice(@PathVariable("id") Long id) {
         invoiceService.deletePurchaseInvoiceById(id);
+        return "redirect:/purchaseInvoices/list";
+    }
+
+    @GetMapping("/approve/{id}")
+    public String approvePurchaseInvoice(@PathVariable("id") Long id, Model model) {
+        invoiceService.approvePurchaseInvoice(id);
         return "redirect:/purchaseInvoices/list";
     }
 }
