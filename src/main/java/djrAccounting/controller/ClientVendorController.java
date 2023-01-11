@@ -18,11 +18,9 @@ import javax.validation.Valid;
 public class ClientVendorController {
 
     private final ClientVendorService clientVendorService;
-    private final SecurityService securityService;
 
-    public ClientVendorController(ClientVendorService clientVendorService, SecurityService securityService) {
+    public ClientVendorController(ClientVendorService clientVendorService) {
         this.clientVendorService = clientVendorService;
-        this.securityService = securityService;
     }
 
     @GetMapping("/list")
