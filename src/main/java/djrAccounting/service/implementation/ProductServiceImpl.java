@@ -12,6 +12,7 @@ import djrAccounting.service.SecurityService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,15 +36,12 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductDto> getAllProducts() {
         Long companyId = securityService.getLoggedInUser().getCompany().getId();
-        return productRepository.findAll().stream().filter(product -> product.getCategory().getCompany().getId() == companyId).map(product -> mapper.convert(product, new ProductDto())).collect(Collectors.toList());
+        return productRepository.findAll().stream().filter(product -> Objects.equals(product.getCategory().getCompany().getId(), companyId)).map(product -> mapper.convert(product, new ProductDto())).collect(Collectors.toList());
     }
 
     @Override
     public void deleteProductById(Long id) {
         Product product = productRepository.findById(id).orElseThrow();
-
-        // if (productDto.getQuantityInStock()>0 || )
-        // TODO: 12/28/2022
         product.setIsDeleted(true);
         productRepository.save(product);
     }
@@ -86,4 +84,20 @@ public class ProductServiceImpl implements ProductService {
         int quantityBeforeReduction = product.getQuantityInStock();
         product.setQuantityInStock(quantityBeforeReduction - quantity);
     }
+
+
+    @Override
+    public boolean isNameAlreadyInUse(String name) {
+
+        return productRepository.existsByNameIgnoreCaseAndCategory_Company_Id(name.trim(), securityService.getLoggedInUser()
+                .getCompany()
+                .getId());
+    }
+
+    @Override
+    public boolean isNameNotPrevious(Long id, String name) {
+
+        return !productRepository.findById(id).orElseThrow().getName().equals(name.trim());
+    }
+
 }
