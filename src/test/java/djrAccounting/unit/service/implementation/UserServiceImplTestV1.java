@@ -1,5 +1,6 @@
 package djrAccounting.unit.service.implementation;
 
+import djrAccounting.TestDocumentInitializer;
 import djrAccounting.dto.UserDto;
 import djrAccounting.entity.User;
 import djrAccounting.mapper.MapperUtil;
@@ -19,12 +20,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Arrays;
 
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-class UserServiceImplTest {
+class UserServiceImplTestV1 {
 
-    /*
     @InjectMocks
     UserServiceImpl service;
     @Mock
@@ -93,5 +94,4 @@ class UserServiceImplTest {
         assertThat(resultUser.getPassword().equals(testPassword));
 
     }
-    */
 }
