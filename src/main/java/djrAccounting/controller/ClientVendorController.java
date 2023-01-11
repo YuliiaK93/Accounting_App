@@ -4,11 +4,13 @@ import djrAccounting.bootstrap.StaticConstants;
 import djrAccounting.dto.ClientVendorDto;
 import djrAccounting.enums.ClientVendorType;
 import djrAccounting.service.ClientVendorService;
+import djrAccounting.service.SecurityService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 @Controller
@@ -16,9 +18,11 @@ import javax.validation.Valid;
 public class ClientVendorController {
 
     private final ClientVendorService clientVendorService;
+    private final SecurityService securityService;
 
-    public ClientVendorController(ClientVendorService clientVendorService) {
+    public ClientVendorController(ClientVendorService clientVendorService, SecurityService securityService) {
         this.clientVendorService = clientVendorService;
+        this.securityService = securityService;
     }
 
     @GetMapping("/list")
@@ -37,9 +41,9 @@ public class ClientVendorController {
 
     @PostMapping("/create")
     public String createClientVendor(@Valid @ModelAttribute("newClientVendor") ClientVendorDto clientVendorDto, BindingResult bindingResult, Model model) {
-        boolean duplicatedName = clientVendorService.nameExists(clientVendorDto.getClientVendorName());
-        if (bindingResult.hasErrors() || duplicatedName) {
-            if (duplicatedName) {
+        boolean nameExists = clientVendorService.nameExists(clientVendorDto.getClientVendorName());
+        if (bindingResult.hasErrors() || nameExists) {
+            if (nameExists) {
                 bindingResult.rejectValue("clientVendorName", " ", "A Client/Vendor with this name already exists. Please, try again.");
             }
             model.addAttribute("clientVendorTypes", ClientVendorType.values());
@@ -53,25 +57,29 @@ public class ClientVendorController {
 
     @GetMapping("/update/{id}")
     public String editClientVendor(@PathVariable("id") Long id, Model model) {
+        if (!clientVendorService.hasRightToUpdate(id)) {
+            return "redirect:/clientVendors/list";
+        }
         model.addAttribute("clientVendor", clientVendorService.findById(id));
         model.addAttribute("countries", StaticConstants.COUNTRY_LIST);
         model.addAttribute("clientVendorTypes", ClientVendorType.values());
+
         return "/clientVendor/clientVendor-update";
     }
 
     @PostMapping("/update/{id}")
-    public String editClientVendor(@Valid @ModelAttribute("clientVendor") ClientVendorDto clientVendorDto, BindingResult bindingResult,@PathVariable("id") Long id, Model model){
-            boolean duplicatedName = clientVendorService.nameExists(clientVendorDto.getClientVendorName());
-            if(bindingResult.hasErrors() || duplicatedName){
-                if(duplicatedName){
-                    bindingResult.rejectValue("clientVendorName"," ", "A Client/Vendor with this name already exists. Please, try again.");
-                }
-                model.addAttribute("countries", StaticConstants.COUNTRY_LIST);
-                model.addAttribute("clientVendorTypes", ClientVendorType.values());
-                return "clientVendor/clientVendor-update";
+    public String editClientVendor(@Valid @ModelAttribute("clientVendor") ClientVendorDto clientVendorDto, BindingResult bindingResult, @PathVariable("id") Long id, Model model) {
+        boolean duplicatedName = clientVendorService.duplicatedName(clientVendorDto);
+        if (bindingResult.hasErrors() || duplicatedName) {
+            if (duplicatedName) {
+                bindingResult.rejectValue("clientVendorName", " ", "A Client/Vendor with this name already exists. Please, try again.");
             }
-            clientVendorService.update(clientVendorDto);
-            return "redirect:/clientVendors/list";
+            model.addAttribute("countries", StaticConstants.COUNTRY_LIST);
+            model.addAttribute("clientVendorTypes", ClientVendorType.values());
+            return "clientVendor/clientVendor-update";
+        }
+        clientVendorService.update(clientVendorDto);
+        return "redirect:/clientVendors/list";
     }
 
     @GetMapping("/delete/{id}")

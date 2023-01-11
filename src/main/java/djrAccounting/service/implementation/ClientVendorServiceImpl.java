@@ -95,11 +95,25 @@ public class ClientVendorServiceImpl implements ClientVendorService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public boolean hasRightToUpdate(Long id) {
+        String loggedInUserCompany=securityService.getLoggedInUser().getCompany().getTitle();
+        ClientVendor clientVendor=clientVendorRepository.findById(id).orElseThrow();
+        return  clientVendor.getCompany().getTitle().equals(loggedInUserCompany);
+    }
+
+    @Override
+    public boolean duplicatedName(ClientVendorDto clientVendorDto){
+    boolean nameMatch=clientVendorRepository.findById(clientVendorDto.getId()).orElseThrow().getClientVendorName().equals(clientVendorDto.getClientVendorName());
+    return !nameMatch && nameExists(clientVendorDto.getClientVendorName());
+    }
 
     @Override
     public boolean nameExists(String name) {
         return clientVendorRepository.existsByClientVendorName(name);
     }
+
+
 }
 
 

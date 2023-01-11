@@ -3,11 +3,8 @@ package djrAccounting.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
 
 @AllArgsConstructor
@@ -23,7 +20,7 @@ public class InvoiceProductDto {
     private int quantity;
 
     @NotNull(message = "Price is a required field.")
-    @Min(value = 1, message = "Price should be at least $1")
+    @DecimalMin(value = "1.00", message ="Price should be at least $1")
     private BigDecimal price;
 
     @NotNull(message = "Tax is a required field.")

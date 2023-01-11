@@ -126,7 +126,7 @@
                                                             <div class="form-group">
                                                                 <div class="controls">
                                                                     <label>Unit Price (without tax)</label>
-                                                                    <input type="number" th:field="*{price}" placeholder="Price"
+                                                                    <input type="number" th:field="*{price}" placeholder="Price" step=".01"
                                                                            class="form-control" aria-invalid="false">
                                                                 </div>
                                                                 <div th:if="${#fields.hasErrors('price')}">

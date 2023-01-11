@@ -27,6 +27,12 @@
                                         <div class="card">
                                             <div class="card-content fw-container">
                                                 <div class="card-body fw-body">
+                                                    <!--modified-->
+                                                    <div class="row">
+                                                        <div><span class="col-sm12 col-md-6 alert-danger float-right"
+                                                                   th:if="${error}" th:text="${error}">Error</span>
+                                                        </div>
+                                                    </div><!--modified-->
                                                     <div class="table-responsive content demo-html">
                                                         <table id="example"
                                                                class="table table-striped table-bordered file-export"

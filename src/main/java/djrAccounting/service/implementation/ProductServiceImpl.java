@@ -12,6 +12,7 @@ import djrAccounting.service.SecurityService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,7 +36,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductDto> getAllProducts() {
         Long companyId = securityService.getLoggedInUser().getCompany().getId();
-        return productRepository.findAll().stream().filter(product -> product.getCategory().getCompany().getId() == companyId).map(product -> mapper.convert(product, new ProductDto())).collect(Collectors.toList());
+        return productRepository.findAll().stream().filter(product -> Objects.equals(product.getCategory().getCompany().getId(), companyId)).map(product -> mapper.convert(product, new ProductDto())).collect(Collectors.toList());
     }
 
     @Override
@@ -46,7 +47,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public boolean productExistByCategory(Long categoryId){
+    public boolean productExistByCategory(Long categoryId) {
         return productRepository.existsByCategory_Id(categoryId);
     }
 
@@ -63,8 +64,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public boolean isStockEnough(InvoiceProductDto invoiceProductDto) {
-        int remainingStock = productRepository.findByName(invoiceProductDto.getProduct().getName()).getQuantityInStock();
-        return remainingStock > invoiceProductDto.getQuantity();
+        int remainingStock = productRepository.findById(invoiceProductDto.getProduct().getId()).get().getQuantityInStock();
+        return remainingStock >= invoiceProductDto.getQuantity();
     }
 
     @Override
@@ -80,7 +81,23 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void decreaseQuantityInStock(Long productId, int quantity) {
         Product product = productRepository.findById(productId).get();
-        int quantityBeforeReduction= product.getQuantityInStock();
-        product.setQuantityInStock(quantityBeforeReduction-quantity);
+        int quantityBeforeReduction = product.getQuantityInStock();
+        product.setQuantityInStock(quantityBeforeReduction - quantity);
     }
+
+
+    @Override
+    public boolean isNameAlreadyInUse(String name) {
+
+        return productRepository.existsByNameIgnoreCaseAndCategory_Company_Id(name.trim(), securityService.getLoggedInUser()
+                .getCompany()
+                .getId());
+    }
+
+    @Override
+    public boolean isNameNotPrevious(Long id, String name) {
+
+        return !productRepository.findById(id).orElseThrow().getName().equals(name.trim());
+    }
+
 }
