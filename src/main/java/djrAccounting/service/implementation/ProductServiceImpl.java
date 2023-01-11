@@ -50,7 +50,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public boolean productExistByCategory(Long categoryId){
+    public boolean productExistByCategory(Long categoryId) {
         return productRepository.existsByCategory_Id(categoryId);
     }
 
@@ -67,8 +67,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public boolean isStockEnough(InvoiceProductDto invoiceProductDto) {
-        int remainingStock = productRepository.findByName(invoiceProductDto.getProduct().getName()).getQuantityInStock();
-        return remainingStock > invoiceProductDto.getQuantity();
+        int remainingStock = productRepository.findById(invoiceProductDto.getProduct().getId()).get().getQuantityInStock();
+        return remainingStock >= invoiceProductDto.getQuantity();
     }
 
     @Override
@@ -84,8 +84,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void decreaseQuantityInStock(Long productId, int quantity) {
         Product product = productRepository.findById(productId).get();
-        int quantityBeforeReduction= product.getQuantityInStock();
-        product.setQuantityInStock(quantityBeforeReduction-quantity);
+        int quantityBeforeReduction = product.getQuantityInStock();
+        product.setQuantityInStock(quantityBeforeReduction - quantity);
     }
 
 

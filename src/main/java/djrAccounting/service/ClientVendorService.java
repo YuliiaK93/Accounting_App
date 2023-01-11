@@ -22,4 +22,5 @@ public interface ClientVendorService {
 
     List<ClientVendorDto> listVendorsBySelectedUserCompany();
 
+    boolean hasRightToUpdate(Long id);
 }

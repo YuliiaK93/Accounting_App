@@ -25,6 +25,8 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     Invoice findTopByCompanyIdOrderByIdDesc(Long id);
 
     List<Invoice> findAllByCompanyIdAndInvoiceTypeOrderByLastUpdateDateTimeDesc(Long companyId, InvoiceType invoiceType);
+
+
 }
 
 
