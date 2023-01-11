@@ -1,16 +1,14 @@
 package djrAccounting.service;
 
-import djrAccounting.dto.CompanyDto;
-import djrAccounting.dto.InvoiceDto;
 import djrAccounting.dto.InvoiceProductDto;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 public interface InvoiceProductService {
-    BigDecimal getTotalPriceByInvoice(String invoiceNo);
+    BigDecimal getTotalPriceByInvoice(Long invoiceId);
 
-    BigDecimal getTotalPriceWithTaxByInvoice(String invoiceNo);
+    BigDecimal getTotalPriceWithTaxByInvoice(Long invoiceId);
 
     BigDecimal getTotalCostForCurrentCompany();
 
@@ -27,5 +25,7 @@ public interface InvoiceProductService {
     void save(InvoiceProductDto invoiceProductDto, Long id);
 
     void deleteInvoiceProductById(Long id);
+
+    void removeInvoiceProduct(Long invoiceProductId);
 
 }

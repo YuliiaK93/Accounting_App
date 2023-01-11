@@ -40,10 +40,11 @@ public class ClientVendorServiceImpl implements ClientVendorService {
     @Override
     public List<ClientVendorDto> listAllClientVendors() {
         Long companyId = securityService.getLoggedInUser().getCompany().getId();
-        return clientVendorRepository.findAll(Sort.by("clientVendorType")).stream()
-                .filter(clientVendor -> clientVendor.getCompany().getId().equals(companyId))
-                .map(clientVendor -> mapperUtil.convert(clientVendor, new ClientVendorDto()))
-                .collect(Collectors.toList());
+       return clientVendorRepository.findByCompany_IdOrderByClientVendorTypeAscClientVendorNameAsc(companyId)
+               .stream()
+               .map(clientVendor -> mapperUtil.convert(clientVendor, new ClientVendorDto()))
+               .collect(Collectors.toList());
+
     }
 
     @Override
@@ -86,9 +87,33 @@ public class ClientVendorServiceImpl implements ClientVendorService {
     }
 
     @Override
+    public List<ClientVendorDto> listVendorsBySelectedUserCompany() {
+        return  clientVendorRepository.findAllByCompanyIdAndClientVendorTypeOrderByClientVendorName(securityService.getLoggedInUser()
+                        .getCompany().getId(), ClientVendorType.VENDOR)
+                .stream()
+                .map(client -> mapperUtil.convert(client, ClientVendorDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean hasRightToUpdate(Long id) {
+        String loggedInUserCompany=securityService.getLoggedInUser().getCompany().getTitle();
+        ClientVendor clientVendor=clientVendorRepository.findById(id).orElseThrow();
+        return  clientVendor.getCompany().getTitle().equals(loggedInUserCompany);
+    }
+
+    @Override
+    public boolean duplicatedName(ClientVendorDto clientVendorDto){
+    boolean nameMatch=clientVendorRepository.findById(clientVendorDto.getId()).orElseThrow().getClientVendorName().equals(clientVendorDto.getClientVendorName());
+    return !nameMatch && nameExists(clientVendorDto.getClientVendorName());
+    }
+
+    @Override
     public boolean nameExists(String name) {
         return clientVendorRepository.existsByClientVendorName(name);
     }
+
+
 }
 
 

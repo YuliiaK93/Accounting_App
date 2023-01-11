@@ -135,7 +135,8 @@
                                                                 <div class="controls">
                                                                     <label>Role</label>
                                                                     <select class="custom-select" id="role" name="role"
-                                                                            th:with="role=*{role}"  >
+                                                                            th:with="role=*{role}"
+                                                                            th:disabled="${user.isOnlyAdmin}"> //this field was changed
                                                                         <option th:each="role:${userRoles}"
                                                                                 th:value="${role.id}"
                                                                                 th:text="${role.description}"
@@ -157,7 +158,8 @@
                                                                 <div class="controls">
                                                                     <label>Company</label>
                                                                     <select class="custom-select" id="company" name="company"
-                                                                            th:with="company=*{company}">
+                                                                            th:with="company=*{company}"
+                                                                            th:readonly="${user.isOnlyAdmin}"> this field was changed
                                                                         <option th:each="company:${companies}"
                                                                                 th:value="${company.id}"
                                                                                 th:text="${company.getTitle()}"

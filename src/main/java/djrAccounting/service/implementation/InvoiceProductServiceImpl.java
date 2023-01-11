@@ -24,7 +24,6 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     private final MapperUtil mapper;
     private final InvoiceService invoiceService;
 
-
     public InvoiceProductServiceImpl(InvoiceProductRepository invoiceProductRepository, SecurityService securityService, MapperUtil mapper, @Lazy InvoiceService invoiceService) {
         this.invoiceProductRepository = invoiceProductRepository;
         this.securityService = securityService;
@@ -33,8 +32,9 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     @Override
-    public BigDecimal getTotalPriceByInvoice(String invoiceNo) {
-        return invoiceProductRepository.findByInvoice_InvoiceNoAndInvoice_Company_Id(invoiceNo, getCurrentCompanyId())
+    public BigDecimal getTotalPriceByInvoice(Long invoiceId) {
+
+        return invoiceProductRepository.findByInvoice_IdAndInvoice_Company_Id(invoiceId, getCurrentCompanyId())
                 .stream()
                 .map(invoiceProduct -> invoiceProduct.getPrice()
                         .multiply(BigDecimal.valueOf(invoiceProduct.getQuantity())))
@@ -43,8 +43,8 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     @Override
-    public BigDecimal getTotalPriceWithTaxByInvoice(String invoiceNo) {
-        return calculatePriceWithTax(invoiceProductRepository.findByInvoice_InvoiceNoAndInvoice_Company_Id(invoiceNo, getCurrentCompanyId()));
+    public BigDecimal getTotalPriceWithTaxByInvoice(Long invoiceId) {
+        return calculatePriceWithTax(invoiceProductRepository.findByInvoice_IdAndInvoice_Company_Id(invoiceId, getCurrentCompanyId()));
     }
 
     @Override
@@ -59,19 +59,17 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
     public BigDecimal getTotalProfitLossForCurrentCompany() {
+
         return invoiceProductRepository.findByInvoice_Company_Id(getCurrentCompanyId())
                 .stream()
                 .map(InvoiceProduct::getProfitLoss)
                 .reduce(BigDecimal::add)
-                .orElseThrow();
+                .orElse(BigDecimal.ZERO);
     }
 
     @Override
     public List<InvoiceProductDto> getAllByInvoiceStatusApprovedForCurrentCompany() {
-        return invoiceProductRepository.findByInvoice_Company_IdAndInvoice_InvoiceStatusIsApprovedOrderByInvoice_DateDesc(getCurrentCompanyId())
-                .stream()
-                .map(invoiceProduct -> mapper.convert(invoiceProduct, InvoiceProductDto.class))
-                .collect(Collectors.toList());
+        return dtoMapper(invoiceProductRepository.findByInvoice_Company_IdAndInvoice_InvoiceStatusIsApprovedOrderByInvoice_DateDesc(getCurrentCompanyId()));
     }
 
     @Override
@@ -88,18 +86,24 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     @Override
-    public void save(InvoiceProductDto invoiceProductDto, Long id) {
-
-        invoiceProductDto.setProfitLoss(BigDecimal.ZERO); //todo profit loss calculation @mehmet
-        invoiceProductDto.setInvoice(invoiceService.findById(id));
-        InvoiceProduct invoiceProduct = mapper.convert(invoiceProductDto, InvoiceProduct.class);
-        invoiceProductRepository.save(invoiceProduct);
-
+    public void deleteInvoiceProductById(Long id) {
+        invoiceProductRepository.delete(invoiceProductRepository.findById(id).get());
     }
 
     @Override
-    public void deleteInvoiceProductById(Long id) {
-        invoiceProductRepository.delete(invoiceProductRepository.findById(id).get());
+    public void removeInvoiceProduct(Long invoiceProductId) {
+        InvoiceProduct invoiceProduct=invoiceProductRepository.findById(invoiceProductId).get();
+        invoiceProduct.setIsDeleted(true);
+        invoiceProductRepository.save(invoiceProduct);
+    }
+
+    @Override
+    public void save(InvoiceProductDto invoiceProductDto, Long id) {
+        invoiceProductDto.setProfitLoss(BigDecimal.ZERO);//required calc
+        invoiceProductDto.setInvoice(invoiceService.findById(id));
+        invoiceProductDto.setRemainingQuantity(invoiceProductDto.getQuantity());
+        InvoiceProduct invoiceProduct = mapper.convert(invoiceProductDto, InvoiceProduct.class);
+        invoiceProductRepository.save(invoiceProduct);
     }
 
     private BigDecimal calculatePriceWithTax(List<InvoiceProduct> list) {
@@ -115,5 +119,12 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     private Long getCurrentCompanyId() {
         return securityService.getLoggedInUser().getCompany().getId();
+    }
+
+    private List<InvoiceProductDto> dtoMapper(List<InvoiceProduct> invoiceProductList) {
+
+        return invoiceProductList.stream()
+                .map(invoiceProduct -> mapper.convert(invoiceProduct, InvoiceProductDto.class))
+                .collect(Collectors.toList());
     }
 }

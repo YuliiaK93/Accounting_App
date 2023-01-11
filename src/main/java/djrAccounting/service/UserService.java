@@ -12,8 +12,6 @@ public interface UserService {
 
     UserDto findByUsername(String username);
 
-    List<UserDto> listAllUsers();
-
     void save(UserDto user);
 
     void deleteUserById(Long id);
@@ -21,5 +19,14 @@ public interface UserService {
     UserDto update(UserDto user);
 
     List<UserDto> findAllFilterForLoggedInUser();
+
+    boolean isEmailExist(UserDto userDto);
+
+    List<UserDto> getFilteredUsers() throws Exception;
+
+    List<UserDto> listAllUsers();
+    boolean isUsernameExist(UserDto userDto);
+
+    String checkIfUserCanBeDeleted(Long id);
 }
 

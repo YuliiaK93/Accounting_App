@@ -1,11 +1,13 @@
 package djrAccounting.service.implementation;
 
 import djrAccounting.dto.CompanyDto;
+import djrAccounting.dto.UserDto;
 import djrAccounting.entity.Company;
 import djrAccounting.enums.CompanyStatus;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.CompanyRepository;
 import djrAccounting.service.CompanyService;
+import djrAccounting.service.SecurityService;
 import djrAccounting.service.UserService;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -21,10 +23,13 @@ public class CompanyServiceImpl implements CompanyService {
     private final MapperUtil mapper;
     private final UserService userService;
 
-    public CompanyServiceImpl(CompanyRepository companyRepository, MapperUtil mapperUtil, UserService userService) {
+    private final SecurityService securityService;
+
+    public CompanyServiceImpl(CompanyRepository companyRepository, MapperUtil mapperUtil, UserService userService, SecurityService securityService) {
         this.companyRepository = companyRepository;
         this.mapper = mapperUtil;
         this.userService = userService;
+        this.securityService = securityService;
     }
 
     @Override
@@ -76,5 +81,18 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public boolean isTitleExist(String title) {
         return companyRepository.existsByTitle(title);
+    }
+
+    @Override
+    public List<CompanyDto> listCompaniesByLoggedInUser() {
+        UserDto loggedInUser = securityService.getLoggedInUser();
+        switch (loggedInUser.getRole().getDescription()) {
+            case "Admin":
+                return listAllCompanies().stream()
+                        .filter(company -> company.getId().equals(loggedInUser.getCompany().getId()))
+                        .collect(Collectors.toList());
+            default:
+                return listAllCompanies();
+        }
     }
 }
