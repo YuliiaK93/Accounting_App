@@ -19,5 +19,7 @@ public interface CompanyService {
 
     boolean isTitleExist(String title);
 
+    boolean isTitleExistExceptCurrentCompanyTitle(CompanyDto companyDto);
+
     List<CompanyDto> listCompaniesByLoggedInUser();
 }
