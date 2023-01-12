@@ -48,7 +48,7 @@ class UserServiceImplTestMentor {
         // Given
         UserDto userDto = TestDocumentInitializer.getTestUserDto(Role.ROOT_USER);
         // When
-        when(userRepository.findUserById(userDto.getId())).thenReturn(new User());
+        when(userRepository.findUserById(userDto.getId())).thenReturn(TestDocumentInitializer.getTestUser(Role.ROOT_USER));
         //when(mapperUtil.convert(any(User.class), any(UserDto.class))).thenReturn(userDto);
         var user = userService.findUserById(userDto.getId());
         // Then
@@ -76,12 +76,12 @@ class UserServiceImplTestMentor {
         User adminUser = mapperUtil.convert(adminUserDto, new User());
         UserDto rootUser = TestDocumentInitializer.getTestUserDto(Role.ROOT_USER);
         // When
-        doReturn(Arrays.asList(adminUser)).when(userRepository).findAllByRole_Description("Admin");
+        doReturn(Arrays.asList(adminUser)).when(userRepository).findAllByRole_Description(Role.ADMIN.getValue());
         doReturn(rootUser).when(securityService).getLoggedInUser();
         var users = userService.getFilteredUsers();
         // Then
         assertThat(users.size() > 0);
-        assertThat(users.get(0).getRole().getDescription().equals("Admin"));
+        assertThat(users.get(0).getRole().getDescription().equals(Role.ADMIN.getValue()));
     }
 
     @Test
