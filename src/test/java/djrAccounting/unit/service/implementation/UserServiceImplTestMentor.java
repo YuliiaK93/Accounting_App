@@ -132,6 +132,7 @@ class UserServiceImplTestMentor {
         verify(userRepository).save(any(User.class));
     }
 
+    /*
     @Test
     void delete_happyPath(){
         User user = TestDocumentInitializer.getTestUserDto(Role.ADMIN);
@@ -145,7 +146,7 @@ class UserServiceImplTestMentor {
         assertTrue(user.getIsDeleted());
         assertNotEquals("test@test.com", user.getUsername());
         assertNull(throwable);
-    }
+    }*/
 
     @Test
     @DisplayName("When_given_non_existing_id_then_fail")

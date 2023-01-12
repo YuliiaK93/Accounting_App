@@ -1,89 +1,104 @@
 package djrAccounting;
 
 import djrAccounting.dto.*;
+import djrAccounting.entity.User;
 import djrAccounting.enums.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static djrAccounting.TestConstants.*;
+
 public class TestDocumentInitializer {
 
-    public static UserDto getTestUserDto(Role role){
-        return UserDto.builder()
-                .id(1L)
-                .firstname("John")
-                .lastname("Mike")
-                .phone("+1 (111) 111-1111")
-                .password("Abc1")
-                .confirmPassword("Abc1")
-                .role(new RoleDto(1L, role.getValue()))
+    public static User getTestUser(Role role) {
+        return User.builder()
+                .id(SAMPLE_ID1)
+                .firstname(SAMPLE_FIRST_NAME_JOHN)
+                .lastname(SAMPLE_LAST_NAME_JOHN)
+                .phone(SAMPLE_PHONE_NUMBER1)
+                .password(PASSWORD_ABC1)
+                .role()
                 .isOnlyAdmin(false)
                 .company(getTestCompanyDto(CompanyStatus.ACTIVE))
                 .build();
     }
 
-    public static CompanyDto getTestCompanyDto(CompanyStatus status){
+    public static UserDto getTestUserDto(Role role) {
+        return UserDto.builder()
+                .id(SAMPLE_ID1)
+                .firstname(SAMPLE_FIRST_NAME_JOHN)
+                .lastname(SAMPLE_LAST_NAME_JOHN)
+                .phone(SAMPLE_PHONE_NUMBER1)
+                .password(PASSWORD_ABC1)
+                .confirmPassword(PASSWORD_ABC1)
+                .role(new RoleDto(SAMPLE_ID1, role.getValue()))
+                .isOnlyAdmin(false)
+                .company(getTestCompanyDto(CompanyStatus.ACTIVE))
+                .build();
+    }
+
+    public static CompanyDto getTestCompanyDto(CompanyStatus status) {
         return CompanyDto.builder()
-                .title("Test_Company")
-                .website("www.test.com")
-                .id(1L)
-                .phone("+1 (111) 111-1111")
+                .title(SAMPLE_COMPANY1)
+                .website(SAMPLE_WEB_SITE1)
+                .id(SAMPLE_ID1)
+                .phone(SAMPLE_PHONE_NUMBER1)
                 .companyStatus(status)
                 .address(new AddressDto())
                 .build();
     }
 
-    public static CategoryDto getTestCategoryDto(){
+    public static CategoryDto getTestCategoryDto() {
         return CategoryDto.builder()
                 .company(getTestCompanyDto(CompanyStatus.ACTIVE))
-                .description("Test_Category")
+                .description(SAMPLE_CATEGORY1)
                 .build();
     }
 
-    public static ClientVendorDto getTestClientVendorDto(ClientVendorType type){
+    public static ClientVendorDto getTestClientVendorDto(ClientVendorType type) {
         return ClientVendorDto.builder()
                 .clientVendorType(type)
-                .clientVendorName("Test_ClientVendor")
+                .clientVendorName(SAMPLE_CLIENT1)
                 .address(new AddressDto())
-                .website("https://www.test.com")
-                .phone("+1 (111) 111-1111")
+                .website(SAMPLE_WEB_SITE1)
+                .phone(SAMPLE_PHONE_NUMBER1)
                 .build();
     }
 
-    public static ProductDto getTestProductDto(){
+    public static ProductDto getTestProductDto() {
         return ProductDto.builder()
                 .category(getTestCategoryDto())
                 .productUnit(ProductUnit.PCS)
-                .name("Test_Product")
-                .quantityInStock(10)
-                .lowLimitAlert(5)
+                .name(SAMPLE_PRODUCT1)
+                .quantityInStock(SAMPLE_QUANTITY_IN_STOCK_10)
+                .lowLimitAlert(SAMPLE_LOW_LIMIT_ALERT5)
                 .build();
     }
 
-    public static InvoiceProductDto getTestInvoiceProductDto(){
+    public static InvoiceProductDto getTestInvoiceProductDto() {
         return InvoiceProductDto.builder()
                 .product(getTestProductDto())
                 .price(BigDecimal.TEN)
-                .tax(10)
-                .quantity(10)
+                .tax(SAMPLE_TAX_RATE10)
+                .quantity(SAMPLE_QUANTITY10)
                 .invoice(new InvoiceDto())
                 .build();
     }
 
-    public static InvoiceDto getTestInvoiceDto(InvoiceStatus status, InvoiceType type){
+    public static InvoiceDto getTestInvoiceDto(InvoiceStatus status, InvoiceType type) {
         return InvoiceDto.builder()
-                .invoiceNo("T-001")
+                .invoiceNo(type == InvoiceType.PURCHASE ? SAMPLE_PURCHASE_INVOICE_NO1 : SAMPLE_SALES_INVOICE_NO1)
                 .clientVendor(getTestClientVendorDto(ClientVendorType.CLIENT))
                 .invoiceStatus(status)
                 .invoiceType(type)
-                .date(LocalDate.of(2022,01,01))
+                .date(SAMPLE_DATE_2022_1_1)
                 .company(getTestCompanyDto(CompanyStatus.ACTIVE))
                 .invoiceProducts(new ArrayList<>(Arrays.asList(getTestInvoiceProductDto())))
-                .price(BigDecimal.valueOf(1000))
+                .price(SAMPLE_PRICE1000)
                 .tax(BigDecimal.TEN)
-                .total(BigDecimal.TEN.multiply(BigDecimal.valueOf(1000)))
+                .total(BigDecimal.TEN.multiply(SAMPLE_PRICE1000))
                 .build();
     }
 }

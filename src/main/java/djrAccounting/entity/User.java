@@ -1,8 +1,7 @@
 package djrAccounting.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -13,7 +12,9 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "users")
 @Where(clause = "is_deleted = false")
+@AllArgsConstructor
 @NoArgsConstructor
+@SuperBuilder
 public class User extends BaseEntity {
 
     @Column(unique = true)
