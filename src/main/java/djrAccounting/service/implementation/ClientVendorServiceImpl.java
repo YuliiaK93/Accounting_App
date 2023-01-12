@@ -1,5 +1,6 @@
 package djrAccounting.service.implementation;
 
+import djrAccounting.annotation.AccountingExceptionMessage;
 import djrAccounting.dto.ClientVendorDto;
 
 import djrAccounting.entity.ClientVendor;
