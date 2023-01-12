@@ -53,10 +53,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto save(UserDto userDto) {
-        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        User user1 = mapperUtil.convert(userDto, new User());
-        user1.setEnabled(true);
-        return mapperUtil.convert(userRepository.save(user1), new UserDto());
+
+        User user = mapperUtil.convert(userDto, User.class);
+
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        user.setEnabled(true);
+
+        return mapperUtil.convert(userRepository.save(user), UserDto.class);
     }
 
     @Override
@@ -91,14 +94,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto update(UserDto userDto) {
-        User user = userRepository.findUserById(userDto.getId());
-        User convertedUser = mapperUtil.convert(userDto, new User());
-        convertedUser.setId(user.getId());
-        convertedUser.setPassword(passwordEncoder.encode(user.getPassword()));
-        convertedUser.setEnabled(user.isEnabled());
-        convertedUser.setCompany(user.getCompany()); //changed
-        userRepository.save(convertedUser);
-        return findUserById(userDto.getId());
+
+        User user = userRepository.findById(userDto.getId()).orElseThrow(); // TODO: 12/01/2023 UserNotFoundException
+
+        userDto.setPassword(passwordEncoder.encode(user.getPassword()));
+        userDto.setEnabled(user.isEnabled());
+
+        return mapperUtil.convert(userRepository.save(mapperUtil.convert(userDto, new User())), UserDto.class);
     }
 
      public UserDto findUserById(Long id) {

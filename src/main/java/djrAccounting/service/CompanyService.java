@@ -9,7 +9,7 @@ public interface CompanyService {
 
     List<CompanyDto> listAllCompanies();
 
-    void save(CompanyDto companyDto);
+    CompanyDto save(CompanyDto companyDto);
 
     void activateCompanyStatus(Long id);
 
@@ -18,6 +18,8 @@ public interface CompanyService {
     CompanyDto update(CompanyDto companyDto);
 
     boolean isTitleExist(String title);
+
+    boolean isTitleExistExceptCurrentCompanyTitle(CompanyDto companyDto);
 
     List<CompanyDto> listCompaniesByLoggedInUser();
 }

@@ -1,16 +1,16 @@
 package djrAccounting.service.implementation;
 
+import djrAccounting.dto.CategoryDto;
 import djrAccounting.dto.ClientVendorDto;
 
+import djrAccounting.entity.Category;
 import djrAccounting.entity.ClientVendor;
-import djrAccounting.entity.Company;
 import djrAccounting.enums.ClientVendorType;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.ClientVendorRepository;
 import djrAccounting.service.ClientVendorService;
 import djrAccounting.service.InvoiceService;
 import djrAccounting.service.SecurityService;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -48,20 +48,21 @@ public class ClientVendorServiceImpl implements ClientVendorService {
     }
 
     @Override
-    public void save(ClientVendorDto clientVendorDto) {
+    public ClientVendorDto save(ClientVendorDto clientVendorDto) {
+
+        clientVendorDto.setCompany(securityService.getLoggedInUser().getCompany());
+
         ClientVendor clientVendor = mapperUtil.convert(clientVendorDto, new ClientVendor());
-        clientVendor.setCompany(mapperUtil.convert(securityService.getLoggedInUser().getCompany(), Company.class));
-        clientVendorRepository.save(clientVendor);
+
+        return mapperUtil.convert(clientVendorRepository.save(clientVendor), ClientVendorDto.class);
     }
 
     @Override
-    public void update(ClientVendorDto clientVendorDto) {
-        Optional<ClientVendor> clientVendor = clientVendorRepository.findById(clientVendorDto.getId());
-        ClientVendor updatedClientVendor = mapperUtil.convert(clientVendorDto, new ClientVendor());
-        if (clientVendor.isPresent()) {
-            updatedClientVendor.setId(clientVendor.get().getId());
-            clientVendorRepository.save(updatedClientVendor);
-        }
+    public ClientVendorDto update(ClientVendorDto clientVendorDto) {
+
+        clientVendorRepository.findById(clientVendorDto.getId()).orElseThrow();// TODO: 12/01/2023 ClientVendorNotFoundException
+
+        return mapperUtil.convert(clientVendorRepository.save(mapperUtil.convert(clientVendorDto, ClientVendor.class)), ClientVendorDto.class);
     }
 
     @Override

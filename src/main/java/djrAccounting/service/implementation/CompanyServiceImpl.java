@@ -8,7 +8,6 @@ import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.CompanyRepository;
 import djrAccounting.service.CompanyService;
 import djrAccounting.service.SecurityService;
-import djrAccounting.service.UserService;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -21,14 +20,11 @@ public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
     private final MapperUtil mapper;
-    private final UserService userService;
-
     private final SecurityService securityService;
 
-    public CompanyServiceImpl(CompanyRepository companyRepository, MapperUtil mapperUtil, UserService userService, SecurityService securityService) {
+    public CompanyServiceImpl(CompanyRepository companyRepository, MapperUtil mapperUtil, SecurityService securityService) {
         this.companyRepository = companyRepository;
         this.mapper = mapperUtil;
-        this.userService = userService;
         this.securityService = securityService;
     }
 
@@ -50,7 +46,6 @@ public class CompanyServiceImpl implements CompanyService {
     public void activateCompanyStatus(Long id) {
         Company company = mapper.convert(findById(id), Company.class);
         company.setCompanyStatus(CompanyStatus.ACTIVE);
-        // userService.makeUserEnableByCompany(company);
         companyRepository.save(company);
     }
 
@@ -58,24 +53,29 @@ public class CompanyServiceImpl implements CompanyService {
     public void deactivateCompanyStatus(Long id) {
         Company company = mapper.convert(findById(id), Company.class);
         company.setCompanyStatus(CompanyStatus.PASSIVE);
-        //userService.makeUserDisableByCompany(company);
         companyRepository.save(company);
     }
 
     @Override
     public CompanyDto update(CompanyDto companyDto) {
-        Company dbCompany = companyRepository.findById(companyDto.getId()).orElseThrow();
+
+        Company dbCompany = companyRepository.findById(companyDto.getId()).orElseThrow();// TODO: 12/01/2023 CompanyNotFoundException
+
         Company convertedCompany = mapper.convert(companyDto, Company.class);
+
         convertedCompany.setCompanyStatus(dbCompany.getCompanyStatus());
-        companyRepository.save(convertedCompany);
-        return companyDto;
+
+        return mapper.convert(companyRepository.save(convertedCompany), CompanyDto.class);
     }
 
     @Override
-    public void save(CompanyDto companyDto) {
+    public CompanyDto save(CompanyDto companyDto) {
+
         Company company = mapper.convert(companyDto, Company.class);
+
         company.setCompanyStatus(CompanyStatus.ACTIVE);
-        companyRepository.save(company);
+
+        return mapper.convert(companyRepository.save(company), CompanyDto.class);
     }
 
     @Override
@@ -84,15 +84,22 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
+    public boolean isTitleExistExceptCurrentCompanyTitle(CompanyDto companyDto) {
+        Company company = mapper.convert(findById(companyDto.getId()), new Company());
+        if (company.getTitle().equals(companyDto.getTitle())) {
+            return false;
+        }
+        return companyRepository.existsByTitle(companyDto.getTitle());
+    }
+
+    @Override
     public List<CompanyDto> listCompaniesByLoggedInUser() {
         UserDto loggedInUser = securityService.getLoggedInUser();
-        switch (loggedInUser.getRole().getDescription()) {
-            case "Admin":
-                return listAllCompanies().stream()
-                        .filter(company -> company.getId().equals(loggedInUser.getCompany().getId()))
-                        .collect(Collectors.toList());
-            default:
-                return listAllCompanies();
+        if ("Admin".equals(loggedInUser.getRole().getDescription())) {
+            return listAllCompanies().stream()
+                    .filter(company -> company.getId().equals(loggedInUser.getCompany().getId()))
+                    .collect(Collectors.toList());
         }
+        return listAllCompanies();
     }
 }

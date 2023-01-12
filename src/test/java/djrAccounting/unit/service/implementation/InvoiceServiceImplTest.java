@@ -50,7 +50,7 @@ class InvoiceServiceImplTest {
     @BeforeEach
     void setUp() {
 
-        invoiceService = new InvoiceServiceImpl(invoiceRepository, invoiceProductService, securityService, mapper, productRepository, invoiceProductRepository, productService);
+        invoiceService = new InvoiceServiceImpl(invoiceRepository, invoiceProductService, securityService, mapper, invoiceProductRepository, productService);
     }
 
     @Test

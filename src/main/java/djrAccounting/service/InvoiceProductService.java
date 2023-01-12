@@ -22,7 +22,7 @@ public interface InvoiceProductService {
 
     List<InvoiceProductDto> findByInvoiceId(Long id);
 
-    void save(InvoiceProductDto invoiceProductDto, Long id);
+    InvoiceProductDto save(InvoiceProductDto invoiceProductDto, Long id);
 
     void deleteInvoiceProductById(Long id);
 

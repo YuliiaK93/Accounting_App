@@ -19,12 +19,14 @@ import java.util.List;
 @Builder
 public class Invoice extends BaseEntity {
 
+    @Column(updatable = false)
     private String invoiceNo;
 
     @Enumerated(EnumType.STRING)
     private InvoiceStatus invoiceStatus;
 
     @Enumerated(EnumType.STRING)
+    @Column(updatable = false)
     private InvoiceType invoiceType;
     private LocalDate date;
 
@@ -33,7 +35,7 @@ public class Invoice extends BaseEntity {
     private ClientVendor clientVendor;
 
     @ManyToOne
-    @JoinColumn(name = "company_id")
+    @JoinColumn(name = "company_id", updatable = false)
     private Company company;
 
     @OneToMany(mappedBy = "invoice")

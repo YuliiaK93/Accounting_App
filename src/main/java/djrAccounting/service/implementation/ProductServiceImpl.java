@@ -70,13 +70,15 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDto update(ProductDto productDto) {
-        return mapper.convert(productRepository.save(mapper.convert(productDto, Product.class)),
-                new ProductDto());
+
+        productRepository.findById(productDto.getId()).orElseThrow(); // TODO: 12/01/2023 ProductNotFoundException
+
+        return mapper.convert(productRepository.save(mapper.convert(productDto, Product.class)), ProductDto.class);
     }
 
     @Override
     public ProductDto save(ProductDto productDto) {
-        return mapper.convert(productRepository.save(mapper.convert(productDto, Product.class)), new ProductDto());
+        return mapper.convert(productRepository.save(mapper.convert(productDto, Product.class)), ProductDto.class);
     }
 
     @Override
