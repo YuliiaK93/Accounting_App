@@ -2,6 +2,7 @@ package djrAccounting.service.implementation;
 
 import djrAccounting.dto.CategoryDto;
 import djrAccounting.entity.Category;
+import djrAccounting.exception.CategoryNotFoundException;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.CategoryRepository;
 import djrAccounting.service.CategoryService;
@@ -28,7 +29,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto findById(Long id) {
-        return mapper.convert(categoryRepository.findById(id).orElseThrow(), CategoryDto.class);
+        return mapper.convert(categoryRepository.findById(id).orElseThrow(() -> new CategoryNotFoundException("Category not found this id: " + id)), CategoryDto.class);
     }
 
     @Override
@@ -37,9 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
                         .getCompany().getId()).stream().map(category -> mapper.convert(category, CategoryDto.class))
                 .collect(Collectors.toList());
 
-        newList.forEach(categoryDto -> {
-            categoryDto.setHasProduct(productService.productExistByCategory(categoryDto.getId()));
-        });
+        newList.forEach(categoryDto -> categoryDto.setHasProduct(productService.productExistByCategory(categoryDto.getId())));
 
         return newList;
     }
@@ -62,7 +61,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto update(CategoryDto category) {
 
-        categoryRepository.findById(category.getId()).orElseThrow(); // TODO: 12/01/2023 CategoryNotFoundException
+        categoryRepository.findById(category.getId()).orElseThrow(() -> new CategoryNotFoundException("Category not found this id: " + category.getId())); // TODO: 12/01/2023 CategoryNotFoundException
 
         return mapper.convert(categoryRepository.save(mapper.convert(category, Category.class)), CategoryDto.class);
     }
