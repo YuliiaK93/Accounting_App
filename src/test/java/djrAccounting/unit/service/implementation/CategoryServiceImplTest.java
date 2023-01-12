@@ -1,10 +1,11 @@
-package djrAccounting.service.implementation;
+package djrAccounting.unit.service.implementation;
 
 import djrAccounting.dto.CategoryDto;
 import djrAccounting.entity.Category;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.CategoryRepository;
 import djrAccounting.service.SecurityService;
+import djrAccounting.service.implementation.CategoryServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;

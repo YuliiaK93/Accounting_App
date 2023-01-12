@@ -164,7 +164,6 @@ public class UserServiceImpl implements UserService {
         return user.filter(value -> !value.getId().equals(userDto.getId())).isPresent();
     }
 
-    @Override
     public List<UserDto> getFilteredUsers() {
 
         List<User> userList;
