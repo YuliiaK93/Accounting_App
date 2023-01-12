@@ -10,10 +10,10 @@ public interface CategoryService {
 
     List<CategoryDto> listAllCategories();
 
-    void save(CategoryDto categoryDto);
+    CategoryDto save(CategoryDto categoryDto);
 
     boolean isCategoryDescriptionExist(String description);
     void deleteCategoryById(Long id);
 
-    void update(CategoryDto category);
+    CategoryDto update(CategoryDto category);
 }
