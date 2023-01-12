@@ -2,7 +2,6 @@ package djrAccounting.converter;
 
 import djrAccounting.dto.RoleDto;
 import djrAccounting.service.RoleService;
-import lombok.SneakyThrows;
 import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.convert.converter.Converter;
@@ -18,7 +17,6 @@ public class RoleDtoConverter implements Converter<String, RoleDto> {
         this.roleService = roleService;
     }
 
-    @SneakyThrows
     @Override
     public RoleDto convert(String source) {
         if (source == null || source.isBlank()) {
