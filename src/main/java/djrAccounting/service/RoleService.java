@@ -1,8 +1,8 @@
 package djrAccounting.service;
 
 import djrAccounting.dto.RoleDto;
+import djrAccounting.exception.RoleNotFoundException;
 
-import javax.management.relation.RoleNotFoundException;
 import java.util.List;
 
 public interface RoleService {
