@@ -13,6 +13,7 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -30,7 +31,6 @@ class UserServiceImplTest {
     UserRepository userRepository;
     @Mock
     MapperUtil mapperUtil;
-
 
 
     @Test
@@ -51,7 +51,7 @@ class UserServiceImplTest {
 
     @ParameterizedTest
     @ValueSource(longs = {1L, 2L, 3L})
-    void findById_Test(long id){
+    void findById_Test(long id) {
 
         //Given
         User user = new User();
@@ -66,8 +66,19 @@ class UserServiceImplTest {
         verify(userRepository).findById(id);
         verify(mapperUtil).convert(user, UserDto.class);
 
-        }
+    }
 
-         }
+    @Test
+    public void save_Test() {  //NullPointerException
+        given(userRepository.findById(1L)).willReturn(Optional.of(new User()));
+
+        assertThrows(ConfigDataResourceNotFoundException.class, () -> {
+            userService.save(new UserDto());
+        });
+        verify(userRepository, never()).save(any(User.class));
+
+    }
+
+}
 
 

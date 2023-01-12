@@ -162,25 +162,6 @@ public class UserServiceImpl implements UserService {
         return user.filter(value -> !value.getId().equals(userDto.getId())).isPresent();
     }
 
-    @Override
-    public List<UserDto> getFilteredUsers() {
-
-        List<User> userList;
-        if (isCurrentUserRootUser()) {
-            userList = userRepository.findAllByRole_Description("Admin");
-        } else {
-            userList = userRepository.findAllByCompany_Title(getCurrentUserCompanyTitle());
-        }
-        return userList.stream()
-                .sorted(Comparator.comparing((User u) -> u.getCompany().getTitle()).thenComparing(u -> u.getRole().getDescription()))
-                .map(entity -> {
-                    UserDto dto = mapperUtil.convert(entity, new UserDto());
-                    dto.setIsOnlyAdmin(checkIfOnlyAdminForCompany(dto));
-                    return dto;
-                })
-                .collect(Collectors.toList());
-    }
-
     private boolean checkIfOnlyAdminForCompany(UserDto userDto) {
         Company company = mapperUtil.convert(userDto.getCompany(), new Company());
         List<User> admins = userRepository.findAllByCompany_Title(company.getTitle().equals("Admin"));
