@@ -1,6 +1,7 @@
 package djrAccounting.service;
 
 import djrAccounting.dto.InvoiceProductDto;
+import djrAccounting.exception.InvoiceProductNotFoundException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -18,7 +19,7 @@ public interface InvoiceProductService {
 
     List<InvoiceProductDto> getAllByInvoiceStatusApprovedForCurrentCompany();
 
-    InvoiceProductDto findById(Long id);
+    InvoiceProductDto findById(Long id) throws InvoiceProductNotFoundException;
 
     List<InvoiceProductDto> findByInvoiceId(Long id);
 

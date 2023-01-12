@@ -86,4 +86,9 @@ class InvoiceServiceImplTest {
         assertEquals(BigDecimal.valueOf(2), invoices.get(1).getTax());
         assertEquals(BigDecimal.valueOf(3), invoices.get(2).getTax());
     }
+
+    @Test
+    void findById() {
+
+    }
 }
