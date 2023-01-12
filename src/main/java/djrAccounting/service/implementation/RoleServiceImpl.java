@@ -4,7 +4,6 @@ import djrAccounting.dto.RoleDto;
 import djrAccounting.dto.UserDto;
 import djrAccounting.entity.Role;
 import djrAccounting.entity.User;
-import djrAccounting.exception.RoleNotFoundException;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.RoleRepository;
 import djrAccounting.repository.UserRepository;
@@ -13,6 +12,7 @@ import djrAccounting.service.SecurityService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
+import javax.management.relation.RoleNotFoundException;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
