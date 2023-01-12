@@ -62,6 +62,12 @@ public class CompanyController {
     public String updateCompany(@Valid @ModelAttribute("company") CompanyDto companyDto,
                                 BindingResult bindingResult, Model model) {
 
+        if (companyService.isTitleExistExceptCurrentCompanyTitle(companyDto)) {
+            bindingResult.rejectValue("title", " ", "This title already exists");
+            model.addAttribute("countries", StaticConstants.COUNTRY_LIST);
+            return "/company/company-update";
+        }
+
         if (bindingResult.hasErrors()) {
             model.addAttribute("countries", StaticConstants.COUNTRY_LIST);
             return "company/company-update";
