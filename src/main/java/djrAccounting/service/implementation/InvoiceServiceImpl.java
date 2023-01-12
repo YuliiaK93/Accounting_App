@@ -11,7 +11,6 @@ import djrAccounting.enums.InvoiceType;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.InvoiceProductRepository;
 import djrAccounting.repository.InvoiceRepository;
-import djrAccounting.repository.ProductRepository;
 import djrAccounting.service.InvoiceProductService;
 import djrAccounting.service.InvoiceService;
 import djrAccounting.service.ProductService;
@@ -30,16 +29,14 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final InvoiceProductService invoiceProductService;
     private final SecurityService securityService;
     private final MapperUtil mapper;
-    private final ProductRepository productRepository;
     private final InvoiceProductRepository invoiceProductRepository;
     private final ProductService productService;
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, InvoiceProductService invoiceProductService, SecurityService securityService, MapperUtil mapper, ProductRepository productRepository, InvoiceProductRepository invoiceProductRepository, ProductService productService) {
+    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, InvoiceProductService invoiceProductService, SecurityService securityService, MapperUtil mapper, InvoiceProductRepository invoiceProductRepository, ProductService productService) {
         this.invoiceRepository = invoiceRepository;
         this.invoiceProductService = invoiceProductService;
         this.securityService = securityService;
         this.mapper = mapper;
-        this.productRepository = productRepository;
         this.invoiceProductRepository = invoiceProductRepository;
         this.productService = productService;
     }
@@ -83,18 +80,18 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public void save(InvoiceDto invoiceDto) {
+    public InvoiceDto save(InvoiceDto invoiceDto) {
+
         if (invoiceDto.getClientVendor().getClientVendorType().equals(ClientVendorType.CLIENT)) {
+
             invoiceDto.setInvoiceType(InvoiceType.SALES);
-        } else {
-            invoiceDto.setInvoiceType(InvoiceType.PURCHASE);
-        }
+
+        } else invoiceDto.setInvoiceType(InvoiceType.PURCHASE);
 
         invoiceDto.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
         invoiceDto.setCompany(securityService.getLoggedInUser().getCompany());
-        Invoice invoice = mapper.convert(invoiceDto, Invoice.class);
-        invoiceRepository.save(invoice);
-        invoiceDto.setId(invoice.getId());
+
+        return mapper.convert(invoiceRepository.save(mapper.convert(invoiceDto, Invoice.class)), InvoiceDto.class);
     }
 
     @Override

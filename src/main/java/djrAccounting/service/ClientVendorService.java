@@ -9,9 +9,9 @@ public interface ClientVendorService {
 
     List<ClientVendorDto> listAllClientVendors();
 
-    void save(ClientVendorDto clientVendorDto);
+    ClientVendorDto save(ClientVendorDto clientVendorDto);
 
-    void update(ClientVendorDto clientVendorDto);
+    ClientVendorDto update(ClientVendorDto clientVendorDto);
 
     void deleteById(Long id) throws IllegalAccessException;
 

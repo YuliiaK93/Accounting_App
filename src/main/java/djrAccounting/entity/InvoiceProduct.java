@@ -16,14 +16,17 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class InvoiceProduct extends BaseEntity {
 
+    @Column(updatable = false)
     private int quantity;
+    @Column(updatable = false)
     private BigDecimal price;
+    @Column(updatable = false)
     private int tax;
     private BigDecimal profitLoss;
     private int remainingQuantity;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "invoice_id")
+    @JoinColumn(name = "invoice_id", updatable = false)
     private Invoice invoice;
 
     @ManyToOne (fetch = FetchType.LAZY)

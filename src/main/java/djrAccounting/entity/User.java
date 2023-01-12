@@ -31,7 +31,7 @@ public class User extends BaseEntity {
     private Role role;
 
     @ManyToOne
-    @JoinColumn(name = "company_id")
+    @JoinColumn(name = "company_id", updatable = false)
     private Company company;
 
     public User(Long id, Boolean isDeleted, LocalDateTime insertDateTime, Long insertUserId, LocalDateTime lastUpdateDateTime, Long lastUpdateUserId, String username, String password, String firstname, String lastname, String phone, boolean enabled, Role role, Company company) {
