@@ -15,11 +15,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,6 +34,7 @@ class UserServiceImplTest {
     UserRepository userRepository;
     @Mock
     MapperUtil mapperUtil;
+    private UserDto user;
 
 
     @Test
@@ -77,6 +81,28 @@ class UserServiceImplTest {
         });
         verify(userRepository, never()).save(any(User.class));
 
+    }
+
+    @Test
+    public void update_Test() { //NullPointerException
+        given(userRepository.save(new User())).willReturn(new User());
+
+        user.setUsername("yulia.karnoza@gmail.com");
+        user.setId(2L);
+
+        UserDto updatedUser = userService.update(user);
+
+        assertThat(updatedUser.getUsername()).isEqualTo("yulia.karnoza@gmail.com");
+        assertThat(updatedUser.getId()).isEqualTo(2L);
+    }
+
+    @Test
+    public void deleteUserById_Test() { //NoSuchElementException
+        long userId = 1L;
+        willDoNothing().given(userRepository).deleteById(userId);
+
+        userService.deleteUserById(userId);
+        verify(userRepository, times(1)).deleteById(userId);
     }
 
 }
