@@ -4,12 +4,13 @@ import djrAccounting.dto.RoleDto;
 import djrAccounting.dto.UserDto;
 import djrAccounting.entity.Role;
 import djrAccounting.entity.User;
+import djrAccounting.exception.RoleNotFoundException;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.RoleRepository;
 import djrAccounting.repository.UserRepository;
 import djrAccounting.service.RoleService;
 import djrAccounting.service.SecurityService;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
+@Log4j2
 public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
@@ -33,8 +34,9 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public RoleDto findById(Long id) {
-        return mapper.convert(roleRepository.findById(id).orElseThrow(), RoleDto.class);
+    public RoleDto findById(Long id) throws RoleNotFoundException {
+        return mapper.convert(roleRepository.findById(id)
+                .orElseThrow(() -> new RoleNotFoundException("There is no role with id: " + id)), RoleDto.class);
     }
 
     @Override
@@ -62,7 +64,7 @@ public class RoleServiceImpl implements RoleService {
                     .map(role -> mapper.convert(role, new RoleDto()))
                     .collect(Collectors.toList());
         }
-            return Collections.emptyList();
+        return Collections.emptyList();
 
     }
 }
