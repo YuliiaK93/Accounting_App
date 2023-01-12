@@ -1,9 +1,7 @@
 package djrAccounting.entity;
 
 import djrAccounting.enums.ClientVendorType;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -14,6 +12,8 @@ import javax.persistence.*;
 @Table(name = "clients_vendors")
 @Where(clause = "is_deleted = false")
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ClientVendor extends BaseEntity {
 
     @Column(unique = true)

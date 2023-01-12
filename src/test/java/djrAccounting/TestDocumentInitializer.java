@@ -1,6 +1,8 @@
 package djrAccounting;
 
 import djrAccounting.dto.*;
+import djrAccounting.entity.Address;
+import djrAccounting.entity.Company;
 import djrAccounting.entity.User;
 import djrAccounting.enums.*;
 
@@ -19,9 +21,19 @@ public class TestDocumentInitializer {
                 .lastname(SAMPLE_LAST_NAME_JOHN)
                 .phone(SAMPLE_PHONE_NUMBER1)
                 .password(PASSWORD_ABC1)
-                .role()
-                .isOnlyAdmin(false)
-                .company(getTestCompanyDto(CompanyStatus.ACTIVE))
+                .role(djrAccounting.entity.Role.builder().description(Role.ADMIN.getValue()).build())
+                .company(getTestCompany(CompanyStatus.ACTIVE))
+                .build();
+    }
+
+    public static Company getTestCompany(CompanyStatus status) {
+        return Company.builder()
+                .title(SAMPLE_COMPANY1)
+                .website(SAMPLE_WEB_SITE1)
+                .id(SAMPLE_ID1)
+                .phone(SAMPLE_PHONE_NUMBER1)
+                .companyStatus(status)
+                .address(new Address())
                 .build();
     }
 

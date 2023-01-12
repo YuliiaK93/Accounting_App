@@ -2,9 +2,7 @@ package djrAccounting.entity;
 
 import djrAccounting.enums.InvoiceStatus;
 import djrAccounting.enums.InvoiceType;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -17,6 +15,8 @@ import java.util.List;
 @Table(name = "invoices")
 @Where(clause = "is_deleted = false")
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Invoice extends BaseEntity {
 
     private String invoiceNo;

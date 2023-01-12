@@ -1,8 +1,6 @@
 package djrAccounting.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.Entity;
@@ -14,6 +12,8 @@ import javax.persistence.Table;
 @Table(name = "addresses")
 @Where(clause = "is_deleted = false")
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class Address extends BaseEntity {
     private String addressLine1;
     private String addressLine2;

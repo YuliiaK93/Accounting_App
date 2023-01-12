@@ -1,9 +1,8 @@
 package djrAccounting.entity;
 
 import djrAccounting.enums.CompanyStatus;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -14,6 +13,8 @@ import javax.persistence.*;
 @Table(name = "companies")
 @Where(clause = "is_deleted = false")
 @NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
 public class Company extends BaseEntity {
 
     @Column(unique = true)
