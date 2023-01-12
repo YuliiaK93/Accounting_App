@@ -21,6 +21,5 @@ public interface CompanyService {
 
     boolean isTitleExistExceptCurrentCompanyTitle(CompanyDto companyDto);
 
-
     List<CompanyDto> listCompaniesByLoggedInUser();
 }
