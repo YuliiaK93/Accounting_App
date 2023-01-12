@@ -52,11 +52,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void save(UserDto userDto) {
+    public UserDto save(UserDto userDto) {
         userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
         User user1 = mapperUtil.convert(userDto, new User());
         user1.setEnabled(true);
-        userRepository.save(user1);
+        return mapperUtil.convert(userRepository.save(user1), new UserDto());
     }
 
     @Override
