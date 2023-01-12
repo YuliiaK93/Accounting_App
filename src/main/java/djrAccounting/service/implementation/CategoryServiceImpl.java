@@ -61,7 +61,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto update(CategoryDto category) {
 
-        categoryRepository.findById(category.getId()).orElseThrow(() -> new CategoryNotFoundException("Category not found this id: " + category.getId())); // TODO: 12/01/2023 CategoryNotFoundException
+        categoryRepository.findById(category.getId()).orElseThrow(() -> new CategoryNotFoundException("Category not found this id: " + category.getId()));
 
         return mapper.convert(categoryRepository.save(mapper.convert(category, Category.class)), CategoryDto.class);
     }
