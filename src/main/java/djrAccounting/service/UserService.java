@@ -20,8 +20,6 @@ public interface UserService {
 
     List<UserDto> findAllFilterForLoggedInUser();
 
-    boolean isEmailExist(UserDto userDto);
-
     List<UserDto> getFilteredUsers() throws Exception;
 
     List<UserDto> listAllUsers();
