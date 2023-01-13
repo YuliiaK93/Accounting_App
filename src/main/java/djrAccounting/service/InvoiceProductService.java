@@ -1,7 +1,6 @@
 package djrAccounting.service;
 
 import djrAccounting.dto.InvoiceProductDto;
-import djrAccounting.exception.InvoiceProductNotFoundException;
 
 import java.math.BigDecimal;
 import java.util.List;
