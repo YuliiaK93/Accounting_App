@@ -13,8 +13,10 @@ import java.util.Arrays;
 
 public class TestConstants {
 
-    public static final String PASSWORD_ABC1 = "Abc1";
+    public static final String PASSWORD_CLEAR_ABC1 = "Abc1";
+    public static final String PASSWORD_ENCODED_ABC1 = "$2a$10$nAB5j9G1c3JHgg7qzhiIXO7cqqr5oJ3LXRNQJKssDUwHXzDGUztNK";
     public static final String SAMPLE_FIRST_NAME_JOHN = "John";
+    public static final String SAMPLE_FIRST_NAME_MRTZA = "Mrtza";
     public static final String SAMPLE_LAST_NAME_JOHN = "Mike";
     public static final String SAMPLE_PHONE_NUMBER1 = "+1 (111) 111-1111";
     public static final String SAMPLE_COMPANY1 = "Test Company 1";
@@ -22,6 +24,8 @@ public class TestConstants {
     public static final String SAMPLE_PRODUCT1 = "Test Product 1";
     public static final String SAMPLE_CLIENT1 = "Test Client 1";
     public static final String SAMPLE_VENDOR1 = "Test Vendor 1";
+    public static final String SAMPLE_EMAIL1 = "abc@def.com";
+    public static final String SAMPLE_EMAIL2 = "def@ghi.com";
     public static final int SAMPLE_TAX_RATE10 = 10;
     public static final int SAMPLE_QUANTITY10 = 10;
     public static final int SAMPLE_QUANTITY_IN_STOCK_10 = 10;
@@ -39,7 +43,7 @@ public class TestConstants {
                 .firstname(SAMPLE_FIRST_NAME_JOHN)
                 .lastname(SAMPLE_LAST_NAME_JOHN)
                 .phone(SAMPLE_PHONE_NUMBER1)
-                .password(PASSWORD_ABC1)
+                .password(PASSWORD_CLEAR_ABC1)
                 .role(djrAccounting.entity.Role.builder().description(RoleEnum.ADMIN.getValue()).build())
                 .company(getTestCompany(CompanyStatus.ACTIVE))
                 .build();
@@ -62,8 +66,8 @@ public class TestConstants {
                 .firstname(SAMPLE_FIRST_NAME_JOHN)
                 .lastname(SAMPLE_LAST_NAME_JOHN)
                 .phone(SAMPLE_PHONE_NUMBER1)
-                .password(PASSWORD_ABC1)
-                .confirmPassword(PASSWORD_ABC1)
+                .password(PASSWORD_CLEAR_ABC1)
+                .confirmPassword(PASSWORD_CLEAR_ABC1)
                 .role(new RoleDto(SAMPLE_ID1, roleEnum.getValue()))
                 .isOnlyAdmin(false)
                 .company(getTestCompanyDto(CompanyStatus.ACTIVE))
