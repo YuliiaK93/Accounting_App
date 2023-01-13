@@ -58,13 +58,7 @@ class CategoryServiceImplTestMentor {
             setIsDeleted(false);
         }};
 
-        Category category1 = new Category(){{
-            setId(1L);
-            setIsDeleted(false);
-        }};
-
         when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
-        when(categoryRepository.save(eq(category))).thenReturn(category1);
         categoryService.deleteCategoryById(category.getId());
         assertTrue(category.getIsDeleted());
     }
