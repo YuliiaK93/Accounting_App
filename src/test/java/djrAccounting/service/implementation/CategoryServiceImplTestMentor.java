@@ -21,6 +21,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -74,7 +75,7 @@ class CategoryServiceImplTestMentor {
     @Test
     @DisplayName("When category is searched with non-existing category id, it should throw CategoryNotFoundException")
     void deleteCategoryById_Throws_Test(){
-        when(categoryRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(categoryRepository.findById(eq(TestConstants.SAMPLE_ID1))).thenReturn(Optional.empty());
         assertThrows(CategoryNotFoundException.class, () -> categoryService.deleteCategoryById(TestConstants.SAMPLE_ID1));
     }
 }

@@ -18,6 +18,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -47,10 +48,10 @@ class ClientVendorServiceImplTestMentor {
         when(clientVendorRepository.findById(anyLong())).thenReturn(Optional.of(clientVendor));
         when(invoiceService.existsByClientVendorId(anyLong())).thenReturn(true);
 
-        assertThrows(IllegalAccessException.class, () -> clientVendorServiceImpl.deleteById(1L));
+        assertThrows(IllegalAccessException.class, () -> clientVendorServiceImpl.deleteById(TestConstants.SAMPLE_ID1));
 
-        verify(clientVendorRepository).findById(1L);
-        verify(invoiceService).existsByClientVendorId(1L);
+        verify(clientVendorRepository).findById(TestConstants.SAMPLE_ID1);
+        verify(invoiceService).existsByClientVendorId(TestConstants.SAMPLE_ID1);
     }
 
     @Test

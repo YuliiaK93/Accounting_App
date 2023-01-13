@@ -40,7 +40,6 @@ class ProductServiceImplTestMentor {
 
         //when
         when(productRepository.findById(any(Long.class))).thenReturn(Optional.of(product));
-        when(productRepository.save(eq(product))).thenReturn(any(Product.class));
 
         //then
         productServiceImpl.deleteProductById(product.getId());

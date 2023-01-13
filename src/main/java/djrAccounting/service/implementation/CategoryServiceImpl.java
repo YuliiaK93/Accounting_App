@@ -71,7 +71,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteCategoryById(Long id) {
-        Category category = categoryRepository.findById(id).orElseThrow();
+        Category category = categoryRepository.findById(id).orElseThrow(() -> new CategoryNotFoundException("Category with the given id not exist"));
         category.setIsDeleted(true);
         categoryRepository.save(category);
     }
