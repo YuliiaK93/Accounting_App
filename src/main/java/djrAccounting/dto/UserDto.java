@@ -1,9 +1,6 @@
 package djrAccounting.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -13,6 +10,7 @@ import javax.validation.constraints.*;
 @Data
 @ToString
 @Valid
+@Builder
 public class UserDto {
 
     private Long id;
