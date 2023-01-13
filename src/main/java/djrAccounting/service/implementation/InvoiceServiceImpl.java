@@ -225,6 +225,14 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
     }
 
+    @Override
+    public void update(InvoiceDto invoiceDto) {
+        Invoice invoice=invoiceRepository.findById(invoiceDto.getId()).orElseThrow();
+        Invoice updatedInvoice=mapper.convert(invoiceDto, Invoice.class);
+        updatedInvoice.setInvoiceStatus(invoice.getInvoiceStatus());
+        invoiceRepository.save(updatedInvoice);
+    }
+
     private boolean isAuthoredToApproveInvoice() {
         String loggedInUserRole = securityService.getLoggedInUser().getRole().getDescription();
         return loggedInUserRole.equals("Manager");
