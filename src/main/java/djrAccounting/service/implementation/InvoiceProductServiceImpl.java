@@ -87,8 +87,10 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     @Override
-    public void deleteInvoiceProductById(Long id) {
-        invoiceProductRepository.delete(invoiceProductRepository.findById(id).orElseThrow());
+    public void deleteInvoiceProductById(Long invoiceProductId) {
+        InvoiceProduct invoiceProduct=invoiceProductRepository.findById(invoiceProductId).orElseThrow();
+        invoiceProduct.setIsDeleted(true);
+        invoiceProductRepository.save(invoiceProduct);
     }
 
     @Override
