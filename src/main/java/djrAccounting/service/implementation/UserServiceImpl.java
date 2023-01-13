@@ -5,6 +5,7 @@ import djrAccounting.dto.UserDto;
 import djrAccounting.entity.Company;
 import djrAccounting.entity.Role;
 import djrAccounting.entity.User;
+import djrAccounting.exception.UserNotFoundException;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.UserRepository;
 import djrAccounting.service.CompanyService;
@@ -29,42 +30,42 @@ public class UserServiceImpl implements UserService {
     private final SecurityService securityService;
 
     private final CompanyService companyService;
-    private final RoleService roleService;
 
-    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder, @Lazy SecurityService securityService, @Lazy CompanyService companyService, @Lazy RoleService roleService) {
+    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder, @Lazy SecurityService securityService, @Lazy CompanyService companyService) {
         this.userRepository = userRepository;
         this.mapperUtil = mapperUtil;
         this.passwordEncoder = passwordEncoder;
         this.securityService = securityService;
         this.companyService = companyService;
-        this.roleService = roleService;
+
     }
 
     @Override
     public UserDto findById(Long id) {
-        return mapperUtil.convert(userRepository.findById(id).orElseThrow(), UserDto.class);
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+        return mapperUtil.convert(user, UserDto.class);
     }
 
     @Override
     public UserDto findByUsername(String username) {
         User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new UserNotFoundException("User not found");
+        }
         return mapperUtil.convert(user, new UserDto());
     }
 
     @Override
     public UserDto save(UserDto userDto) {
-
         User user = mapperUtil.convert(userDto, User.class);
-
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setEnabled(true);
-
         return mapperUtil.convert(userRepository.save(user), UserDto.class);
     }
 
     @Override
     public void deleteUserById(Long id) {
-        User user = userRepository.findById(id).get();
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
         user.setIsDeleted(true);
         user.setUsername(user.getUsername() + "-" + user.getId());
         userRepository.save(user);
@@ -94,49 +95,28 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto update(UserDto userDto) {
-
-        User user = userRepository.findById(userDto.getId()).orElseThrow(); // TODO: 12/01/2023 UserNotFoundException
-
+        User user = userRepository.findById(userDto.getId()).orElseThrow();
         userDto.setPassword(passwordEncoder.encode(user.getPassword()));
         userDto.setEnabled(user.isEnabled());
-
         return mapperUtil.convert(userRepository.save(mapperUtil.convert(userDto, new User())), UserDto.class);
     }
 
-     public UserDto findUserById(Long id) {
-        return mapperUtil.convert(userRepository.findById(id)
-                .orElseThrow(()-> new NoSuchElementException("User was not found")), new UserDto());
-     }
-
-    /*
     public UserDto findUserById(Long id) {
-        return mapperUtil.convert(userRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("User was not found")), new UserDto());
+        return mapperUtil.convert(userRepository.findById(id).orElseThrow(() ->
+                new NoSuchElementException("User was not found")), new UserDto());
     }
-
-    /*
-    public UserDto findUserById(Long id) {
-        User user = userRepository.findUserById(id);
-        UserDto dto =  mapperUtil.convert(user, new UserDto());
-        dto.setIsOnlyAdmin(checkIfOnlyAdminForCompany(dto));
-        return dto;
-    }
-
-     */
 
     private List<UserDto> findAllOrderByCompanyAndRole() {
         List<UserDto> list = userRepository.findAllOrderByCompanyAndRole(false).stream().map(currentUser -> {
-                    Role admin = new Role();
-                    admin.setId(2L);
-                    admin.setDescription("Admin");
-                    List<User> listCurrentAdmins =
-                            userRepository.findAllByCompanyAndRole(currentUser.getCompany(), admin);
-                    Boolean isOnlyAdmin = listCurrentAdmins.size() == 1;
-                    UserDto userDto = mapperUtil.convert(currentUser, new UserDto());
-                    userDto.setIsOnlyAdmin(isOnlyAdmin);
-                    return userDto;
-                })
-                .collect(Collectors.toList());
+            Role admin = new Role();
+            admin.setId(2L);
+            admin.setDescription("Admin");
+            List<User> listCurrentAdmins = userRepository.findAllByCompanyAndRole(currentUser.getCompany(), admin);
+            Boolean isOnlyAdmin = listCurrentAdmins.size() == 1;
+            UserDto userDto = mapperUtil.convert(currentUser, new UserDto());
+            userDto.setIsOnlyAdmin(isOnlyAdmin);
+            return userDto;
+        }).collect(Collectors.toList());
         return list;
     }
 
@@ -158,10 +138,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean isEmailExist(UserDto userDto) {
+    public List<UserDto> getFilteredUsers() {
 
-        Optional<User> user = Optional.ofNullable(userRepository.findByUsername(userDto.getUsername()));
-        return user.filter(value -> !value.getId().equals(userDto.getId())).isPresent();
+        List<User> userList;
+        if (isCurrentUserRootUser()) {
+            userList = userRepository.findAllByRole_Description("Admin");
+        } else {
+            userList = userRepository.findAllByCompany_Title(getCurrentUserCompanyTitle());
+        }
+        return userList.stream()
+                .sorted(Comparator.comparing((User u) -> u.getCompany().getTitle()).thenComparing(u -> u.getRole().getDescription()))
+                .map(entity -> {
+                    UserDto dto = mapperUtil.convert(entity, new UserDto());
+                    dto.setIsOnlyAdmin(checkIfOnlyAdminForCompany(dto));
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
     public List<UserDto> getFilteredUsers() {
@@ -202,33 +194,35 @@ public class UserServiceImpl implements UserService {
 
     public List<UserDto> listAllUsers() {
         if (securityService.getLoggedInUser().getRole().getDescription().equals("Root User")) {
-            return userRepository.findAllByRoleDescriptionOrderByCompanyTitle("Admin").stream()
-                    .map(user -> mapperUtil.convert(user, new UserDto()))
-                    .peek(userDto -> userDto.setIsOnlyAdmin(isOnlyAdmin(userDto)))
-                    .collect(Collectors.toList());
+            return userRepository.findAllByRoleDescriptionOrderByCompanyTitle("Admin")
+                    .stream().map(user -> mapperUtil.convert(user, new UserDto()))
+                    .peek(userDto -> userDto.setIsOnlyAdmin(isOnlyAdmin(userDto))).collect(Collectors.toList());
         } else {
-
             Company company = mapperUtil.convert(companyService.listCompaniesByLoggedInUser(), new Company());
 
-            return userRepository.findAllByCompanyOrderByRoleDescription(company).stream()
-                    .map(user -> mapperUtil.convert(user, new UserDto()))
-                    .peek(userDto -> userDto.setIsOnlyAdmin(isOnlyAdmin(userDto)))
-                    .collect(Collectors.toList());
+            return userRepository.findAllByCompanyOrderByRoleDescription(company)
+                    .stream().map(user -> mapperUtil.convert(user, new UserDto()))
+                    .peek(userDto -> userDto.setIsOnlyAdmin(isOnlyAdmin(userDto))).collect(Collectors.toList());
+
         }
     }
 
     @Override
     public boolean isUsernameExist(UserDto userDto) {
         User user = userRepository.findByUsername(userDto.getUsername());
-        if (user == null)
-            return false;
+        if (user == null) return false;
         return !Objects.equals(userDto.getId(), user.getId());
     }
 
+    @Override
+    public boolean isEmailExist(UserDto userDto) {
+        Optional<User> user = Optional.ofNullable(userRepository.findByUsername(userDto.getUsername()));
+        return user.filter(value -> !value.getId().equals(userDto.getId())).isPresent();
+    }
+
     private boolean isOnlyAdmin(UserDto userDto) {
-        List<User> admin = userRepository.findAllByCompanyId(userDto.getId()).stream()
-                .filter(user -> user.getRole().getDescription().equals("Admin"))
-                .collect(Collectors.toList());
+        List<User> admin = userRepository.findAllByCompanyId(userDto.getId())
+                .stream().filter(user -> user.getRole().getDescription().equals("Admin")).collect(Collectors.toList());
         return admin.size() == 1;
     }
 }
