@@ -91,14 +91,14 @@ public class PurchaseInvoiceController {
     }
 
     @PostMapping("/update/{id}")
-    public String updatePurchaseInvoice(@Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDto invoiceProductDto, BindingResult bindingResult, Model model, @PathVariable Long id) {
+    public String updatePurchaseInvoice(@Valid @ModelAttribute("invoice") InvoiceDto invoiceDto, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("vendors", clientVendorService.listVendorsBySelectedUserCompany());
             model.addAttribute("products", productService.listProductsBySelectedUserCompany());
             return "invoice/purchase-invoice-update";
         }
 
-        invoiceProductService.save(invoiceProductDto, id);
+        invoiceService.update(invoiceDto);
         return "redirect:/purchaseInvoices/list";
     }
 
