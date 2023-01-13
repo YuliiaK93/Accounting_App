@@ -1,7 +1,6 @@
 package djrAccounting.service.implementation;
 
 import djrAccounting.TestConstants;
-import djrAccounting.TestDocumentInitializer;
 import djrAccounting.dto.CategoryDto;
 import djrAccounting.entity.Category;
 import djrAccounting.exception.CategoryNotFoundException;
@@ -39,9 +38,10 @@ class CategoryServiceImplTestMentor {
 
     @ParameterizedTest
     @ValueSource(longs = {1L, 2L, 3L})
-    @DisplayName("When category is searched with existing category id, it should return a valid Category object")
+    @DisplayName("When category is searched with existing category id, " +
+            "it should return a valid Category object")
     void findById_Test(long id){
-        CategoryDto categoryDto = TestDocumentInitializer.getTestCategoryDto();
+        CategoryDto categoryDto = TestConstants.getTestCategoryDto();
         categoryDto.setId(id);
         Category category = mapperUtil.convert(categoryDto, Category.class);
 
@@ -54,7 +54,8 @@ class CategoryServiceImplTestMentor {
     }
 
     @Test
-    @DisplayName("When category is searched with non-existing category id, it should throw CategoryNotFoundException")
+    @DisplayName("When category is searched with non-existing category id, " +
+            "it should throw CategoryNotFoundException")
     void findById_Throws_Test(){
         when(categoryRepository.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(CategoryNotFoundException.class, () -> categoryService.findById(TestConstants.SAMPLE_ID1));
