@@ -1,6 +1,7 @@
 package djrAccounting.service;
 
 import djrAccounting.dto.InvoiceDto;
+import djrAccounting.dto.InvoiceProductDto;
 
 import java.util.List;
 
@@ -27,5 +28,7 @@ public interface InvoiceService {
 
     void deletePurchaseInvoiceById(Long id);
     void approvePurchaseInvoice(Long id);
+
+   void update(InvoiceDto invoiceDto);
 
 }
