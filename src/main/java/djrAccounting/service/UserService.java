@@ -22,7 +22,7 @@ public interface UserService {
 
     boolean isEmailExist(UserDto userDto);
 
-    //List<UserDto> getFilteredUsers() throws Exception;
+    List<UserDto> getFilteredUsers();
 
     List<UserDto> listAllUsers();
     boolean isUsernameExist(UserDto userDto);

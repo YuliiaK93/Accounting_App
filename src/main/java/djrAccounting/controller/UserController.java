@@ -66,11 +66,14 @@ public class UserController {
     public String editUser(@PathVariable("id") Long id, Model model) {
 
         UserDto userDto = userService.findById(id);
-        if(!userDto.getCompany().equals(securityService.getLoggedInUser().getCompany()))
-        return "redirect:/users/list";
+        UserDto loggedInUser = securityService.getLoggedInUser();
+
+        if(!userDto.getCompany().equals(loggedInUser.getCompany()) && loggedInUser.getId().equals(1L)) return "redirect:/users/list";
+
         model.addAttribute("user", userService.findById(id));
         model.addAttribute("userRoles", roleService.listRoleByLoggedInUser());
         model.addAttribute("companies", companyService.listCompaniesByLoggedInUser());
+
         return "/user/user-update";
     }
 

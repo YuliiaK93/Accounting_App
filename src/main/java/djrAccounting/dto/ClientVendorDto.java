@@ -2,6 +2,7 @@ package djrAccounting.dto;
 
 import djrAccounting.enums.ClientVendorType;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import javax.validation.constraints.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Builder
 public class ClientVendorDto {
 
     private Long id;

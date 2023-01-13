@@ -2,6 +2,7 @@ package djrAccounting.dto;
 
 import djrAccounting.enums.ProductUnit;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Builder
 public class ProductDto {
 
     private Long id;
