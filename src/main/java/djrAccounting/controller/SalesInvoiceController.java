@@ -115,7 +115,7 @@ public class SalesInvoiceController {
 
         invoiceService.update(invoice);
 
-        return "redirect:/salesInvoices/list/" + invoice.getId();
+        return "redirect:/salesInvoices/list";
     }
 
     @PostMapping("/addInvoiceProduct/{invoiceId}")
