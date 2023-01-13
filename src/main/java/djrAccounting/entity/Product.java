@@ -2,6 +2,7 @@ package djrAccounting.entity;
 
 import djrAccounting.enums.ProductUnit;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -13,7 +14,7 @@ import javax.persistence.*;
 @Where(clause = "is_deleted = false")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class Product extends BaseEntity {
 
     private String name;

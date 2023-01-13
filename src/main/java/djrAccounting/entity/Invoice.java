@@ -3,6 +3,7 @@ package djrAccounting.entity;
 import djrAccounting.enums.InvoiceStatus;
 import djrAccounting.enums.InvoiceType;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -16,7 +17,7 @@ import java.util.List;
 @Where(clause = "is_deleted = false")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class Invoice extends BaseEntity {
 
     @Column(updatable = false)

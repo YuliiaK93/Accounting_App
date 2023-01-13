@@ -2,6 +2,7 @@ package djrAccounting.entity;
 
 import djrAccounting.enums.ClientVendorType;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -13,7 +14,7 @@ import javax.persistence.*;
 @Where(clause = "is_deleted = false")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class ClientVendor extends BaseEntity {
 
     @Column(unique = true)

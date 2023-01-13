@@ -1,12 +1,13 @@
-package djrAccounting.unit.service.implementation;
+package djrAccounting.service.implementation;
 
+import djrAccounting.TestConstants;
 import djrAccounting.TestDocumentInitializer;
 import djrAccounting.dto.CategoryDto;
 import djrAccounting.entity.Category;
+import djrAccounting.exception.CategoryNotFoundException;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.CategoryRepository;
-import djrAccounting.service.SecurityService;
-import djrAccounting.service.implementation.CategoryServiceImpl;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,9 +20,10 @@ import org.modelmapper.ModelMapper;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceImplTestMentor {
@@ -37,6 +39,7 @@ class CategoryServiceImplTestMentor {
 
     @ParameterizedTest
     @ValueSource(longs = {1L, 2L, 3L})
+    @DisplayName("When category is searched with existing category id, it should return a valid Category object")
     void findById_Test(long id){
         CategoryDto categoryDto = TestDocumentInitializer.getTestCategoryDto();
         categoryDto.setId(id);
@@ -50,16 +53,27 @@ class CategoryServiceImplTestMentor {
         assertEquals(returnedCategoryDto.getId(), categoryDto.getId());
     }
 
+    @Test
+    @DisplayName("When category is searched with non-existing category id, it should throw CategoryNotFoundException")
+    void findById_Throws_Test(){
+        when(categoryRepository.findById(anyLong())).thenReturn(Optional.empty());
+        assertThrows(CategoryNotFoundException.class, () -> categoryService.findById(TestConstants.SAMPLE_ID1));
+    }
 
     @Test
     void deleteCategoryById_Test(){
-        Category category = new Category(){{
-            setId(1L);
-            setIsDeleted(false);
-        }};
+        Category category = Category.builder().id(TestConstants.SAMPLE_ID1).isDeleted(false).build();
 
         when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
+
         categoryService.deleteCategoryById(category.getId());
         assertTrue(category.getIsDeleted());
+    }
+
+    @Test
+    @DisplayName("When category is searched with non-existing category id, it should throw CategoryNotFoundException")
+    void deleteCategoryById_Throws_Test(){
+        when(categoryRepository.findById(anyLong())).thenReturn(Optional.empty());
+        assertThrows(CategoryNotFoundException.class, () -> categoryService.deleteCategoryById(TestConstants.SAMPLE_ID1));
     }
 }

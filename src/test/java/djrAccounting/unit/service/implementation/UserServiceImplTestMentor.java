@@ -3,7 +3,7 @@ package djrAccounting.unit.service.implementation;
 import djrAccounting.TestDocumentInitializer;
 import djrAccounting.dto.UserDto;
 import djrAccounting.entity.User;
-import djrAccounting.enums.Role;
+import djrAccounting.enums.RoleEnum;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.UserRepository;
 import djrAccounting.service.SecurityService;
@@ -20,9 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Arrays;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.*;
@@ -46,9 +44,9 @@ class UserServiceImplTestMentor {
     @DisplayName("When_find_by_id_then_success")
     public void GIVEN_ID_WHEN_FIND_BY_ID_THEN_SUCCESS(){
         // Given
-        UserDto userDto = TestDocumentInitializer.getTestUserDto(Role.ROOT_USER);
+        UserDto userDto = TestDocumentInitializer.getTestUserDto(RoleEnum.ROOT_USER);
         // When
-        when(userRepository.findUserById(userDto.getId())).thenReturn(TestDocumentInitializer.getTestUser(Role.ROOT_USER));
+        when(userRepository.findUserById(userDto.getId())).thenReturn(TestDocumentInitializer.getTestUser(RoleEnum.ROOT_USER));
         //when(mapperUtil.convert(any(User.class), any(UserDto.class))).thenReturn(userDto);
         var user = userService.findUserById(userDto.getId());
         // Then
@@ -59,7 +57,7 @@ class UserServiceImplTestMentor {
     @DisplayName("When_find_by_user_name_then_success")
     public void GIVEN_USERNAME_WHEN_FIND_BY_USERNAME_THEN_SUCCESS(){
         // Given
-        UserDto userDto = TestDocumentInitializer.getTestUserDto(Role.ADMIN);
+        UserDto userDto = TestDocumentInitializer.getTestUserDto(RoleEnum.ADMIN);
         // When
         when(userRepository.findByUsername(userDto.getUsername())).thenReturn(new User());
         //when(mapperUtil.convert(any(User.class), any(UserDto.class))).thenReturn(userDto);
@@ -72,16 +70,16 @@ class UserServiceImplTestMentor {
     @DisplayName("When_get_filtered_users_then_success")
     public void GIVEN_ROOT_USER_WHEN_GET_FILTERED_USERS_THEN_SUCCESS(){
         // Given
-        UserDto adminUserDto = TestDocumentInitializer.getTestUserDto(Role.ADMIN);
+        UserDto adminUserDto = TestDocumentInitializer.getTestUserDto(RoleEnum.ADMIN);
         User adminUser = mapperUtil.convert(adminUserDto, new User());
-        UserDto rootUser = TestDocumentInitializer.getTestUserDto(Role.ROOT_USER);
+        UserDto rootUser = TestDocumentInitializer.getTestUserDto(RoleEnum.ROOT_USER);
         // When
-        doReturn(Arrays.asList(adminUser)).when(userRepository).findAllByRole_Description(Role.ADMIN.getValue());
+        doReturn(Arrays.asList(adminUser)).when(userRepository).findAllByRole_Description(RoleEnum.ADMIN.getValue());
         doReturn(rootUser).when(securityService).getLoggedInUser();
         var users = userService.getFilteredUsers();
         // Then
         assertThat(users.size() > 0);
-        assertThat(users.get(0).getRole().getDescription().equals(Role.ADMIN.getValue()));
+        assertThat(users.get(0).getRole().getDescription().equals(RoleEnum.ADMIN.getValue()));
     }
 
     @Test
@@ -89,7 +87,7 @@ class UserServiceImplTestMentor {
     public void GIVEN_USER_DTO_WHEN_SAVE_THEN_SUCCESS(){
         // Given
         String testPassword = "$2a$10$nAB5j9G1c3JHgg7qzhiIXO7cqqr5oJ3LXRNQJKssDUwHXzDGUztNK";
-        UserDto userDto = TestDocumentInitializer.getTestUserDto(Role.ADMIN);
+        UserDto userDto = TestDocumentInitializer.getTestUserDto(RoleEnum.ADMIN);
         User user = mapperUtil.convert(userDto, new User());
         doReturn(testPassword).when(passwordEncoder).encode(anyString());
         // When
@@ -103,9 +101,9 @@ class UserServiceImplTestMentor {
     public void GIVEN_USER_DTO_WHEN_UPDATE_THEN_SUCCESS(){
         // Given
         String testPassword = "$2a$10$nAB5j9G1c3JHgg7qzhiIXO7cqqr5oJ3LXRNQJKssDUwHXzDGUztNK";
-        UserDto userDto = TestDocumentInitializer.getTestUserDto(Role.ADMIN);
+        UserDto userDto = TestDocumentInitializer.getTestUserDto(RoleEnum.ADMIN);
         User user = mapperUtil.convert(userDto, new User());
-        UserDto updateUserDto = TestDocumentInitializer.getTestUserDto(Role.MANAGER);
+        UserDto updateUserDto = TestDocumentInitializer.getTestUserDto(RoleEnum.MANAGER);
         User updateUser = mapperUtil.convert(updateUserDto, new User());
         // When
         doReturn(testPassword).when(passwordEncoder).encode(anyString());
@@ -122,7 +120,7 @@ class UserServiceImplTestMentor {
     @DisplayName("Given id when delete then success")
     public void GIVEN_ID_WHEN_DELETE_THEN_SUCCESS(){
         // Given
-        UserDto userDto = TestDocumentInitializer.getTestUserDto(Role.ADMIN);
+        UserDto userDto = TestDocumentInitializer.getTestUserDto(RoleEnum.ADMIN);
         User user = mapperUtil.convert(userDto, new User());
         // When
         doReturn(user).when(userRepository).findUserById(anyLong());

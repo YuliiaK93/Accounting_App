@@ -1,6 +1,7 @@
 package djrAccounting.entity;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -13,7 +14,7 @@ import java.math.BigDecimal;
 @Where(clause = "is_deleted = false")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class InvoiceProduct extends BaseEntity {
 
     @Column(updatable = false)

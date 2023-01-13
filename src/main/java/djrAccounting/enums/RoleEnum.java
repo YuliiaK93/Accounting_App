@@ -1,13 +1,11 @@
 package djrAccounting.enums;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
-public enum Role {
+public enum RoleEnum {
     ROOT_USER("Root User", 1L),
     ADMIN("Admin", 2L),
     MANAGER("Manager", 3L),

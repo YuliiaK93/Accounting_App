@@ -1,6 +1,7 @@
 package djrAccounting.entity;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.Entity;
@@ -12,7 +13,7 @@ import javax.persistence.Table;
 @Table(name = "addresses")
 @Where(clause = "is_deleted = false")
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 public class Address extends BaseEntity {
     private String addressLine1;

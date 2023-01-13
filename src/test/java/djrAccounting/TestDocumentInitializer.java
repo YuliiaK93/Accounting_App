@@ -14,14 +14,14 @@ import static djrAccounting.TestConstants.*;
 
 public class TestDocumentInitializer {
 
-    public static User getTestUser(Role role) {
+    public static User getTestUser(RoleEnum roleEnum) {
         return User.builder()
                 .id(SAMPLE_ID1)
                 .firstname(SAMPLE_FIRST_NAME_JOHN)
                 .lastname(SAMPLE_LAST_NAME_JOHN)
                 .phone(SAMPLE_PHONE_NUMBER1)
                 .password(PASSWORD_ABC1)
-                .role(djrAccounting.entity.Role.builder().description(Role.ADMIN.getValue()).build())
+                .role(djrAccounting.entity.Role.builder().description(RoleEnum.ADMIN.getValue()).build())
                 .company(getTestCompany(CompanyStatus.ACTIVE))
                 .build();
     }
@@ -37,7 +37,7 @@ public class TestDocumentInitializer {
                 .build();
     }
 
-    public static UserDto getTestUserDto(Role role) {
+    public static UserDto getTestUserDto(RoleEnum roleEnum) {
         return UserDto.builder()
                 .id(SAMPLE_ID1)
                 .firstname(SAMPLE_FIRST_NAME_JOHN)
@@ -45,7 +45,7 @@ public class TestDocumentInitializer {
                 .phone(SAMPLE_PHONE_NUMBER1)
                 .password(PASSWORD_ABC1)
                 .confirmPassword(PASSWORD_ABC1)
-                .role(new RoleDto(SAMPLE_ID1, role.getValue()))
+                .role(new RoleDto(SAMPLE_ID1, roleEnum.getValue()))
                 .isOnlyAdmin(false)
                 .company(getTestCompanyDto(CompanyStatus.ACTIVE))
                 .build();
