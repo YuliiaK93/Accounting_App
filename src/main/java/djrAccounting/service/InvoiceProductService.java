@@ -19,7 +19,7 @@ public interface InvoiceProductService {
 
     List<InvoiceProductDto> getAllByInvoiceStatusApprovedForCurrentCompany();
 
-    InvoiceProductDto findById(Long id) throws InvoiceProductNotFoundException;
+    InvoiceProductDto findById(Long id);
 
     List<InvoiceProductDto> findByInvoiceId(Long id);
 

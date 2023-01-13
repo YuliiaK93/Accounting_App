@@ -74,7 +74,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     @Override
-    public InvoiceProductDto findById(Long id) throws InvoiceProductNotFoundException {
+    public InvoiceProductDto findById(Long id){
         return mapper.convert(invoiceProductRepository.findById(id).orElseThrow(()->new InvoiceProductNotFoundException("There is no invoice product with id: " + id)), InvoiceProductDto.class);
     }
 
@@ -88,7 +88,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
     public void deleteInvoiceProductById(Long id) {
-        invoiceProductRepository.delete(invoiceProductRepository.findById(id).get());
+        invoiceProductRepository.delete(invoiceProductRepository.findById(id).orElseThrow());
     }
 
     @Override
