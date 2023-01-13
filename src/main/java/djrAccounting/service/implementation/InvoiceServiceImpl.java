@@ -8,6 +8,7 @@ import djrAccounting.entity.InvoiceProduct;
 import djrAccounting.enums.ClientVendorType;
 import djrAccounting.enums.InvoiceStatus;
 import djrAccounting.enums.InvoiceType;
+import djrAccounting.exception.InvoiceNotFoundException;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.InvoiceProductRepository;
 import djrAccounting.repository.InvoiceRepository;
@@ -49,7 +50,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public InvoiceDto findById(Long id) {
-        InvoiceDto invoiceDto = mapper.convert(invoiceRepository.findById(id).orElseThrow(), InvoiceDto.class);
+        InvoiceDto invoiceDto = mapper.convert(invoiceRepository.findById(id).orElseThrow(() -> new InvoiceNotFoundException("There is no invoice with id: " + id)), InvoiceDto.class);
         invoiceDto.setPrice(invoiceProductService.getTotalPriceByInvoice(invoiceDto.getId()));
         invoiceDto.setTotal(invoiceProductService.getTotalPriceWithTaxByInvoice(invoiceDto.getId()));
         invoiceDto.setTax(invoiceDto.getTotal().subtract(invoiceDto.getPrice()));
