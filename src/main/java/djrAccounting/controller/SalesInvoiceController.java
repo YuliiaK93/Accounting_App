@@ -46,7 +46,7 @@ public class SalesInvoiceController {
         model.addAttribute("company", securityService.getLoggedInUser().getCompany());
         model.addAttribute("invoice", invoiceDto);
         model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(invoiceDto.getId()));
-        return "invoice/invoice_print";
+        return "invoice/invoice-print";
     }
 
     @GetMapping("/approve/{id}")

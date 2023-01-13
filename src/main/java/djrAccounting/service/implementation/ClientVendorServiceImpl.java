@@ -1,16 +1,15 @@
 package djrAccounting.service.implementation;
 
-import djrAccounting.dto.CategoryDto;
 import djrAccounting.dto.ClientVendorDto;
-
-import djrAccounting.entity.Category;
 import djrAccounting.entity.ClientVendor;
 import djrAccounting.enums.ClientVendorType;
+import djrAccounting.exception.ClientVendorNotFoundException;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.ClientVendorRepository;
 import djrAccounting.service.ClientVendorService;
 import djrAccounting.service.InvoiceService;
 import djrAccounting.service.SecurityService;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,34 +33,29 @@ public class ClientVendorServiceImpl implements ClientVendorService {
 
     @Override
     public ClientVendorDto findById(Long id) {
-        return mapperUtil.convert(clientVendorRepository.findById(id).orElseThrow(), ClientVendorDto.class);
+        return mapperUtil.convert(clientVendorRepository.findById(id).orElseThrow(()->new ClientVendorNotFoundException("Client/Vendor with indicated ID is not found")), ClientVendorDto.class);
     }
 
     @Override
     public List<ClientVendorDto> listAllClientVendors() {
         Long companyId = securityService.getLoggedInUser().getCompany().getId();
-       return clientVendorRepository.findByCompany_IdOrderByClientVendorTypeAscClientVendorNameAsc(companyId)
-               .stream()
-               .map(clientVendor -> mapperUtil.convert(clientVendor, new ClientVendorDto()))
-               .collect(Collectors.toList());
+        return clientVendorRepository.findByCompany_IdOrderByClientVendorTypeAscClientVendorNameAsc(companyId)
+                .stream()
+                .map(clientVendor -> mapperUtil.convert(clientVendor, new ClientVendorDto()))
+                .collect(Collectors.toList());
 
     }
 
     @Override
     public ClientVendorDto save(ClientVendorDto clientVendorDto) {
-
         clientVendorDto.setCompany(securityService.getLoggedInUser().getCompany());
-
         ClientVendor clientVendor = mapperUtil.convert(clientVendorDto, new ClientVendor());
-
         return mapperUtil.convert(clientVendorRepository.save(clientVendor), ClientVendorDto.class);
     }
 
     @Override
     public ClientVendorDto update(ClientVendorDto clientVendorDto) {
-
-        clientVendorRepository.findById(clientVendorDto.getId()).orElseThrow();// TODO: 12/01/2023 ClientVendorNotFoundException
-
+        clientVendorRepository.findById(clientVendorDto.getId()).orElseThrow();
         return mapperUtil.convert(clientVendorRepository.save(mapperUtil.convert(clientVendorDto, ClientVendor.class)), ClientVendorDto.class);
     }
 
@@ -89,7 +83,7 @@ public class ClientVendorServiceImpl implements ClientVendorService {
 
     @Override
     public List<ClientVendorDto> listVendorsBySelectedUserCompany() {
-        return  clientVendorRepository.findAllByCompanyIdAndClientVendorTypeOrderByClientVendorName(securityService.getLoggedInUser()
+        return clientVendorRepository.findAllByCompanyIdAndClientVendorTypeOrderByClientVendorName(securityService.getLoggedInUser()
                         .getCompany().getId(), ClientVendorType.VENDOR)
                 .stream()
                 .map(client -> mapperUtil.convert(client, ClientVendorDto.class))
@@ -98,15 +92,15 @@ public class ClientVendorServiceImpl implements ClientVendorService {
 
     @Override
     public boolean hasRightToUpdate(Long id) {
-        String loggedInUserCompany=securityService.getLoggedInUser().getCompany().getTitle();
-        ClientVendor clientVendor=clientVendorRepository.findById(id).orElseThrow();
-        return  clientVendor.getCompany().getTitle().equals(loggedInUserCompany);
+        String loggedInUserCompany = securityService.getLoggedInUser().getCompany().getTitle();
+        ClientVendor clientVendor = clientVendorRepository.findById(id).orElseThrow(()->new ClientVendorNotFoundException("Client/Vendor with indicated ID is not found"));
+        return clientVendor.getCompany().getTitle().equals(loggedInUserCompany);
     }
 
     @Override
-    public boolean duplicatedName(ClientVendorDto clientVendorDto){
-    boolean nameMatch=clientVendorRepository.findById(clientVendorDto.getId()).orElseThrow().getClientVendorName().equals(clientVendorDto.getClientVendorName());
-    return !nameMatch && nameExists(clientVendorDto.getClientVendorName());
+    public boolean duplicatedName(ClientVendorDto clientVendorDto) {
+        boolean nameMatch = clientVendorRepository.findById(clientVendorDto.getId()).orElseThrow(()->new ClientVendorNotFoundException("Client/Vendor with indicated ID is not found")).getClientVendorName().equals(clientVendorDto.getClientVendorName());
+        return !nameMatch && nameExists(clientVendorDto.getClientVendorName());
     }
 
     @Override
