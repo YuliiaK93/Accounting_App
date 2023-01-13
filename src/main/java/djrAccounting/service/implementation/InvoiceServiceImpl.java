@@ -87,10 +87,8 @@ public class InvoiceServiceImpl implements InvoiceService {
             invoiceDto.setInvoiceType(InvoiceType.SALES);
 
         } else invoiceDto.setInvoiceType(InvoiceType.PURCHASE);
-
         invoiceDto.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
         invoiceDto.setCompany(securityService.getLoggedInUser().getCompany());
-
         return mapper.convert(invoiceRepository.save(mapper.convert(invoiceDto, Invoice.class)), InvoiceDto.class);
     }
 
