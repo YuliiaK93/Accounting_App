@@ -33,7 +33,7 @@ public class ClientVendorServiceImpl implements ClientVendorService {
 
     @Override
     public ClientVendorDto findById(Long id) {
-        return mapperUtil.convert(clientVendorRepository.findById(id).orElseThrow(() -> new ClientVendorNotFoundException("There is no Client/Vendor associated with id: " + id)), ClientVendorDto.class);
+        return mapperUtil.convert(clientVendorRepository.findById(id).orElseThrow(()->new ClientVendorNotFoundException("Client/Vendor with indicated ID is not found")), ClientVendorDto.class);
     }
 
     @Override
@@ -48,19 +48,14 @@ public class ClientVendorServiceImpl implements ClientVendorService {
 
     @Override
     public ClientVendorDto save(ClientVendorDto clientVendorDto) {
-
         clientVendorDto.setCompany(securityService.getLoggedInUser().getCompany());
-
         ClientVendor clientVendor = mapperUtil.convert(clientVendorDto, new ClientVendor());
-
         return mapperUtil.convert(clientVendorRepository.save(clientVendor), ClientVendorDto.class);
     }
 
     @Override
     public ClientVendorDto update(ClientVendorDto clientVendorDto) {
-
         clientVendorRepository.findById(clientVendorDto.getId()).orElseThrow();
-
         return mapperUtil.convert(clientVendorRepository.save(mapperUtil.convert(clientVendorDto, ClientVendor.class)), ClientVendorDto.class);
     }
 
@@ -98,13 +93,13 @@ public class ClientVendorServiceImpl implements ClientVendorService {
     @Override
     public boolean hasRightToUpdate(Long id) {
         String loggedInUserCompany = securityService.getLoggedInUser().getCompany().getTitle();
-        ClientVendor clientVendor = clientVendorRepository.findById(id).orElseThrow();
+        ClientVendor clientVendor = clientVendorRepository.findById(id).orElseThrow(()->new ClientVendorNotFoundException("Client/Vendor with indicated ID is not found"));
         return clientVendor.getCompany().getTitle().equals(loggedInUserCompany);
     }
 
     @Override
     public boolean duplicatedName(ClientVendorDto clientVendorDto) {
-        boolean nameMatch = clientVendorRepository.findById(clientVendorDto.getId()).orElseThrow().getClientVendorName().equals(clientVendorDto.getClientVendorName());
+        boolean nameMatch = clientVendorRepository.findById(clientVendorDto.getId()).orElseThrow(()->new ClientVendorNotFoundException("Client/Vendor with indicated ID is not found")).getClientVendorName().equals(clientVendorDto.getClientVendorName());
         return !nameMatch && nameExists(clientVendorDto.getClientVendorName());
     }
 
