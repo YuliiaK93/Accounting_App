@@ -149,7 +149,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public void approveInvoiceById(Long id) {
-        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow(()->new InvoiceNotFoundException("Invoice not found with id: "+id));
         List<InvoiceProduct> invoiceProductList = invoice.getInvoiceProducts();
         invoiceProductList.forEach(salesInvoiceProduct -> {
             List<InvoiceProduct> purchaseInvoiceProducts = invoiceProductRepository.findByRemainingQuantityGreaterThanAndInvoice_InvoiceTypeAndProduct_IdOrderByLastUpdateDateTimeAsc(salesInvoiceProduct.getProduct().getId());
