@@ -81,8 +81,7 @@ public class SalesInvoiceController {
             return "invoice/sales-invoice-create";
         }
 
-        invoiceService.save(invoiceDto);
-        return "redirect:/salesInvoices/update/" + invoiceDto.getId();
+        return "redirect:/salesInvoices/update/" + invoiceService.save(invoiceDto).getId();
     }
 
     @GetMapping("/update/{id}")
@@ -101,6 +100,22 @@ public class SalesInvoiceController {
         model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
 
         return "invoice/sales-invoice-update";
+    }
+
+    @PostMapping("/update/{id}")
+    public String editSalesInvoice(@Valid @ModelAttribute("invoice") InvoiceDto invoice, BindingResult bindingResult, Model model) {
+
+        if (bindingResult.hasErrors()) {
+
+            model.addAttribute("clients", clientVendorService.listClientsBySelectedUserCompany());
+            model.addAttribute("products", productService.listProductsBySelectedUserCompany());
+
+            return "invoice/sales-invoice-update";
+        }
+
+        invoiceService.update(invoice);
+
+        return "redirect:/salesInvoices/list/" + invoice.getId();
     }
 
     @PostMapping("/addInvoiceProduct/{invoiceId}")
