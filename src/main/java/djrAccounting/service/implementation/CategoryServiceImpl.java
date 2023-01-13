@@ -2,7 +2,7 @@ package djrAccounting.service.implementation;
 
 import djrAccounting.dto.CategoryDto;
 import djrAccounting.entity.Category;
-import djrAccounting.entity.Company;
+import djrAccounting.exception.CategoryNotFoundException;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.CategoryRepository;
 import djrAccounting.service.CategoryService;
@@ -29,7 +29,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto findById(Long id) {
-        return mapper.convert(categoryRepository.findById(id).orElseThrow(), CategoryDto.class);
+        return mapper.convert(categoryRepository.findById(id).orElseThrow(() -> new CategoryNotFoundException("Category not found this id: " + id)), CategoryDto.class);
     }
 
     @Override
@@ -38,18 +38,19 @@ public class CategoryServiceImpl implements CategoryService {
                         .getCompany().getId()).stream().map(category -> mapper.convert(category, CategoryDto.class))
                 .collect(Collectors.toList());
 
-        newList.forEach(categoryDto -> {
-            categoryDto.setHasProduct(productService.productExistByCategory(categoryDto.getId()));
-        });
+        newList.forEach(categoryDto -> categoryDto.setHasProduct(productService.productExistByCategory(categoryDto.getId())));
 
         return newList;
     }
 
     @Override
-    public void save(CategoryDto categoryDto) {
+    public CategoryDto save(CategoryDto categoryDto) {
+
+        categoryDto.setCompany(securityService.getLoggedInUser().getCompany());
+
         Category category = mapper.convert(categoryDto, Category.class);
-        category.setCompany(mapper.convert(securityService.getLoggedInUser().getCompany(), Company.class));
-        categoryRepository.save(category);
+
+        return mapper.convert(categoryRepository.save(category), CategoryDto.class);
     }
 
     @Override
@@ -58,9 +59,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void update(CategoryDto category) {
-        category.setCompany(securityService.getLoggedInUser().getCompany());
-        categoryRepository.save(mapper.convert(category, Category.class));
+    public CategoryDto update(CategoryDto category) {
+
+        categoryRepository.findById(category.getId()).orElseThrow(() -> new CategoryNotFoundException("Category not found this id: " + category.getId()));
+
+        return mapper.convert(categoryRepository.save(mapper.convert(category, Category.class)), CategoryDto.class);
     }
 
     @Override

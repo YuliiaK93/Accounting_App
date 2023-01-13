@@ -13,7 +13,7 @@ public interface InvoiceService {
 
     List<InvoiceDto> findSalesInvoicesByCurrentUserCompany();
 
-    void save(InvoiceDto invoiceDto);
+    InvoiceDto save(InvoiceDto invoiceDto);
 
     String nextSalesInvoiceNo();
 

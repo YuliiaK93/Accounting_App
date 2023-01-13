@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
 
     private final CompanyService companyService;
 
-    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder, @Lazy SecurityService securityService, @Lazy CompanyService companyService, @Lazy RoleService roleService) {
+    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder, @Lazy SecurityService securityService, @Lazy CompanyService companyService) {
         this.userRepository = userRepository;
         this.mapperUtil = mapperUtil;
         this.passwordEncoder = passwordEncoder;
@@ -55,11 +55,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void save(UserDto userDto) {
-        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        User user1 = mapperUtil.convert(userDto, new User());
-        user1.setEnabled(true);
-        userRepository.save(user1);
+    public UserDto save(UserDto userDto) {
+        User user = mapperUtil.convert(userDto, User.class);
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        user.setEnabled(true);
+        return mapperUtil.convert(userRepository.save(user), UserDto.class);
     }
 
     @Override
@@ -76,12 +76,16 @@ public class UserServiceImpl implements UserService {
         User userDeleted = new User();
         if (userWillBeDeleted.isPresent()) {
             userDeleted = userWillBeDeleted.get();
-            if (userDeleted.getRole().getDescription().equals("Root User")) return "Root User cannot be deleted";
-            if (!userDeleted.getRole().getDescription().equals("Admin") && loggedInUser.getRole().getDescription().equals("Root User"))
+            if (userDeleted.getRole().getDescription().equals("Root User"))
+                return "Root User cannot be deleted";
+            if (!userDeleted.getRole().getDescription().equals("Admin") &&
+                    loggedInUser.getRole().getDescription().equals("Root User"))
                 return "As Root User you can only delete Admins";
-            if (userDeleted.getRole().getDescription().equals("Admin") && !loggedInUser.getRole().getDescription().equals("Root User"))
+            if (userDeleted.getRole().getDescription().equals("Admin") &&
+                    !loggedInUser.getRole().getDescription().equals("Root User"))
                 return "Only Root User can delete Admins.";
-            if (!userDeleted.getCompany().getId().equals(loggedInUser.getCompany().getId()) && !loggedInUser.getRole().getDescription().equals("Root User"))
+            if (!userDeleted.getCompany().getId().equals(loggedInUser.getCompany().getId()) &&
+                    !loggedInUser.getRole().getDescription().equals("Root User"))
                 return "As Admin, you can delete managers and employees only from your company";
         } else return "There is no User with this id " + id;
 
@@ -90,14 +94,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto update(UserDto userDto) {
-        User user = userRepository.findUserById(userDto.getId());
-        User convertedUser = mapperUtil.convert(userDto, new User());
-        convertedUser.setId(user.getId());
-        convertedUser.setPassword(passwordEncoder.encode(user.getPassword()));
-        convertedUser.setEnabled(user.isEnabled());
-        convertedUser.setCompany(user.getCompany()); //changed
-        userRepository.save(convertedUser);
-        return findUserById(userDto.getId());
+        User user = userRepository.findById(userDto.getId()).orElseThrow();
+        userDto.setPassword(passwordEncoder.encode(user.getPassword()));
+        userDto.setEnabled(user.isEnabled());
+        return mapperUtil.convert(userRepository.save(mapperUtil.convert(userDto, new User())), UserDto.class);
     }
 
     public UserDto findUserById(Long id) {
@@ -124,9 +124,13 @@ public class UserServiceImpl implements UserService {
         List<User> userList = null;
         switch (loggedInUser.getRole().getDescription()) {
             case "Root User":
-                return findAllOrderByCompanyAndRole().stream().filter(user -> user.getRole().getDescription().equals("Admin")).collect(Collectors.toList());
+                return findAllOrderByCompanyAndRole().stream()
+                        .filter(user -> user.getRole().getDescription().equals("Admin"))
+                        .collect(Collectors.toList());
             case "Admin":
-                return findAllOrderByCompanyAndRole().stream().filter(user -> user.getCompany().getId().equals(loggedInUser.getCompany().getId())).collect(Collectors.toList());
+                return findAllOrderByCompanyAndRole().stream()
+                        .filter(user -> user.getCompany().getId().equals(loggedInUser.getCompany().getId()))
+                        .collect(Collectors.toList());
             default:
                 return findAllOrderByCompanyAndRole();
         }
@@ -141,11 +145,14 @@ public class UserServiceImpl implements UserService {
         } else {
             userList = userRepository.findAllByCompany_Title(getCurrentUserCompanyTitle());
         }
-        return userList.stream().sorted(Comparator.comparing((User u) -> u.getCompany().getTitle()).thenComparing(u -> u.getRole().getDescription())).map(entity -> {
-            UserDto dto = mapperUtil.convert(entity, new UserDto());
-            dto.setIsOnlyAdmin(checkIfOnlyAdminForCompany(dto));
-            return dto;
-        }).collect(Collectors.toList());
+        return userList.stream()
+                .sorted(Comparator.comparing((User u) -> u.getCompany().getTitle()).thenComparing(u -> u.getRole().getDescription()))
+                .map(entity -> {
+                    UserDto dto = mapperUtil.convert(entity, new UserDto());
+                    dto.setIsOnlyAdmin(checkIfOnlyAdminForCompany(dto));
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
     private boolean checkIfOnlyAdminForCompany(UserDto userDto) {
@@ -155,7 +162,6 @@ public class UserServiceImpl implements UserService {
     }
 
     private Object getCurrentUserCompanyTitle() {
-
         return securityService.getLoggedInUser().getCompany().getTitle();
     }
 
@@ -187,6 +193,12 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUsername(userDto.getUsername());
         if (user == null) return false;
         return !Objects.equals(userDto.getId(), user.getId());
+    }
+
+    @Override
+    public boolean isEmailExist(UserDto userDto) {
+        Optional<User> user = Optional.ofNullable(userRepository.findByUsername(userDto.getUsername()));
+        return user.filter(value -> !value.getId().equals(userDto.getId())).isPresent();
     }
 
     private boolean isOnlyAdmin(UserDto userDto) {

@@ -12,7 +12,7 @@ public interface UserService {
 
     UserDto findByUsername(String username);
 
-    void save(UserDto user);
+    UserDto save(UserDto user);
 
     void deleteUserById(Long id);
 
@@ -20,7 +20,9 @@ public interface UserService {
 
     List<UserDto> findAllFilterForLoggedInUser();
 
-    List<UserDto> getFilteredUsers() throws Exception;
+    boolean isEmailExist(UserDto userDto);
+
+    List<UserDto> getFilteredUsers();
 
     List<UserDto> listAllUsers();
     boolean isUsernameExist(UserDto userDto);
