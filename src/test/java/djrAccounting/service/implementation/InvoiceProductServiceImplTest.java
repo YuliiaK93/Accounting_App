@@ -38,7 +38,7 @@ class InvoiceProductServiceImplTest {
         assertTrue(invoiceProduct.getIsDeleted());
     }
     @Test
-    @DisplayName("When invoice product is deleted, it is hard-deleted from the database")
+    @DisplayName("When invoice product id is not found, it throws InvoiceProductNotFoundException")
     void deleteInvoiceProductById_test_throws(){
         when(invoiceProductRepository.findById(TestConstants.SAMPLE_ID1)).thenReturn(Optional.empty());
         assertThrows(InvoiceProductNotFoundException.class,()->invoiceProductService.deleteInvoiceProductById(TestConstants.SAMPLE_ID1));
