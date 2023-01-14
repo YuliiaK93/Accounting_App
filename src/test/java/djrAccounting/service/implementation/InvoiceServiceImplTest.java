@@ -71,18 +71,17 @@ class InvoiceServiceImplTest {
         when(invoiceRepository.findById(TestConstants.SAMPLE_ID1)).thenReturn(Optional.of(salesInvoice));
         when(invoiceProductRepository.findByRemainingQuantityGreaterThanAndInvoice_InvoiceTypeAndProduct_IdOrderByLastUpdateDateTimeAsc(product1.getId())).thenReturn(List.of(purchaseInvoiceProduct1));
         when(invoiceProductRepository.findByRemainingQuantityGreaterThanAndInvoice_InvoiceTypeAndProduct_IdOrderByLastUpdateDateTimeAsc(product2.getId())).thenReturn(List.of(purchaseInvoiceProduct2));
-        productService.decreaseQuantityInStock(product1.getId(), salesInvoiceProduct1.getQuantity());
-        productService.decreaseQuantityInStock(product2.getId(), salesInvoiceProduct2.getQuantity());
+        product1.setQuantityInStock(product1.getQuantityInStock()-salesInvoiceProduct1.getQuantity());
+        product2.setQuantityInStock(product2.getQuantityInStock()-salesInvoiceProduct2.getQuantity());
         invoiceService.approveInvoiceById(TestConstants.SAMPLE_ID1);
 
         assertEquals(InvoiceStatus.APPROVED, salesInvoice.getInvoiceStatus());
         assertEquals(BigDecimal.valueOf(2200), salesInvoiceProduct1.getProfitLoss());
         assertEquals(BigDecimal.valueOf(-220), salesInvoiceProduct2.getProfitLoss());
-        //todo following part will be done later: @mehmet
-//        assertEquals(6,product1.getQuantityInStock());
-//        assertEquals(8,product1.getQuantityInStock());
-//        assertEquals(2,purchaseInvoiceProduct1.getRemainingQuantity());
-//        assertEquals(4,purchaseInvoiceProduct1.getRemainingQuantity());
+        assertEquals(2,purchaseInvoiceProduct1.getRemainingQuantity());
+        assertEquals(4,purchaseInvoiceProduct2.getRemainingQuantity());
+        assertEquals(6,product1.getQuantityInStock());
+        assertEquals(8,product2.getQuantityInStock());
     }
 
 }
