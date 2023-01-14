@@ -22,6 +22,7 @@ public class TestConstants {
     public static final String SAMPLE_COMPANY1 = "Test Company 1";
     public static final String SAMPLE_CATEGORY1 = "Test Category 1";
     public static final String SAMPLE_PRODUCT1 = "Test Product 1";
+    public static final String SAMPLE_PRODUCT2 = "Test Product 2";
     public static final String SAMPLE_CLIENT1 = "Test Client 1";
     public static final String SAMPLE_VENDOR1 = "Test Vendor 1";
     public static final String SAMPLE_EMAIL1 = "abc@def.com";
