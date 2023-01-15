@@ -4,6 +4,7 @@ import djrAccounting.dto.CompanyDto;
 import djrAccounting.dto.UserDto;
 import djrAccounting.entity.Company;
 import djrAccounting.enums.CompanyStatus;
+import djrAccounting.exception.CompanyNotFoundException;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.CompanyRepository;
 import djrAccounting.service.CompanyService;
@@ -30,7 +31,10 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public CompanyDto findById(Long id) {
-        return mapper.convert(companyRepository.findById(id).orElseThrow(), CompanyDto.class);
+        return mapper.convert(
+                companyRepository.findById(id)
+                        .orElseThrow(() -> new CompanyNotFoundException("Company not found this id: " + id)),
+                new CompanyDto());
     }
 
     @Override
@@ -58,23 +62,17 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public CompanyDto update(CompanyDto companyDto) {
-
-        Company dbCompany = companyRepository.findById(companyDto.getId()).orElseThrow();// TODO: 12/01/2023 CompanyNotFoundException
-
+        Company dbCompany = companyRepository.findById(companyDto.getId()).orElseThrow(
+                () -> new CompanyNotFoundException("Company not found this id: " + companyDto.getId()));
         Company convertedCompany = mapper.convert(companyDto, Company.class);
-
         convertedCompany.setCompanyStatus(dbCompany.getCompanyStatus());
-
         return mapper.convert(companyRepository.save(convertedCompany), CompanyDto.class);
     }
 
     @Override
     public CompanyDto save(CompanyDto companyDto) {
-
         Company company = mapper.convert(companyDto, Company.class);
-
         company.setCompanyStatus(CompanyStatus.ACTIVE);
-
         return mapper.convert(companyRepository.save(company), CompanyDto.class);
     }
 
