@@ -48,16 +48,14 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public void activateCompanyStatus(Long id) {
-        Company company = companyRepository.findById(id).orElseThrow(
-                () -> new CompanyNotFoundException("Company not found this id: " + id));
+        Company company = mapper.convert(findById(id), Company.class);
         company.setCompanyStatus(CompanyStatus.ACTIVE);
         companyRepository.save(company);
     }
 
     @Override
     public void deactivateCompanyStatus(Long id) {
-        Company company = companyRepository.findById(id).orElseThrow(
-                () -> new CompanyNotFoundException("Company not found this id: " + id));
+        Company company = mapper.convert(findById(id), Company.class);
         company.setCompanyStatus(CompanyStatus.PASSIVE);
         companyRepository.save(company);
     }
@@ -68,16 +66,14 @@ public class CompanyServiceImpl implements CompanyService {
                 () -> new CompanyNotFoundException("Company not found this id: " + companyDto.getId()));
         Company convertedCompany = mapper.convert(companyDto, Company.class);
         convertedCompany.setCompanyStatus(dbCompany.getCompanyStatus());
-        companyRepository.save(convertedCompany);
-        return mapper.convert(convertedCompany, CompanyDto.class);
+        return mapper.convert(companyRepository.save(convertedCompany), CompanyDto.class);
     }
 
     @Override
     public CompanyDto save(CompanyDto companyDto) {
         Company company = mapper.convert(companyDto, Company.class);
         company.setCompanyStatus(CompanyStatus.ACTIVE);
-        companyRepository.save(company);
-        return mapper.convert(company, CompanyDto.class);
+        return mapper.convert(companyRepository.save(company), CompanyDto.class);
     }
 
     @Override
