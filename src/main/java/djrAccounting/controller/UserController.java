@@ -68,7 +68,7 @@ public class UserController {
         UserDto userDto = userService.findById(id);
         UserDto loggedInUser = securityService.getLoggedInUser();
 
-        if(!userDto.getCompany().equals(loggedInUser.getCompany()) && loggedInUser.getId().equals(1L)) return "redirect:/users/list";
+        if(!userDto.getCompany().equals(loggedInUser.getCompany()) && !loggedInUser.getId().equals(1L)) return "redirect:/users/list";
 
         model.addAttribute("user", userService.findById(id));
         model.addAttribute("userRoles", roleService.listRoleByLoggedInUser());
