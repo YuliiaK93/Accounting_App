@@ -2,17 +2,22 @@ package djrAccounting.service.implementation;
 
 import djrAccounting.TestConstants;
 import djrAccounting.bootstrap.StaticConstants;
+import djrAccounting.dto.CompanyDto;
 import djrAccounting.dto.InvoiceDto;
-import djrAccounting.entity.Invoice;
-import djrAccounting.entity.InvoiceProduct;
-import djrAccounting.entity.Product;
+import djrAccounting.dto.UserDto;
+import djrAccounting.entity.*;
+import djrAccounting.enums.CompanyStatus;
 import djrAccounting.enums.InvoiceStatus;
 import djrAccounting.enums.InvoiceType;
+import djrAccounting.enums.RoleEnum;
 import djrAccounting.exception.InvoiceNotFoundException;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.InvoiceProductRepository;
 import djrAccounting.repository.InvoiceRepository;
+import djrAccounting.repository.UserRepository;
 import djrAccounting.service.ProductService;
+import djrAccounting.service.SecurityService;
+import djrAccounting.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +44,8 @@ class InvoiceServiceImplTest {
     private InvoiceProductRepository invoiceProductRepository;
     @Mock
     private ProductService productService;
+    @Mock
+    private SecurityService securityService;
     @InjectMocks
     private InvoiceServiceImpl invoiceService;
     @Spy
@@ -71,17 +78,54 @@ class InvoiceServiceImplTest {
         when(invoiceRepository.findById(TestConstants.SAMPLE_ID1)).thenReturn(Optional.of(salesInvoice));
         when(invoiceProductRepository.findByRemainingQuantityGreaterThanAndInvoice_InvoiceTypeAndProduct_IdOrderByLastUpdateDateTimeAsc(product1.getId())).thenReturn(List.of(purchaseInvoiceProduct1));
         when(invoiceProductRepository.findByRemainingQuantityGreaterThanAndInvoice_InvoiceTypeAndProduct_IdOrderByLastUpdateDateTimeAsc(product2.getId())).thenReturn(List.of(purchaseInvoiceProduct2));
-        product1.setQuantityInStock(product1.getQuantityInStock()-salesInvoiceProduct1.getQuantity());
-        product2.setQuantityInStock(product2.getQuantityInStock()-salesInvoiceProduct2.getQuantity());
+        product1.setQuantityInStock(product1.getQuantityInStock() - salesInvoiceProduct1.getQuantity());
+        product2.setQuantityInStock(product2.getQuantityInStock() - salesInvoiceProduct2.getQuantity());
         invoiceService.approveInvoiceById(TestConstants.SAMPLE_ID1);
 
         assertEquals(InvoiceStatus.APPROVED, salesInvoice.getInvoiceStatus());
         assertEquals(BigDecimal.valueOf(2200), salesInvoiceProduct1.getProfitLoss());
         assertEquals(BigDecimal.valueOf(-220), salesInvoiceProduct2.getProfitLoss());
-        assertEquals(2,purchaseInvoiceProduct1.getRemainingQuantity());
-        assertEquals(4,purchaseInvoiceProduct2.getRemainingQuantity());
-        assertEquals(6,product1.getQuantityInStock());
-        assertEquals(8,product2.getQuantityInStock());
+        assertEquals(2, purchaseInvoiceProduct1.getRemainingQuantity());
+        assertEquals(4, purchaseInvoiceProduct2.getRemainingQuantity());
+        assertEquals(6, product1.getQuantityInStock());
+        assertEquals(8, product2.getQuantityInStock());
     }
+
+    @Test
+    @DisplayName("When the company has no invoice, its first sales InvoiceNo should be S-001")
+    void nextSalesInvoiceNo_firstInvoice_test() {
+        CompanyDto companyDto = CompanyDto.builder().id(1L).companyStatus(CompanyStatus.ACTIVE).build();
+        UserDto userDto = UserDto.builder().id(1L).company(companyDto).build();
+        when(securityService.getLoggedInUser()).thenReturn(userDto);
+
+        assertEquals("S-001", invoiceService.nextSalesInvoiceNo());
+    }
+
+    @Test
+    @DisplayName("The next sales invoice no must be in same format with the consecutive number (1 digit)")
+    void nextSalesInvoiceNo_test() {
+        CompanyDto companyDto = CompanyDto.builder().id(1L).companyStatus(CompanyStatus.ACTIVE).build();
+        UserDto userDto = UserDto.builder().id(1L).company(companyDto).build();
+        Invoice invoice = Invoice.builder().invoiceNo(TestConstants.SAMPLE_SALES_INVOICE_NO1).build();
+
+        when(securityService.getLoggedInUser()).thenReturn(userDto);
+        when(invoiceRepository.findTopByCompanyIdAndInvoiceTypeOrderByIdDesc(1L, InvoiceType.SALES)).thenReturn(invoice);
+
+        assertEquals("S-002", invoiceService.nextSalesInvoiceNo());
+    }
+
+    @Test
+    @DisplayName("The next sales invoice no must be in same format with the consecutive number (2 digit)")
+    void nextSalesInvoiceNo_2digit_test() {
+        CompanyDto companyDto = CompanyDto.builder().id(1L).companyStatus(CompanyStatus.ACTIVE).build();
+        UserDto userDto = UserDto.builder().id(1L).company(companyDto).build();
+        Invoice invoice = Invoice.builder().invoiceNo("S-099").build();
+
+        when(securityService.getLoggedInUser()).thenReturn(userDto);
+        when(invoiceRepository.findTopByCompanyIdAndInvoiceTypeOrderByIdDesc(1L, InvoiceType.SALES)).thenReturn(invoice);
+
+        assertEquals("S-100", invoiceService.nextSalesInvoiceNo());
+    }
+
 
 }
