@@ -98,9 +98,12 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public String nextSalesInvoiceNo() {
-        Invoice invoice = invoiceRepository.findTopByCompanyIdOrderByIdDesc(securityService.getLoggedInUser()
+        Invoice invoice = invoiceRepository.findTopByCompanyIdAndInvoiceTypeOrderByIdDesc(securityService.getLoggedInUser()
                 .getCompany()
-                .getId());
+                .getId(), InvoiceType.SALES);
+
+        if (invoice == null) return "S-001";
+
         String invoiceNo = invoice.getInvoiceNo();
         String substring = invoiceNo.substring(2);
         int number = Integer.parseInt(substring) + 1;
@@ -132,9 +135,12 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public String nextPurchaseInvoiceNo() {
-        Invoice invoice = invoiceRepository.findTopByCompanyIdOrderByIdDesc(securityService.getLoggedInUser()
+        Invoice invoice = invoiceRepository.findTopByCompanyIdAndInvoiceTypeOrderByIdDesc(securityService.getLoggedInUser()
                 .getCompany()
-                .getId());
+                .getId(), InvoiceType.PURCHASE);
+
+        if (invoice == null) return "P-001";
+
         String invoiceNo = invoice.getInvoiceNo();//get number
         String substring = invoiceNo.substring(2);
         int number = Integer.parseInt(substring) + 1;
@@ -149,7 +155,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public void approveInvoiceById(Long id) {
-        Invoice invoice = invoiceRepository.findById(id).orElseThrow(()->new InvoiceNotFoundException("Invoice not found with id: "+id));
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow(() -> new InvoiceNotFoundException("Invoice not found with id: " + id));
         List<InvoiceProduct> invoiceProductList = invoice.getInvoiceProducts();
         invoiceProductList.forEach(salesInvoiceProduct -> {
             List<InvoiceProduct> purchaseInvoiceProducts = invoiceProductRepository.findByRemainingQuantityGreaterThanAndInvoice_InvoiceTypeAndProduct_IdOrderByLastUpdateDateTimeAsc(salesInvoiceProduct.getProduct().getId());
@@ -228,8 +234,8 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public void update(InvoiceDto invoiceDto) {
-        Invoice invoice=invoiceRepository.findById(invoiceDto.getId()).orElseThrow();
-        Invoice updatedInvoice=mapper.convert(invoiceDto, Invoice.class);
+        Invoice invoice = invoiceRepository.findById(invoiceDto.getId()).orElseThrow();
+        Invoice updatedInvoice = mapper.convert(invoiceDto, Invoice.class);
         updatedInvoice.setInvoiceStatus(invoice.getInvoiceStatus());
         invoiceRepository.save(updatedInvoice);
     }
