@@ -1,23 +1,18 @@
 package djrAccounting.service.implementation;
 
 import djrAccounting.TestConstants;
-import djrAccounting.bootstrap.StaticConstants;
 import djrAccounting.dto.CompanyDto;
-import djrAccounting.dto.InvoiceDto;
 import djrAccounting.dto.UserDto;
 import djrAccounting.entity.*;
 import djrAccounting.enums.CompanyStatus;
 import djrAccounting.enums.InvoiceStatus;
 import djrAccounting.enums.InvoiceType;
-import djrAccounting.enums.RoleEnum;
 import djrAccounting.exception.InvoiceNotFoundException;
 import djrAccounting.mapper.MapperUtil;
 import djrAccounting.repository.InvoiceProductRepository;
 import djrAccounting.repository.InvoiceRepository;
-import djrAccounting.repository.UserRepository;
 import djrAccounting.service.ProductService;
 import djrAccounting.service.SecurityService;
-import djrAccounting.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
