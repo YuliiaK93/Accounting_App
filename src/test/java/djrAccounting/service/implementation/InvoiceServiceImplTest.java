@@ -91,6 +91,7 @@ class InvoiceServiceImplTest {
     void nextSalesInvoiceNo_firstInvoice_test() {
         CompanyDto companyDto = CompanyDto.builder().id(1L).companyStatus(CompanyStatus.ACTIVE).build();
         UserDto userDto = UserDto.builder().id(1L).company(companyDto).build();
+
         when(securityService.getLoggedInUser()).thenReturn(userDto);
 
         assertEquals("S-001", invoiceService.nextSalesInvoiceNo());
@@ -127,6 +128,7 @@ class InvoiceServiceImplTest {
     void nextPurchaseInvoiceNo_firstInvoice_test() {
         CompanyDto companyDto = CompanyDto.builder().id(1L).companyStatus(CompanyStatus.ACTIVE).build();
         UserDto userDto = UserDto.builder().id(1L).company(companyDto).build();
+
         when(securityService.getLoggedInUser()).thenReturn(userDto);
 
         assertEquals("P-001", invoiceService.nextPurchaseInvoiceNo());
