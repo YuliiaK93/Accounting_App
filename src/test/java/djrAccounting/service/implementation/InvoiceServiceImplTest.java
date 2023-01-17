@@ -122,5 +122,40 @@ class InvoiceServiceImplTest {
         assertEquals("S-100", invoiceService.nextSalesInvoiceNo());
     }
 
+    @Test
+    @DisplayName("When the company has no invoice, its first purchase InvoiceNo should be P-001")
+    void nextPurchaseInvoiceNo_firstInvoice_test() {
+        CompanyDto companyDto = CompanyDto.builder().id(1L).companyStatus(CompanyStatus.ACTIVE).build();
+        UserDto userDto = UserDto.builder().id(1L).company(companyDto).build();
+        when(securityService.getLoggedInUser()).thenReturn(userDto);
+
+        assertEquals("P-001", invoiceService.nextPurchaseInvoiceNo());
+    }
+
+    @Test
+    @DisplayName("The next purchase invoice no must be in same format with the consecutive number (1 digit)")
+    void nextPurchaseInvoiceNo_test() {
+        CompanyDto companyDto = CompanyDto.builder().id(1L).companyStatus(CompanyStatus.ACTIVE).build();
+        UserDto userDto = UserDto.builder().id(1L).company(companyDto).build();
+        Invoice invoice = Invoice.builder().invoiceNo("P-007").build();
+
+        when(securityService.getLoggedInUser()).thenReturn(userDto);
+        when(invoiceRepository.findTopByCompanyIdAndInvoiceTypeOrderByIdDesc(1L, InvoiceType.PURCHASE)).thenReturn(invoice);
+
+        assertEquals("P-008", invoiceService.nextPurchaseInvoiceNo());
+    }
+
+    @Test
+    @DisplayName("The next purchase invoice no must be in same format with the consecutive number (2 digit)")
+    void nextPurchaseInvoiceNo_2digit_test() {
+        CompanyDto companyDto = CompanyDto.builder().id(1L).companyStatus(CompanyStatus.ACTIVE).build();
+        UserDto userDto = UserDto.builder().id(1L).company(companyDto).build();
+        Invoice invoice = Invoice.builder().invoiceNo("P-077").build();
+
+        when(securityService.getLoggedInUser()).thenReturn(userDto);
+        when(invoiceRepository.findTopByCompanyIdAndInvoiceTypeOrderByIdDesc(1L, InvoiceType.PURCHASE)).thenReturn(invoice);
+
+        assertEquals("P-078", invoiceService.nextPurchaseInvoiceNo());
+    }
 
 }
